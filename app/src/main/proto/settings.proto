@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_package = "sh.elizabeth.wastodon";
+option java_multiple_files = true;
+
+/*message Account {
+//  string access_token = 1;
+  string username = 2;
+  string name = 3;
+  string avatar_url = 4;
+//  string avatar_blur = 5;
+  string banner_url = 6;
+}*/
+
+message Settings {
+  map<string, string> app_secrets = 1;
+  string lastLoginInstance = 2;
+  map<string, string> accessTokens = 3;
+  string activeAccount = 4;
+}
