@@ -3,11 +3,12 @@ package sh.elizabeth.wastodon.ui.view.dashboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,25 +28,36 @@ fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(uiState: HomeUiState, onRefresh: (String) -> Unit) {
-	val pullrefreshState = rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
-	Column(
-		Modifier.wrapContentSize(Alignment.Center),
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.Center
+	val pullRefreshState =
+		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
+	Box(
+		Modifier
+			.fillMaxSize()
+			.pullRefresh(pullRefreshState, true)
+
 	) {
 		when (uiState) {
-			is HomeUiState.NoPosts -> Button(onClick = { onRefresh(uiState.activeAccount) }) {
-				Text("Refresh")
+			is HomeUiState.NoPosts -> if (!uiState.isLoading) Column(
+				Modifier
+					.fillMaxSize()
+					.verticalScroll(rememberScrollState()),
+				verticalArrangement = Arrangement.Center,
+				horizontalAlignment = Alignment.CenterHorizontally
+			) {
+				Text(text = "No posts yet!")
 			}
 
-			is HomeUiState.HasPosts -> Box(Modifier.pullRefresh(pullrefreshState)) {
-				LazyColumn(Modifier.fillMaxSize()) {
-					items(uiState.posts) { post ->
-						SlimPostCard(post = post)
-					}
+			is HomeUiState.HasPosts -> LazyColumn(Modifier.fillMaxSize()) {
+				items(uiState.posts) { post ->
+					SlimPostCard(post = post)
 				}
-				PullRefreshIndicator(uiState.isLoading, pullrefreshState, Modifier.align(Alignment.TopCenter))
 			}
 		}
+
+		PullRefreshIndicator(
+			uiState.isLoading,
+			pullRefreshState,
+			Modifier.align(Alignment.TopCenter)
+		)
 	}
 }

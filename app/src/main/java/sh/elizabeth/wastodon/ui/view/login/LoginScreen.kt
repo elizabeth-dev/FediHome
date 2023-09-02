@@ -3,6 +3,8 @@ package sh.elizabeth.wastodon.ui.view.login
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -10,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import sh.elizabeth.wastodon.ui.theme.WastodonTheme
@@ -45,7 +48,9 @@ fun LoginScreen(uiState: LoginUiState, navToDashboard: () -> Unit, onLogin: (Str
 					value = instance,
 					onValueChange = { setInstance(it) },
 					label = { Text("Instance") },
-					singleLine = true
+					singleLine = true,
+					keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
+					keyboardActions = KeyboardActions(onGo = { onLogin(instance) })
 				)
 				Spacer(Modifier.size(padding))
 				Button(modifier = Modifier.align(Alignment.End), onClick = { onLogin(instance) }) {
