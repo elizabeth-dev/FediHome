@@ -1,13 +1,14 @@
 package sh.elizabeth.wastodon.ui.view.dashboard
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,15 +55,10 @@ fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass) {
 					selectedTab = it
 				}
 			}
-			Column(
-				Modifier.fillMaxSize(),
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.Center
-			) {
-				if (selectedTab == HOME.route) HomeScreen()
-				if (selectedTab == NOTIFICATIONS.route) Text("Notifications screen")
-				if (selectedTab == SEARCH.route) Text("Search screen")
-			}
+			if (selectedTab == HOME.route) HomeScreen()
+			if (selectedTab == NOTIFICATIONS.route) Text("Notifications screen")
+			if (selectedTab == SEARCH.route) Text("Search screen")
+
 		}
 	}
 }
