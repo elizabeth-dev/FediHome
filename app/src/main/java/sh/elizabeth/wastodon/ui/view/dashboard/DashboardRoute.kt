@@ -28,7 +28,7 @@ fun DashboardRoute(
 	dashboardViewModel: DashboardViewModel = hiltViewModel(),
 	windowSizeClass: WindowSizeClass,
 	navToLogin: () -> Unit,
-	navToCompose: () -> Unit,
+	navToCompose: (String?) -> Unit,
 ) {
 	val uiState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -48,7 +48,7 @@ fun DashboardRoute(
 }
 
 @Composable
-fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass, navToCompose: () -> Unit) {
+fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass, navToCompose: (String?) -> Unit) {
 	var selectedTab by remember { mutableStateOf(HOME.route) }
 	Scaffold(bottomBar = {
 		if (windowWidthSizeClass == WindowWidthSizeClass.Compact) {
@@ -57,7 +57,7 @@ fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass, navToCompose: () 
 			}
 		}
 	}, floatingActionButton = {
-		PostFAB(onClick = navToCompose)
+		PostFAB(onClick = { navToCompose(null) })
 	}) { contentPadding ->
 		Row(
 			Modifier
@@ -69,7 +69,7 @@ fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass, navToCompose: () 
 					selectedTab = it
 				}
 			}
-			if (selectedTab == HOME.route) HomeScreen()
+			if (selectedTab == HOME.route) HomeScreen(navToCompose = navToCompose)
 			if (selectedTab == NOTIFICATIONS.route) Text("Notifications screen")
 			if (selectedTab == SEARCH.route) Text("Search screen")
 

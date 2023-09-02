@@ -19,15 +19,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.wastodon.ui.composable.SlimPostCard
 
 @Composable
-fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel(), navToCompose: (String) -> Unit) {
 	val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
-	HomeScreen(uiState = uiState, onRefresh = { homeViewModel.refreshTimeline(it) })
+	HomeScreen(
+		uiState = uiState,
+		onRefresh = { homeViewModel.refreshTimeline(it) },
+		onReply = navToCompose
+	)
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(uiState: HomeUiState, onRefresh: (String) -> Unit) {
+fun HomeScreen(uiState: HomeUiState, onRefresh: (String) -> Unit, onReply: (String) -> Unit) {
 	val pullRefreshState =
 		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
 	Box(
@@ -49,7 +53,7 @@ fun HomeScreen(uiState: HomeUiState, onRefresh: (String) -> Unit) {
 
 			is HomeUiState.HasPosts -> LazyColumn(Modifier.fillMaxSize()) {
 				items(uiState.posts) { post ->
-					SlimPostCard(post = post)
+					SlimPostCard(post = post, onReply = onReply)
 				}
 			}
 		}

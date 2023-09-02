@@ -22,6 +22,9 @@ class TimelineRepository @Inject constructor(
 
 		profileRepository.insertOrReplace(*profiles.toTypedArray())
 		postRepository.insertOrReplace(*posts.toTypedArray())
-		timelineLocalDataSource.insert(profileIdentifier, *posts.map(Post::id).toTypedArray())
+		timelineLocalDataSource.insert(
+			profileIdentifier,
+			*posts.map(Post::id).reversed().toTypedArray()
+		)
 	}
 }

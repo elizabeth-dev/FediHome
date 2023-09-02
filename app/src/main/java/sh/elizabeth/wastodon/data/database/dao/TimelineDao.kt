@@ -11,6 +11,6 @@ interface TimelineDao {
 	suspend fun insertTimelinePost(vararg timelinePost: TimelinePostCrossRefEntity): List<Long>
 
 	@Transaction
-	@Query("SELECT PostEntity.* FROM TimelinePostCrossRefEntity JOIN PostEntity ON PostEntity.postId = TimelinePostCrossRefEntity.timelinePostId WHERE TimelinePostCrossRefEntity.profileIdentifier = :profileIdentifier ORDER BY TimelinePostCrossRefEntity.timelinePostRow ASC")
+	@Query("SELECT PostEntity.* FROM TimelinePostCrossRefEntity JOIN PostEntity ON PostEntity.postId = TimelinePostCrossRefEntity.timelinePostId WHERE TimelinePostCrossRefEntity.profileIdentifier = :profileIdentifier ORDER BY TimelinePostCrossRefEntity.timelinePostRow DESC")
 	fun getTimelinePosts(profileIdentifier: String): Flow<List<PostWithAuthor>>
 }

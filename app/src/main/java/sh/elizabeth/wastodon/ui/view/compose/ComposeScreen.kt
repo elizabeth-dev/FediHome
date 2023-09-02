@@ -165,7 +165,7 @@ fun ComposeScreenPreview() {
 				name = "Elizabeth",
 				avatarUrl = null,
 				instance = "blahaj.zone",
-				fullUsername = "bar@blahaj.zone",
+				fullUsername = "elizabeth@blahaj.zone",
 				headerUrl = null,
 			)
 		), { _, _ -> }, {})
