@@ -1,5 +1,6 @@
 package sh.elizabeth.wastodon
 
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
@@ -7,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
-import sh.elizabeth.wastodon.ui.view.home.HomeRoute
+import sh.elizabeth.wastodon.ui.view.dashboard.DashboardRoute
 import sh.elizabeth.wastodon.ui.view.login.LoginRoute
 import sh.elizabeth.wastodon.util.APP_DEEPLINK_URI
 
@@ -16,14 +17,15 @@ const val TOKEN_PARAM = "token"
 @Composable
 fun MainNavGraph(
 	navController: NavHostController = rememberNavController(),
-	startDestination: String = MainDestinations.HOME_ROUTE,
+	startDestination: String = MainDestinations.DASHBOARD_ROUTE,
 	navActions: MainNavigationActions = remember(navController) {
 		MainNavigationActions(navController)
 	},
+	windowSizeClass: WindowSizeClass,
 ) {
 	NavHost(startDestination = startDestination, navController = navController) {
-		composable(MainDestinations.HOME_ROUTE) {
-			HomeRoute(navToLogin = navActions.navigateToLogin)
+		composable(MainDestinations.DASHBOARD_ROUTE) {
+			DashboardRoute(windowSizeClass = windowSizeClass, navToLogin = navActions.navigateToLogin)
 		}
 		composable(
 			route = MainDestinations.LOGIN_ROUTE,
@@ -32,7 +34,7 @@ fun MainNavGraph(
 					"$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}?token={$TOKEN_PARAM}"
 			})
 		) {
-			LoginRoute(navToHome = navActions.navigateToHome)
+			LoginRoute(navToDashboard = navActions.navigateToDashboard)
 		}
 
 	}

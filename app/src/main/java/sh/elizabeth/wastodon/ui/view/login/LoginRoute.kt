@@ -6,17 +6,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun LoginRoute(loginViewModel: LoginViewModel = hiltViewModel(), navToHome: () -> Unit) {
+fun LoginRoute(loginViewModel: LoginViewModel = hiltViewModel(), navToDashboard: () -> Unit) {
 	val uiState by loginViewModel.uiState.collectAsStateWithLifecycle()
 
-	LoginRoute(uiState = uiState, navToHome = navToHome, onLogin = loginViewModel::getLoginUrl)
+	LoginRoute(uiState = uiState, navToDashboard = navToDashboard, onLogin = loginViewModel::getLoginUrl)
 }
 
 @Composable
-fun LoginRoute(uiState: LoginUiState, navToHome: () -> Unit, onLogin: (String) -> Unit) {
+fun LoginRoute(uiState: LoginUiState, navToDashboard: () -> Unit, onLogin: (String) -> Unit) {
 	LoginScreen(
 		uiState = uiState,
-		navToHome = navToHome,
+		navToDashboard = navToDashboard,
 		onLogin = onLogin
 	)
 }

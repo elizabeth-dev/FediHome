@@ -19,7 +19,7 @@ val padding = 16.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(uiState: LoginUiState, navToHome: () -> Unit, onLogin: (String) -> Unit) {
+fun LoginScreen(uiState: LoginUiState, navToDashboard: () -> Unit, onLogin: (String) -> Unit) {
 	val context = LocalContext.current
 	val (instance, setInstance) = remember { mutableStateOf("") }
 
@@ -28,7 +28,7 @@ fun LoginScreen(uiState: LoginUiState, navToHome: () -> Unit, onLogin: (String) 
 	}
 
 	if (uiState.successfulLogin) {
-		navToHome()
+		navToDashboard()
 		return
 	}
 
@@ -58,7 +58,7 @@ fun LoginScreenPreview() {
 	WastodonTheme {
 		LoginScreen(
 			uiState = LoginUiState(isLoading = false, errorMessage = "Login failed"),
-			navToHome = {},
+			navToDashboard = {},
 			onLogin = {})
 	}
 }
@@ -70,7 +70,7 @@ fun LoginScreenLoadingPreview() {
 	WastodonTheme {
 		LoginScreen(
 			uiState = LoginUiState(isLoading = true, errorMessage = "Login failed"),
-			navToHome = {},
+			navToDashboard = {},
 			onLogin = {})
 	}
 }
