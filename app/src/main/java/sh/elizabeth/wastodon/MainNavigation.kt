@@ -32,7 +32,7 @@ class MainNavigationActions(val navController: NavHostController) {
 
 	fun navigateToCompose(replyTo: String? = null) {
 		navController.navigate(
-			if (replyTo.isNullOrEmpty()) MainDestinations.COMPOSE_ROUTE else "${MainDestinations.COMPOSE_ROUTE}?replyTo=$replyTo"
+			if (replyTo.isNullOrBlank()) MainDestinations.COMPOSE_ROUTE else "${MainDestinations.COMPOSE_ROUTE}?replyTo=$replyTo"
 		) {
 			popUpTo(navController.graph.findStartDestination().id) {
 				saveState = true

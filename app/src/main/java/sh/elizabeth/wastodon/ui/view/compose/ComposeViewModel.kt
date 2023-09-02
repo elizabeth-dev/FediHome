@@ -51,7 +51,7 @@ class ComposeViewModel @Inject constructor(
 				createPostUseCase(
 					it, PostDraft(
 						text = text,
-						cw = if (contentWarning.isNullOrEmpty()) null else contentWarning,
+						cw = if (contentWarning.isNullOrBlank()) null else contentWarning,
 						visibility = PostVisibility.PUBLIC,
 						visibleUserIds = emptyList(),
 						localOnly = false,

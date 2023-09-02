@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d7bdb478f8ad97d6c9c6486f8b467098",
+    "identityHash": "3df66afe458a2f1b39dc2a61fd3d6416",
     "entities": [
       {
         "tableName": "ProfileEntity",
@@ -88,7 +88,7 @@
       },
       {
         "tableName": "PostEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `postId` TEXT NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `cw` TEXT, `text` TEXT NOT NULL, `authorId` TEXT NOT NULL, FOREIGN KEY(`authorId`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `postId` TEXT NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `cw` TEXT, `text` TEXT, `authorId` TEXT NOT NULL, `quoteId` TEXT, FOREIGN KEY(`authorId`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`quoteId`) REFERENCES `PostEntity`(`postId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "postRow",
@@ -124,13 +124,19 @@
             "fieldPath": "text",
             "columnName": "text",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "authorId",
             "columnName": "authorId",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "quoteId",
+            "columnName": "quoteId",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -157,6 +163,15 @@
             ],
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_PostEntity_postId` ON `${TABLE_NAME}` (`postId`)"
+          },
+          {
+            "name": "index_PostEntity_quoteId",
+            "unique": false,
+            "columnNames": [
+              "quoteId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_PostEntity_quoteId` ON `${TABLE_NAME}` (`quoteId`)"
           }
         ],
         "foreignKeys": [
@@ -170,12 +185,23 @@
             "referencedColumns": [
               "profileId"
             ]
+          },
+          {
+            "table": "PostEntity",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "quoteId"
+            ],
+            "referencedColumns": [
+              "postId"
+            ]
           }
         ]
       },
       {
         "tableName": "TimelinePostCrossRefEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timelinePostRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileIdentifier` TEXT NOT NULL, `timelinePostId` TEXT NOT NULL, FOREIGN KEY(`timelinePostId`) REFERENCES `PostEntity`(`postId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timelinePostRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileIdentifier` TEXT NOT NULL, `timelinePostId` TEXT NOT NULL, `repostedBy` TEXT, FOREIGN KEY(`timelinePostId`) REFERENCES `PostEntity`(`postId`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`repostedBy`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "timelinePostRow",
@@ -194,6 +220,12 @@
             "columnName": "timelinePostId",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "repostedBy",
+            "columnName": "repostedBy",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -221,6 +253,15 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_TimelinePostCrossRefEntity_timelinePostId` ON `${TABLE_NAME}` (`timelinePostId`)"
+          },
+          {
+            "name": "index_TimelinePostCrossRefEntity_repostedBy",
+            "unique": false,
+            "columnNames": [
+              "repostedBy"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TimelinePostCrossRefEntity_repostedBy` ON `${TABLE_NAME}` (`repostedBy`)"
           }
         ],
         "foreignKeys": [
@@ -234,6 +275,17 @@
             "referencedColumns": [
               "postId"
             ]
+          },
+          {
+            "table": "ProfileEntity",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "repostedBy"
+            ],
+            "referencedColumns": [
+              "profileId"
+            ]
           }
         ]
       }
@@ -241,7 +293,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd7bdb478f8ad97d6c9c6486f8b467098')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3df66afe458a2f1b39dc2a61fd3d6416')"
     ]
   }
 }

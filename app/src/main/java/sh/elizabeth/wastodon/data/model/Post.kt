@@ -71,11 +71,31 @@ data class PollChoice(
 	val isVoted: Boolean,
 )
 
-fun Post.toDomain(fetchedFromInstance: String) = DomainPost(
-	id = id,
-	createdAt = createdAt,
-	updatedAt = updatedAt,
-	text = text ?: "boost",
-	cw = cw,
-	author = user.toDomain(fetchedFromInstance),
-)
+// Needs to have text, poll, files, or maybe a reply?
+fun Post.isQuote(): Boolean =
+	renote != null && (!text.isNullOrBlank() || poll != null || files.isNotEmpty() || reply != null)
+
+fun Post.toDomain(fetchedFromInstance: String): DomainPost {
+	if (renote != null && !isQuote()) {
+		return DomainPost(
+			id = renote.id,
+			createdAt = renote.createdAt,
+			updatedAt = renote.updatedAt,
+			text = renote.text,
+			cw = renote.cw,
+			author = renote.user.toDomain(fetchedFromInstance),
+			repostedBy = user.toDomain(fetchedFromInstance),
+			quote = renote.renote?.toDomain(fetchedFromInstance),
+		)
+	}
+	return DomainPost(
+		id = id,
+		createdAt = createdAt,
+		updatedAt = updatedAt,
+		text = text,
+		cw = cw,
+		author = user.toDomain(fetchedFromInstance),
+		repostedBy = null,
+		quote = renote?.toDomain(fetchedFromInstance),
+	)
+}

@@ -41,9 +41,11 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import sh.elizabeth.wastodon.model.Post
 import sh.elizabeth.wastodon.model.Profile
 import sh.elizabeth.wastodon.ui.composable.SlimProfileCard
 import sh.elizabeth.wastodon.ui.theme.WastodonTheme
+import java.time.Instant
 
 @Composable
 fun ComposeScreen(
@@ -186,6 +188,26 @@ fun ComposeScreenPreview() {
 				instance = "blahaj.zone",
 				fullUsername = "elizabeth@blahaj.zone",
 				headerUrl = null,
+			),
+			isReply = true,
+			replyTo = Post(
+				id = "foo",
+				createdAt = Instant.now(),
+				updatedAt = null,
+				cw = null,
+				text = "bar",
+				author = Profile(
+					id = "foo",
+					username = "elizabeth",
+					name = "Elizabeth",
+					avatarUrl = null,
+					instance = "blahaj.zone",
+					fullUsername = "elizabeth@blahaj.zone",
+					headerUrl = null,
+
+					),
+				quote = null,
+				repostedBy = null
 			)
 		), { _, _ -> }, {})
 	}

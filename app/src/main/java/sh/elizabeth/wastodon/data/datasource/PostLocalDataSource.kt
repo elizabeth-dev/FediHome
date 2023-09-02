@@ -21,4 +21,5 @@ fun Post.toEntity() = PostEntity(
 	cw = cw,
 	text = text,
 	authorId = author.id,
+	quoteId = quote?.id
 )

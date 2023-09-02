@@ -9,15 +9,20 @@ import androidx.room.PrimaryKey
 	indices = [Index(
 		value = ["profileIdentifier", "timelinePostId"],
 		unique = true
-	), Index(value = ["timelinePostId"])],
+	), Index(value = ["timelinePostId"]), Index(value = ["repostedBy"])],
 	foreignKeys = [ForeignKey(
 		entity = PostEntity::class,
 		parentColumns = ["postId"],
 		childColumns = ["timelinePostId"]
+	), ForeignKey(
+		entity = ProfileEntity::class,
+		parentColumns = ["profileId"],
+		childColumns = ["repostedBy"]
 	)]
 )
 data class TimelinePostCrossRefEntity(
 	@PrimaryKey(autoGenerate = true) var timelinePostRow: Long = 0,
 	val profileIdentifier: String,
 	val timelinePostId: String,
+	val repostedBy: String?,
 )

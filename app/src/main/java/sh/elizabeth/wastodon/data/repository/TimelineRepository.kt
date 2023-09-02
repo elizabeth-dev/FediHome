@@ -2,9 +2,12 @@ package sh.elizabeth.wastodon.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import sh.elizabeth.wastodon.data.datasource.TimelineLocalDataSource
+import sh.elizabeth.wastodon.data.datasource.TimelinePost
 import sh.elizabeth.wastodon.data.datasource.TimelineRemoteDataSource
 import sh.elizabeth.wastodon.data.model.toDomain
 import sh.elizabeth.wastodon.model.Post
+import sh.elizabeth.wastodon.model.unwrapProfiles
+import sh.elizabeth.wastodon.model.unwrapQuotes
 import javax.inject.Inject
 
 class TimelineRepository @Inject constructor(
@@ -18,13 +21,16 @@ class TimelineRepository @Inject constructor(
 
 	suspend fun fetchTimeline(instance: String, profileIdentifier: String) {
 		val posts = timelineRemoteDataSource.getHome(instance).map { it.toDomain(instance) }
-		val profiles = posts.map(Post::author).toSet()
+		val unWrappedPosts = posts.flatMap { it.unwrapQuotes() }
+		val profiles = unWrappedPosts.flatMap { it.unwrapProfiles() }.toSet()
 
 		profileRepository.insertOrReplace(*profiles.toTypedArray())
-		postRepository.insertOrReplace(*posts.toTypedArray())
+		postRepository.insertOrReplace(*unWrappedPosts.toTypedArray())
 		timelineLocalDataSource.insert(
 			profileIdentifier,
-			*posts.map(Post::id).reversed().toTypedArray()
+			*posts.map { TimelinePost(postId = it.id, repostedById = it.repostedBy?.id) }
+				.reversed()
+				.toTypedArray()
 		)
 	}
 }
