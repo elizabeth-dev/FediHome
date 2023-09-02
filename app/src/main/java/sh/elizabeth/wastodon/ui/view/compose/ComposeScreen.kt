@@ -29,10 +29,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,6 +55,17 @@ fun ComposeScreen(
 	val (contentWarning, setContentWarning) = remember { mutableStateOf("") }
 	val (isCWVisible, setCWVisible) = remember { mutableStateOf(false) }
 
+	val postFocus = remember { FocusRequester() }
+	val cwFocus = remember { FocusRequester() }
+
+	LaunchedEffect(Unit) {
+		postFocus.requestFocus()
+	}
+
+	LaunchedEffect(isCWVisible) {
+		if (isCWVisible) cwFocus.requestFocus()
+	}
+
 	Surface(
 		Modifier
 			.fillMaxSize()
@@ -63,8 +77,7 @@ fun ComposeScreen(
 			Surface(
 				modifier = Modifier
 					.padding(bottom = 8.dp)
-					.fillMaxWidth(),
-				tonalElevation = 6.dp
+					.fillMaxWidth(), tonalElevation = 6.dp
 			) {
 				Row(
 					Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
@@ -74,7 +87,11 @@ fun ComposeScreen(
 						Icon(Icons.Outlined.ArrowBack, contentDescription = "Close")
 					}
 					Spacer(modifier = Modifier.weight(1f))
-					Button(onClick = { onSendPost(postText, contentWarning) }) {
+					Button(onClick = {
+						onSendPost(
+							postText, if (isCWVisible) contentWarning else null
+						)
+					}) {
 						Text("Send")
 					}
 				}
@@ -88,8 +105,7 @@ fun ComposeScreen(
 				Row(
 					modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
 					horizontalArrangement = Arrangement.spacedBy(
-						8.dp,
-						Alignment.CenterHorizontally
+						8.dp, Alignment.CenterHorizontally
 					),
 					verticalAlignment = Alignment.CenterVertically
 				) {
@@ -102,7 +118,9 @@ fun ComposeScreen(
 			)
 			AnimatedVisibility(visible = isCWVisible) {
 				TextField(
-					modifier = Modifier.fillMaxWidth(),
+					modifier = Modifier
+						.fillMaxWidth()
+						.focusRequester(cwFocus),
 					value = contentWarning,
 					onValueChange = { setContentWarning(it) },
 					placeholder = { Text("Content warning") },
@@ -119,7 +137,8 @@ fun ComposeScreen(
 			TextField(
 				modifier = Modifier
 					.fillMaxWidth()
-					.weight(1f),
+					.weight(1f)
+					.focusRequester(postFocus),
 				value = postText,
 				onValueChange = { setPostText(it) },
 				placeholder = { Text("Type what's on your mind") },
