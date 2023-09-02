@@ -41,7 +41,12 @@ fun LoginScreen(uiState: LoginUiState, navToDashboard: () -> Unit, onLogin: (Str
 			if (uiState.isLoading) {
 				CircularProgressIndicator()
 			} else {
-				TextField(value = instance, onValueChange = { setInstance(it) }, label = { Text("Instance") })
+				TextField(
+					value = instance,
+					onValueChange = { setInstance(it) },
+					label = { Text("Instance") },
+					singleLine = true
+				)
 				Spacer(Modifier.size(padding))
 				Button(modifier = Modifier.align(Alignment.End), onClick = { onLogin(instance) }) {
 					Text("Login", style = MaterialTheme.typography.labelLarge)

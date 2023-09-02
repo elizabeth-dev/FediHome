@@ -9,14 +9,18 @@ import sh.elizabeth.wastodon.model.Profile
 	indices = [
 		// TODO: Maybe add an Index for fullUsername? or stop storing fullUsername?
 		Index(
-			value = ["instance", "accountId"],
+			value = ["instance", "profileId"],
 			unique = true
+		),
+		Index(
+			value = ["profileId"],
+			unique = true // FIXME: not actually unique, although calckey api might return a unique id. check this.
 		)
 	]
 )
 data class ProfileEntity(
-	@PrimaryKey(autoGenerate = true) var id: Long = 0,
-	val accountId: String,
+	@PrimaryKey(autoGenerate = true) var profileRow: Long = 0,
+	val profileId: String,
 	val name: String?,
 	val username: String,
 	val instance: String,
@@ -26,7 +30,7 @@ data class ProfileEntity(
 )
 
 fun ProfileEntity.toDomain() = Profile(
-	id = accountId,
+	id = profileId,
 	name = name,
 	username = username,
 	instance = instance,

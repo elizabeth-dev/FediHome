@@ -8,14 +8,14 @@ import javax.inject.Inject
 
 class ProfileLocalDataSource @Inject constructor(private val profileDao: ProfileDao) {
 	suspend fun insertOrReplace(vararg profiles: Profile): List<Long> =
-		profileDao.insertOrReplace(*profiles.map { it.toEntity() }.toTypedArray())
+		profileDao.insertOrReplace(*profiles.map(Profile::toEntity).toTypedArray())
 
-	suspend fun getByInstanceAndAccountId(instance: String, accountId: String): Profile? =
-		profileDao.getByInstanceAndAccountId(instance, accountId)?.toDomain()
+	suspend fun getByInstanceAndProfileId(instance: String, profileId: String): Profile? =
+		profileDao.getByInstanceAndProfileId(instance, profileId)?.toDomain()
 }
 
 fun Profile.toEntity() = ProfileEntity(
-	accountId = id,
+	profileId = id,
 	name = name,
 	username = username,
 	instance = instance,

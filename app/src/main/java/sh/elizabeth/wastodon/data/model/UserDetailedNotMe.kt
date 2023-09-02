@@ -88,6 +88,7 @@ data class UserDetailedNotMe(
 	val isBlocked: Boolean? = null,
 	val isMuted: Boolean? = null,
 	val isRenoteMuted: Boolean? = null,
+	val driveCapacityOverrideMb: Int? = null,
 )
 
 fun UserDetailedNotMe.toDomain(fetchedFromInstance: String): Profile = Profile(

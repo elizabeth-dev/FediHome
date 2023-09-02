@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import sh.elizabeth.wastodon.TOKEN_PARAM
 import sh.elizabeth.wastodon.data.repository.AuthRepository
-import sh.elizabeth.wastodon.data.repository.ProfileRepository
+import sh.elizabeth.wastodon.domain.FinishOAuthUseCase
 import javax.inject.Inject
 
 data class LoginUiState(
@@ -24,7 +24,7 @@ data class LoginUiState(
 class LoginViewModel @Inject constructor(
 	savedStateHandle: SavedStateHandle,
 	private val authRepository: AuthRepository,
-	private val profileRepository: ProfileRepository,
+	private val finishOAuthUseCase: FinishOAuthUseCase,
 ) : ViewModel() {
 	private val _uiState = MutableStateFlow(LoginUiState(isLoading = false))
 	val uiState = _uiState.asStateFlow()
@@ -49,7 +49,6 @@ class LoginViewModel @Inject constructor(
 
 	private suspend fun onTokenReceived(token: String) {
 		// TODO: Handle errors here
-		val profile = authRepository.finishOAuth(token)
-		profileRepository.insertOrReplace(profile)
+		finishOAuthUseCase(token)
 	}
 }

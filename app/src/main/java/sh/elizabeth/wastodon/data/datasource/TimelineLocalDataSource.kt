@@ -1,0 +1,23 @@
+package sh.elizabeth.wastodon.data.datasource
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import sh.elizabeth.wastodon.data.database.dao.TimelineDao
+import sh.elizabeth.wastodon.data.database.entity.PostWithAuthor
+import sh.elizabeth.wastodon.data.database.entity.TimelinePostCrossRefEntity
+import sh.elizabeth.wastodon.data.database.entity.toPostDomain
+import sh.elizabeth.wastodon.model.Post
+import javax.inject.Inject
+
+class TimelineLocalDataSource @Inject constructor(private val timelineDao: TimelineDao) {
+	suspend fun insert(profileIdentifier: String, vararg postIds: String): List<Long> =
+		timelineDao.insertTimelinePost(*postIds.map { postId ->
+			TimelinePostCrossRefEntity(
+				profileIdentifier = profileIdentifier,
+				timelinePostId = postId
+			)
+		}.toTypedArray())
+
+	fun getTimelinePosts(profileIdentifier: String): Flow<List<Post>> =
+		timelineDao.getTimelinePosts(profileIdentifier).map { it.map(PostWithAuthor::toPostDomain) }
+}

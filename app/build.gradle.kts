@@ -72,6 +72,11 @@ kapt {
 	correctErrorTypes = true
 }
 
+ksp {
+	arg("room.schemaLocation", "$projectDir/schemas")
+	arg("room.incremental", "true")
+}
+
 protobuf {
 	protoc {
 		artifact = "com.google.protobuf:protoc:3.23.4"
@@ -98,6 +103,7 @@ dependencies {
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
+	implementation("androidx.compose.material:material")
 	implementation("androidx.compose.material3:material3")
 	implementation("androidx.compose.material:material-icons-extended")
 	implementation("androidx.compose.material3:material3-window-size-class")
@@ -134,6 +140,7 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
 	implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 	implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+	implementation("io.ktor:ktor-client-auth:$ktorVersion")
 
 	val roomVersion = "2.5.2"
 	implementation("androidx.room:room-runtime:$roomVersion")

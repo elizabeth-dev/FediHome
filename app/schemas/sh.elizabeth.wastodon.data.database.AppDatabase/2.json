@@ -1,0 +1,247 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "2bc87a270fb0f6de982a5fcd42876c9c",
+    "entities": [
+      {
+        "tableName": "ProfileEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileId` TEXT NOT NULL, `name` TEXT, `username` TEXT NOT NULL, `instance` TEXT NOT NULL, `fullUsername` TEXT NOT NULL, `avatarUrl` TEXT, `headerUrl` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "profileRow",
+            "columnName": "profileRow",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileId",
+            "columnName": "profileId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "instance",
+            "columnName": "instance",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fullUsername",
+            "columnName": "fullUsername",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatarUrl",
+            "columnName": "avatarUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "headerUrl",
+            "columnName": "headerUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "profileRow"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ProfileEntity_instance_profileId",
+            "unique": true,
+            "columnNames": [
+              "instance",
+              "profileId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ProfileEntity_instance_profileId` ON `${TABLE_NAME}` (`instance`, `profileId`)"
+          },
+          {
+            "name": "index_ProfileEntity_profileId",
+            "unique": true,
+            "columnNames": [
+              "profileId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ProfileEntity_profileId` ON `${TABLE_NAME}` (`profileId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "PostEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `postId` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `cw` TEXT, `text` TEXT NOT NULL, `authorId` TEXT NOT NULL, FOREIGN KEY(`authorId`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "postRow",
+            "columnName": "postRow",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "postId",
+            "columnName": "postId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cw",
+            "columnName": "cw",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "authorId",
+            "columnName": "authorId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "postRow"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_PostEntity_authorId",
+            "unique": false,
+            "columnNames": [
+              "authorId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_PostEntity_authorId` ON `${TABLE_NAME}` (`authorId`)"
+          },
+          {
+            "name": "index_PostEntity_postId",
+            "unique": true,
+            "columnNames": [
+              "postId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_PostEntity_postId` ON `${TABLE_NAME}` (`postId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ProfileEntity",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "authorId"
+            ],
+            "referencedColumns": [
+              "profileId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "TimelinePostCrossRefEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timelinePostRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileIdentifier` TEXT NOT NULL, `timelinePostId` TEXT NOT NULL, FOREIGN KEY(`timelinePostId`) REFERENCES `PostEntity`(`postId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "timelinePostRow",
+            "columnName": "timelinePostRow",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileIdentifier",
+            "columnName": "profileIdentifier",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timelinePostId",
+            "columnName": "timelinePostId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "timelinePostRow"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_TimelinePostCrossRefEntity_profileIdentifier_timelinePostId",
+            "unique": true,
+            "columnNames": [
+              "profileIdentifier",
+              "timelinePostId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_TimelinePostCrossRefEntity_profileIdentifier_timelinePostId` ON `${TABLE_NAME}` (`profileIdentifier`, `timelinePostId`)"
+          },
+          {
+            "name": "index_TimelinePostCrossRefEntity_timelinePostId",
+            "unique": false,
+            "columnNames": [
+              "timelinePostId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TimelinePostCrossRefEntity_timelinePostId` ON `${TABLE_NAME}` (`timelinePostId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "PostEntity",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "timelinePostId"
+            ],
+            "referencedColumns": [
+              "postId"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2bc87a270fb0f6de982a5fcd42876c9c')"
+    ]
+  }
+}

@@ -8,35 +8,35 @@ import sh.elizabeth.wastodon.data.model.*
 import javax.inject.Inject
 
 class AuthRemoteDataSource @Inject constructor(private val httpClient: HttpClient) {
-    suspend fun createApp(
-        instance: String,
-        name: String,
-        description: String,
-        permission: List<String>,
-        callbackUrl: String
-    ): CreateAppResponse = httpClient.post(Url("https://$instance/api/app/create")) {
-        contentType(ContentType.Application.Json)
-        setBody(
-            CreateAppRequest(
-                name = name,
-                description = description,
-                permission = permission,
-                callbackUrl = callbackUrl
-            )
-        )
-    }.body()
+	suspend fun createApp(
+		instance: String,
+		name: String,
+		description: String,
+		permission: List<String>,
+		callbackUrl: String,
+	): CreateAppResponse = httpClient.post("https://$instance/api/app/create") {
+		contentType(ContentType.Application.Json)
+		setBody(
+			CreateAppRequest(
+				name = name,
+				description = description,
+				permission = permission,
+				callbackUrl = callbackUrl
+			)
+		)
+	}.body()
 
-    suspend fun generateSession(instance: String, appSecret: String): GenerateSessionResponse = httpClient.post(
-        Url("https://$instance/api/auth/session/generate")
-    ) {
-        contentType(ContentType.Application.Json)
-        setBody(GenerateSessionRequest(appSecret = appSecret))
-    }.body()
+	suspend fun generateSession(instance: String, appSecret: String): GenerateSessionResponse = httpClient.post(
+		"https://$instance/api/auth/session/generate"
+	) {
+		contentType(ContentType.Application.Json)
+		setBody(GenerateSessionRequest(appSecret = appSecret))
+	}.body()
 
-    suspend fun getUserKey(instance: String, appSecret: String, token: String): UserKeyResponse = httpClient.post(
-        Url("https://$instance/api/auth/session/userkey")
-    ) {
-        contentType(ContentType.Application.Json)
-        setBody(UserKeyRequest(appSecret = appSecret, token = token))
-    }.body()
+	suspend fun getUserKey(instance: String, appSecret: String, token: String): UserKeyResponse = httpClient.post(
+		"https://$instance/api/auth/session/userkey"
+	) {
+		contentType(ContentType.Application.Json)
+		setBody(UserKeyRequest(appSecret = appSecret, token = token))
+	}.body()
 }

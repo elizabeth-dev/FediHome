@@ -15,6 +15,6 @@ interface ProfileDao {
 	suspend fun getByFullUsername(fullUsername: String): ProfileEntity?
 
 	// TODO: Maybe make this Flow<ProfileEntity> ?
-	@Query("SELECT * FROM ProfileEntity WHERE instance = :instance AND accountId = :accountId LIMIT 1")
-	suspend fun getByInstanceAndAccountId(instance: String, accountId: String): ProfileEntity?
+	@Query("SELECT * FROM ProfileEntity WHERE instance = :instance AND profileId = :profileId LIMIT 1")
+	suspend fun getByInstanceAndProfileId(instance: String, profileId: String): ProfileEntity?
 }
