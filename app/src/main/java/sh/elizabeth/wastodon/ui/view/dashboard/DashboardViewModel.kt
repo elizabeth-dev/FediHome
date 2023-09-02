@@ -16,8 +16,7 @@ data class DashboardUiState(
 )
 
 @HiltViewModel
-class DashboardViewModel @Inject constructor(authRepository: AuthRepository) :
-	ViewModel() {
+class DashboardViewModel @Inject constructor(authRepository: AuthRepository) : ViewModel() {
 	private val _uiState = MutableStateFlow(DashboardUiState())
 	val uiState = combine(
 		_uiState,

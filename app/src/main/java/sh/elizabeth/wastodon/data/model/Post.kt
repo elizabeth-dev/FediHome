@@ -1,8 +1,27 @@
 package sh.elizabeth.wastodon.data.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import sh.elizabeth.wastodon.util.InstantAsString
 import sh.elizabeth.wastodon.model.Post as DomainPost
+
+@Serializable
+enum class PostVisibility {
+	@SerialName("public")
+	PUBLIC,
+
+	@SerialName("home")
+	HOME,
+
+	@SerialName("followers")
+	FOLLOWERS,
+
+	@SerialName("specified")
+	SPECIFIED,
+
+	@SerialName("hidden") // ???
+	HIDDEN,
+}
 
 @Serializable
 data class Post(
@@ -17,7 +36,7 @@ data class Post(
 	val reply: Post? = null,
 	val renoteId: String? = null,
 	val renote: Post? = null,
-	val visibility: String,
+	val visibility: PostVisibility,
 	val mentions: List<String>? = emptyList(), // Strings are user ids
 	// val visibleUserIds: List<String>, // Never seen in blahaj.zone API
 	val fileIds: List<String>,
@@ -41,13 +60,14 @@ data class Post(
 data class Poll(
 	val multiple: Boolean,
 	val expiresAt: InstantAsString? = null,
+	val expiredAfter: Int? = null, // Millis, only present when posting
 	val choices: List<PollChoice>,
 )
 
 @Serializable
 data class PollChoice(
 	val text: String,
-	val votesCount: Int,
+	val votes: Int,
 	val isVoted: Boolean,
 )
 

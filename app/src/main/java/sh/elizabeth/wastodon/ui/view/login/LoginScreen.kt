@@ -2,10 +2,20 @@ package sh.elizabeth.wastodon.ui.view.login
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,7 +30,6 @@ import sh.elizabeth.wastodon.util.openLinkInCustomTab
 
 val padding = 16.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(uiState: LoginUiState, navToDashboard: () -> Unit, onLogin: (String) -> Unit) {
 	val context = LocalContext.current

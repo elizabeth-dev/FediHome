@@ -8,4 +8,7 @@ class ProfileRepository @Inject constructor(private val profileLocalDataSource: 
 	suspend fun insertOrReplace(vararg profiles: Profile) {
 		profileLocalDataSource.insertOrReplace(*profiles)
 	}
+
+	suspend fun getByInstanceAndProfileId(instance: String, profileId: String): Profile? =
+		profileLocalDataSource.getByInstanceAndProfileId(instance, profileId)
 }

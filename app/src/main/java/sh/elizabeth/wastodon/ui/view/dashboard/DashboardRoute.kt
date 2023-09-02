@@ -8,20 +8,27 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.wastodon.ui.composable.PostFAB
 import sh.elizabeth.wastodon.ui.theme.WastodonTheme
-import sh.elizabeth.wastodon.ui.view.dashboard.DashboardDestinations.*
+import sh.elizabeth.wastodon.ui.view.dashboard.DashboardDestinations.HOME
+import sh.elizabeth.wastodon.ui.view.dashboard.DashboardDestinations.NOTIFICATIONS
+import sh.elizabeth.wastodon.ui.view.dashboard.DashboardDestinations.SEARCH
 
 @Composable
 fun DashboardRoute(
 	dashboardViewModel: DashboardViewModel = hiltViewModel(),
 	windowSizeClass: WindowSizeClass,
 	navToLogin: () -> Unit,
+	navToCompose: () -> Unit,
 ) {
 	val uiState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -34,11 +41,14 @@ fun DashboardRoute(
 		return
 	}
 
-	DashboardRoute(windowWidthSizeClass = windowSizeClass.widthSizeClass)
+	DashboardRoute(
+		windowWidthSizeClass = windowSizeClass.widthSizeClass,
+		navToCompose = navToCompose
+	)
 }
 
 @Composable
-fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass) {
+fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass, navToCompose: () -> Unit) {
 	var selectedTab by remember { mutableStateOf(HOME.route) }
 	Scaffold(bottomBar = {
 		if (windowWidthSizeClass == WindowWidthSizeClass.Compact) {
@@ -47,9 +57,13 @@ fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass) {
 			}
 		}
 	}, floatingActionButton = {
-		PostFAB { }
+		PostFAB(onClick = navToCompose)
 	}) { contentPadding ->
-		Row(Modifier.fillMaxSize().padding(contentPadding)) {
+		Row(
+			Modifier
+				.fillMaxSize()
+				.padding(contentPadding)
+		) {
 			if (windowWidthSizeClass != WindowWidthSizeClass.Compact) {
 				DashboardNavRail(selectedTab) {
 					selectedTab = it
@@ -67,5 +81,5 @@ fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass) {
 @Preview
 @Composable
 fun DashboardRoutePreview() {
-	WastodonTheme { DashboardRoute(WindowWidthSizeClass.Compact) }
+	WastodonTheme { DashboardRoute(WindowWidthSizeClass.Compact) {} }
 }
