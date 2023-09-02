@@ -7,8 +7,7 @@ import javax.inject.Inject
 
 class GetTimelineUseCase @Inject constructor(
 	private val timelineRepository: TimelineRepository,
-	private val refreshTimelineUseCase: RefreshTimelineUseCase,
 ) {
-	operator fun invoke(profileIdentifier: String, refresh: Boolean = false): Flow<List<Post>> =
+	operator fun invoke(profileIdentifier: String): Flow<List<Post>> =
 		timelineRepository.getTimeline(profileIdentifier)
 }

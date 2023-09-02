@@ -18,7 +18,7 @@ import java.time.Instant
 data class PostEntity(
 	@PrimaryKey(autoGenerate = true) var postRow: Long = 0,
 	val postId: String,
-	val createdAt: Instant,
+	val createdAt: Instant?, // Sometimes null on Calckey
 	val updatedAt: Instant?,
 	val cw: String?,
 	val text: String,

@@ -147,4 +147,9 @@ dependencies {
 	ksp("androidx.room:room-compiler:$roomVersion")
 	implementation("androidx.room:room-ktx:$roomVersion")
 	//implementation("androidx.room:room-paging:$room_version")
+
+	implementation("com.github.bumptech.glide:glide:4.16.0")
+	implementation("com.github.bumptech.glide:compose:1.0.0-alpha.5")
+	implementation("com.github.bumptech.glide:okhttp3-integration:4.16.0")
+	ksp("com.github.bumptech.glide:ksp:4.16.0")
 }

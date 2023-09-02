@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1b04ced94f1adfdb337f220f6afde82e",
+    "identityHash": "d7bdb478f8ad97d6c9c6486f8b467098",
     "entities": [
       {
         "tableName": "ProfileEntity",
@@ -88,7 +88,7 @@
       },
       {
         "tableName": "PostEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `postId` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER, `cw` TEXT, `text` TEXT NOT NULL, `authorId` TEXT NOT NULL, FOREIGN KEY(`authorId`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `postId` TEXT NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `cw` TEXT, `text` TEXT NOT NULL, `authorId` TEXT NOT NULL, FOREIGN KEY(`authorId`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "postRow",
@@ -106,7 +106,7 @@
             "fieldPath": "createdAt",
             "columnName": "createdAt",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "updatedAt",
@@ -241,7 +241,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1b04ced94f1adfdb337f220f6afde82e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd7bdb478f8ad97d6c9c6486f8b467098')"
     ]
   }
 }

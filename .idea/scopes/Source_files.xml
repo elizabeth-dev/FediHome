@@ -1,3 +1,0 @@
-<component name="DependencyValidationManager">
-  <scope name="Source files" pattern="!file[Wastodon.app.main]:*/&amp;&amp;!ext:*/||file[Wastodon.app.main]:proto/*||file[Wastodon.app.main]:res/*||file:AndroidManifest.xml||file[Wastodon.app.main]:java/*||file[Wastodon.app.main]:java//*||file[Wastodon.app.main]:res//*" />
-</component>

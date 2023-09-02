@@ -1,7 +1,6 @@
 package sh.elizabeth.wastodon.ui.composable
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,17 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import sh.elizabeth.wastodon.R
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import sh.elizabeth.wastodon.model.Post
 import sh.elizabeth.wastodon.model.Profile
 import sh.elizabeth.wastodon.ui.theme.WastodonTheme
 import java.time.Instant
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun SlimPostCard(post: Post) { // TODO: Check if it's better to pass individual props
 	Surface(
@@ -39,20 +39,18 @@ fun SlimPostCard(post: Post) { // TODO: Check if it's better to pass individual 
 			)
 		) {// TODO: Adapt padding for WindowSizeClass https://m3.material.io/foundations/layout/applying-layout/medium
 			Row(Modifier.padding(bottom = 8.dp)) {
-				Image(
-					painter = painterResource(id = R.drawable.ic_launcher_background),
+				GlideImage(
+					model = post.author.avatarUrl,
 					contentDescription = null,
-					modifier = Modifier.padding(end = 8.dp)
-						.fillMaxWidth(0.125f)
-						.clip(RoundedCornerShape(4.dp))
-				) // Avatar
+					modifier = Modifier.padding(end = 8.dp).fillMaxWidth(0.125f).clip(RoundedCornerShape(8.dp))
+				)
 				Column(Modifier.align(Alignment.CenterVertically)) {
 					Text(
 						post.author.name ?: "",
 						style = MaterialTheme.typography.titleMedium,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis
-					) // Name
+					)
 					Text(
 						"@${post.author.fullUsername}",
 						style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
@@ -62,7 +60,7 @@ fun SlimPostCard(post: Post) { // TODO: Check if it's better to pass individual 
 					) // TODO: Maybe show short username on local profiles?
 				}
 			}
-			Text(post.text, style = MaterialTheme.typography.bodyMedium) // Content
+			Text(post.text, style = MaterialTheme.typography.bodyMedium)
 		}
 	}
 }
