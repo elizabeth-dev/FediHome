@@ -10,7 +10,7 @@ plugins {
 
 android {
 	namespace = "sh.elizabeth.wastodon"
-	compileSdk = 33
+	compileSdk = 34
 
 	defaultConfig {
 		applicationId = "sh.elizabeth.wastodon"
