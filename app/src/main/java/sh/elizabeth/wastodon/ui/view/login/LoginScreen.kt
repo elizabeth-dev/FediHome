@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import sh.elizabeth.wastodon.ui.theme.WastodonTheme
@@ -58,7 +59,10 @@ fun LoginScreen(uiState: LoginUiState, navToDashboard: () -> Unit, onLogin: (Str
 					onValueChange = { setInstance(it) },
 					label = { Text("Instance") },
 					singleLine = true,
-					keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
+					keyboardOptions = KeyboardOptions(
+						imeAction = ImeAction.Go,
+						keyboardType = KeyboardType.Uri
+					),
 					keyboardActions = KeyboardActions(onGo = { onLogin(instance) })
 				)
 				Spacer(Modifier.size(padding))
