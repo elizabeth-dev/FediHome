@@ -23,17 +23,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import sh.elizabeth.wastodon.model.Poll
+import sh.elizabeth.wastodon.model.PollChoice
 import sh.elizabeth.wastodon.model.Post
 import sh.elizabeth.wastodon.model.Profile
 import sh.elizabeth.wastodon.ui.theme.WastodonTheme
 import java.time.Instant
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun SlimPostCard(
 	post: Post,
 	onReply: (String) -> Unit,
+	onVotePoll: (postId: String, choices: List<Int>) -> Unit,
 ) { // TODO: Check if it's better to pass individual props
 	Surface(
 		Modifier.fillMaxWidth(),
@@ -42,19 +43,14 @@ fun SlimPostCard(
 	) {
 		Column {
 			Column(
-				Modifier.padding(
-					start = 16.dp, end = 16.dp, top = 12.dp
-				)
+				Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
+				verticalArrangement = Arrangement.spacedBy(8.dp)
 			) {// TODO: Adapt padding for WindowSizeClass https://m3.material.io/foundations/layout/applying-layout/medium
 				if (post.repostedBy != null) Surface(
-					Modifier
-						.padding(bottom = 8.dp),
 					contentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 				) {
 					Row(
-						horizontalArrangement = Arrangement.spacedBy(
-							8.dp, Alignment.Start
-						),
+						horizontalArrangement = Arrangement.spacedBy(8.dp),
 						verticalAlignment = Alignment.CenterVertically
 					) {
 						Icon(
@@ -69,18 +65,17 @@ fun SlimPostCard(
 						)
 					}
 				}
-				SlimProfileSummary(
-					modifier = Modifier.padding(bottom = 8.dp),
-					profile = post.author
-				)
+				SlimProfileSummary(profile = post.author)
 				if (!post.text.isNullOrBlank()) Text(
 					post.text,
-					style = MaterialTheme.typography.bodyMedium,
-					modifier = Modifier.padding(bottom = 8.dp)
+					style = MaterialTheme.typography.bodyLarge, // TODO: Maybe use a smaller font size like bodyMedium
+					modifier = Modifier
 				)
+				if (post.poll != null) PollDisplay(poll = post.poll) { onVotePoll(post.id, it) }
 				if (post.quote != null) PostPreview(
-					modifier = Modifier.fillMaxWidth(),
-					post = post.quote
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(top = 4.dp), post = post.quote
 				)
 			}
 			Row(
@@ -143,7 +138,18 @@ fun SlimPostCardPreview() {
 
 					),
 				quote = null,
-				repostedBy = null
+				repostedBy = null,
+				poll = Poll(
+					voted = false, expiresAt = null, multiple = false, choices = listOf(
+						PollChoice(
+							text = "foo", votes = 0, isVoted = false
+						), PollChoice(
+							text = "bar", votes = 0, isVoted = false
+						)
+					)
+
+				)
+
 			),
 			repostedBy = Profile(
 				id = "foo",
@@ -154,6 +160,15 @@ fun SlimPostCardPreview() {
 				fullUsername = "elizabeth@blahaj.zone",
 				headerUrl = null,
 			),
-		), onReply = {})
+			poll = Poll(
+				voted = false, expiresAt = null, multiple = false, choices = listOf(
+					PollChoice(
+						text = "foo", votes = 0, isVoted = false
+					), PollChoice(
+						text = "bar", votes = 0, isVoted = false
+					)
+				)
+			)
+		), onReply = {}, onVotePoll = { _, _ -> })
 	}
 }

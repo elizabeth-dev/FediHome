@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import sh.elizabeth.wastodon.model.Poll
+import sh.elizabeth.wastodon.model.PollChoice
 import sh.elizabeth.wastodon.model.Post
 import java.time.Instant
 
@@ -33,6 +35,22 @@ data class PostEntity(
 	val text: String?,
 	val authorId: String,
 	val quoteId: String?,
+	val poll: PollEntity?,
+)
+
+data class PollEntity(
+	val choices: List<PollChoiceEntity>,
+	val expiresAt: Instant?,
+	val multiple: Boolean,
+)
+
+data class PollChoiceEntity(val text: String, val votes: Int, val isVoted: Boolean)
+
+fun PollEntity.toDomain() = Poll(
+	voted = choices.any { it.isVoted },
+	multiple = multiple,
+	expiresAt = expiresAt,
+	choices = choices.map { PollChoice(text = it.text, votes = it.votes, isVoted = it.isVoted) }
 )
 
 data class PostWithAuthor(
@@ -68,4 +86,5 @@ fun PostWithAuthor.toPostDomain(): Post = Post(
 		quotePost = null,
 		quoteAuthor = null,
 	).toPostDomain() else null,
+	poll = post.poll?.toDomain(),
 )

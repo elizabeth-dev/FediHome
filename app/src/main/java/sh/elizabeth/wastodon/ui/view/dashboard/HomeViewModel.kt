@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import sh.elizabeth.wastodon.data.repository.AuthRepository
 import sh.elizabeth.wastodon.domain.GetTimelineUseCase
 import sh.elizabeth.wastodon.domain.RefreshTimelineUseCase
+import sh.elizabeth.wastodon.domain.VotePollUseCase
 import sh.elizabeth.wastodon.model.Post
 import javax.inject.Inject
 
@@ -46,11 +47,13 @@ class HomeViewModel @Inject constructor(
 	private val getTimelineUseCase: GetTimelineUseCase,
 	private val authRepository: AuthRepository,
 	private val refreshTimelineUseCase: RefreshTimelineUseCase,
+	private val votePollUseCase: VotePollUseCase,
 ) : ViewModel() {
 	private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private val timeline = authRepository.activeAccount.flatMapLatest { getTimelineUseCase(it) }.distinctUntilChanged()
+	private val timeline =
+		authRepository.activeAccount.flatMapLatest { getTimelineUseCase(it) }.distinctUntilChanged()
 
 	val uiState =
 		viewModelState
@@ -77,6 +80,12 @@ class HomeViewModel @Inject constructor(
 		viewModelScope.launch {
 			refreshTimelineUseCase(profileIdentifier)
 			viewModelState.update { it.copy(isLoading = false) }
+		}
+	}
+
+	fun votePoll(profileIdentifier: String, postId: String, choices: List<Int>) {
+		viewModelScope.launch {
+			votePollUseCase(profileIdentifier, postId, choices)
 		}
 	}
 }

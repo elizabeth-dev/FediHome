@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "3df66afe458a2f1b39dc2a61fd3d6416",
+    "identityHash": "e2c83d8da3b41a8efddf2c00e2944d47",
     "entities": [
       {
         "tableName": "ProfileEntity",
@@ -88,7 +88,7 @@
       },
       {
         "tableName": "PostEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `postId` TEXT NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `cw` TEXT, `text` TEXT, `authorId` TEXT NOT NULL, `quoteId` TEXT, FOREIGN KEY(`authorId`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`quoteId`) REFERENCES `PostEntity`(`postId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `postId` TEXT NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `cw` TEXT, `text` TEXT, `authorId` TEXT NOT NULL, `quoteId` TEXT, `poll` TEXT, FOREIGN KEY(`authorId`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`quoteId`) REFERENCES `PostEntity`(`postId`) ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED)",
         "fields": [
           {
             "fieldPath": "postRow",
@@ -135,6 +135,12 @@
           {
             "fieldPath": "quoteId",
             "columnName": "quoteId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "poll",
+            "columnName": "poll",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -293,7 +299,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3df66afe458a2f1b39dc2a61fd3d6416')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e2c83d8da3b41a8efddf2c00e2944d47')"
     ]
   }
 }

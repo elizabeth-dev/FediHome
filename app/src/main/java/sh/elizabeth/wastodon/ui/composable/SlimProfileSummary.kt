@@ -23,7 +23,7 @@ import sh.elizabeth.wastodon.ui.theme.WastodonTheme
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun SlimProfileSummary(modifier: Modifier, profile: Profile) {
+fun SlimProfileSummary(modifier: Modifier = Modifier, profile: Profile) {
 	Row(modifier = modifier) {
 		GlideImage(
 			model = profile.avatarUrl,

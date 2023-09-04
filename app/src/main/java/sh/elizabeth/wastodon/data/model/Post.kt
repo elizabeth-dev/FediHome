@@ -3,6 +3,8 @@ package sh.elizabeth.wastodon.data.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import sh.elizabeth.wastodon.util.InstantAsString
+import sh.elizabeth.wastodon.model.Poll as DomainPoll
+import sh.elizabeth.wastodon.model.PollChoice as DomainPollChoice
 import sh.elizabeth.wastodon.model.Post as DomainPost
 
 @Serializable
@@ -56,21 +58,6 @@ data class Post(
 	val myReaction: String? = null,
 )
 
-@Serializable
-data class Poll(
-	val multiple: Boolean,
-	val expiresAt: InstantAsString? = null,
-	val expiredAfter: Int? = null, // Millis, only present when posting
-	val choices: List<PollChoice>,
-)
-
-@Serializable
-data class PollChoice(
-	val text: String,
-	val votes: Int,
-	val isVoted: Boolean,
-)
-
 // Needs to have text, poll, files, or maybe a reply?
 fun Post.isQuote(): Boolean =
 	renote != null && (!text.isNullOrBlank() || poll != null || files.isNotEmpty() || reply != null)
@@ -86,6 +73,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			author = renote.user.toDomain(fetchedFromInstance),
 			repostedBy = user.toDomain(fetchedFromInstance),
 			quote = renote.renote?.toDomain(fetchedFromInstance),
+			poll = renote.poll?.toDomain(),
 		)
 	}
 	return DomainPost(
@@ -97,5 +85,34 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		author = user.toDomain(fetchedFromInstance),
 		repostedBy = null,
 		quote = renote?.toDomain(fetchedFromInstance),
+		poll = poll?.toDomain(),
 	)
 }
+
+@Serializable
+data class Poll(
+	val multiple: Boolean,
+	val expiresAt: InstantAsString? = null,
+	val expiredAfter: Int? = null, // Millis, only present when posting
+	val choices: List<PollChoice>,
+)
+
+@Serializable
+data class PollChoice(
+	val text: String,
+	val votes: Int,
+	val isVoted: Boolean,
+)
+
+fun Poll.toDomain() = DomainPoll(
+	voted = choices.any { it.isVoted },
+	multiple = multiple,
+	expiresAt = expiresAt,
+	choices = choices.map {
+		DomainPollChoice(
+			text = it.text,
+			votes = it.votes,
+			isVoted = it.isVoted
+		)
+	}
+)

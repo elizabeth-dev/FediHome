@@ -207,7 +207,8 @@ fun ComposeScreenPreview() {
 
 					),
 				quote = null,
-				repostedBy = null
+				repostedBy = null,
+				poll = null,
 			)
 		), { _, _ -> }, {})
 	}

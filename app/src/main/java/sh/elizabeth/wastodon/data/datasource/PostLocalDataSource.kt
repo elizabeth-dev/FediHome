@@ -1,6 +1,8 @@
 package sh.elizabeth.wastodon.data.datasource
 
 import sh.elizabeth.wastodon.data.database.dao.PostDao
+import sh.elizabeth.wastodon.data.database.entity.PollChoiceEntity
+import sh.elizabeth.wastodon.data.database.entity.PollEntity
 import sh.elizabeth.wastodon.data.database.entity.PostEntity
 import sh.elizabeth.wastodon.data.database.entity.toPostDomain
 import sh.elizabeth.wastodon.model.Post
@@ -21,5 +23,16 @@ fun Post.toEntity() = PostEntity(
 	cw = cw,
 	text = text,
 	authorId = author.id,
-	quoteId = quote?.id
+	quoteId = quote?.id,
+	poll = if (poll != null) PollEntity(
+		choices = poll.choices.map {
+			PollChoiceEntity(
+				text = it.text,
+				votes = it.votes,
+				isVoted = it.isVoted
+			)
+		},
+		expiresAt = poll.expiresAt,
+		multiple = poll.multiple
+	) else null
 )

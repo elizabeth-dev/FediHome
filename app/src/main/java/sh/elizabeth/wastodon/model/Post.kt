@@ -11,6 +11,7 @@ data class Post(
 	val author: Profile,
 	val repostedBy: Profile?,
 	val quote: Post?,
+	val poll: Poll?,
 )
 
 fun Post.unwrapQuotes(): List<Post> {
@@ -25,3 +26,12 @@ fun Post.unwrapQuotes(): List<Post> {
 
 fun Post.unwrapProfiles(): List<Profile> =
 	if (repostedBy == null) listOf(author) else listOf(author, repostedBy)
+
+data class Poll(
+	val voted: Boolean,
+	val choices: List<PollChoice>,
+	val expiresAt: Instant?,
+	val multiple: Boolean,
+)
+
+data class PollChoice(val text: String, val votes: Int, val isVoted: Boolean)

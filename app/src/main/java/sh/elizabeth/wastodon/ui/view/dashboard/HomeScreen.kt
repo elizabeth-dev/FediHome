@@ -24,14 +24,20 @@ fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel(), navToCompose: (St
 
 	HomeScreen(
 		uiState = uiState,
-		onRefresh = { homeViewModel.refreshTimeline(it) },
-		onReply = navToCompose
+		onRefresh = homeViewModel::refreshTimeline,
+		onReply = navToCompose,
+		onVotePoll = homeViewModel::votePoll
 	)
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(uiState: HomeUiState, onRefresh: (String) -> Unit, onReply: (String) -> Unit) {
+fun HomeScreen(
+	uiState: HomeUiState,
+	onRefresh: (String) -> Unit,
+	onReply: (String) -> Unit,
+	onVotePoll: (String, String, List<Int>) -> Unit,
+) {
 	val pullRefreshState =
 		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
 	Box(
@@ -53,15 +59,15 @@ fun HomeScreen(uiState: HomeUiState, onRefresh: (String) -> Unit, onReply: (Stri
 
 			is HomeUiState.HasPosts -> LazyColumn(Modifier.fillMaxSize()) {
 				items(uiState.posts) { post ->
-					SlimPostCard(post = post, onReply = onReply)
+					SlimPostCard(post = post, onReply = onReply, onVotePoll = { postId, choices ->
+						onVotePoll(uiState.activeAccount, postId, choices)
+					})
 				}
 			}
 		}
 
 		PullRefreshIndicator(
-			uiState.isLoading,
-			pullRefreshState,
-			Modifier.align(Alignment.TopCenter)
+			uiState.isLoading, pullRefreshState, Modifier.align(Alignment.TopCenter)
 		)
 	}
 }

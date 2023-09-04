@@ -28,7 +28,10 @@ android {
 	buildTypes {
 		release {
 			isMinifyEnabled = false
-			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+			proguardFiles(
+				getDefaultProguardFile("proguard-android-optimize.txt"),
+				"proguard-rules.pro"
+			)
 		}
 	}
 	compileOptions {
@@ -147,6 +150,7 @@ dependencies {
 	ksp("androidx.room:room-compiler:$roomVersion")
 	implementation("androidx.room:room-ktx:$roomVersion")
 	//implementation("androidx.room:room-paging:$room_version")
+	implementation("com.google.code.gson:gson:2.10.1")
 
 	implementation("com.github.bumptech.glide:glide:4.16.0")
 	implementation("com.github.bumptech.glide:compose:1.0.0-alpha.5")
