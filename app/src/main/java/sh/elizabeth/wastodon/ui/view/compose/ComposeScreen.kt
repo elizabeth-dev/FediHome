@@ -32,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -44,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import sh.elizabeth.wastodon.model.Post
 import sh.elizabeth.wastodon.model.Profile
 import sh.elizabeth.wastodon.ui.composable.SlimProfileCard
+import sh.elizabeth.wastodon.ui.composable.TopDisclaimer
 import sh.elizabeth.wastodon.ui.theme.WastodonTheme
 import java.time.Instant
 
@@ -88,7 +88,9 @@ fun ComposeScreen(
 					IconButton(onClick = onClose) {
 						Icon(Icons.Outlined.ArrowBack, contentDescription = "Close")
 					}
+
 					Spacer(modifier = Modifier.weight(1f))
+
 					Button(onClick = {
 						onSendPost(
 							postText, if (isCWVisible) contentWarning else null
@@ -99,25 +101,18 @@ fun ComposeScreen(
 				}
 				Divider(thickness = Dp.Hairline)
 			}
-			if (uiState.replyTo != null) Surface(
-				contentColor = MaterialTheme.colorScheme.onSurface.copy(
-					alpha = 0.6f
-				)
-			) {
-				Row(
-					modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-					horizontalArrangement = Arrangement.spacedBy(
-						8.dp, Alignment.CenterHorizontally
-					),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					Icon(Icons.Outlined.Reply, contentDescription = "Reply")
-					Text("Replying to ${uiState.replyTo.author.name}")
-				}
-			}
+
+			if (uiState.replyTo != null) TopDisclaimer(
+				modifier = Modifier.padding(horizontal = 16.dp),
+				icon = Icons.Outlined.Reply,
+				iconDescription = "Reply",
+				text = "Replying to ${uiState.replyTo.author.name}"
+			)
+
 			if (uiState.activeProfile != null) SlimProfileCard(
 				profile = uiState.activeProfile
 			)
+
 			AnimatedVisibility(visible = isCWVisible) {
 				TextField(
 					modifier = Modifier
@@ -136,6 +131,7 @@ fun ComposeScreen(
 				)
 			}
 			if (isCWVisible) Divider(thickness = 1.dp)
+
 			TextField(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -151,6 +147,7 @@ fun ComposeScreen(
 					unfocusedIndicatorColor = Color.Transparent,
 				)
 			)
+
 			Divider(thickness = Dp.Hairline)
 			Surface(modifier = Modifier.fillMaxWidth(), tonalElevation = 6.dp) {
 				Row(

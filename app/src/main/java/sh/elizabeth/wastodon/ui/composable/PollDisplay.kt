@@ -65,13 +65,18 @@ fun PollDisplay(modifier: Modifier = Modifier, poll: Poll, onVote: (choices: Lis
 				}
 			}
 		}
-		Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
+		Row(
+			modifier = Modifier.padding(start = 8.dp),
+			horizontalArrangement = Arrangement.spacedBy(8.dp)
+		) {
 			Text(
 				text = "$totalVotes votes",
 				style = MaterialTheme.typography.labelLarge.copy(
 					color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 				)
 			)
+
 			if (poll.expiresAt != null) {
 				Text(
 					text = "•", style = MaterialTheme.typography.labelLarge.copy(
@@ -86,6 +91,7 @@ fun PollDisplay(modifier: Modifier = Modifier, poll: Poll, onVote: (choices: Lis
 				)
 			}
 		}
+
 		if (!disabledPoll) TextButton(
 			onClick = { onVote(selectedChoices) },
 			enabled = selectedChoices.size > 0
