@@ -26,6 +26,7 @@ data class ProfileEntity(
 	val instance: String,
 	val fullUsername: String,
 	val avatarUrl: String?,
+	val avatarBlur: String?,
 	val headerUrl: String?,
 )
 
@@ -36,5 +37,6 @@ fun ProfileEntity.toDomain() = Profile(
 	instance = instance,
 	fullUsername = fullUsername,
 	avatarUrl = avatarUrl,
+	avatarBlur = avatarBlur,
 	headerUrl = headerUrl
 )

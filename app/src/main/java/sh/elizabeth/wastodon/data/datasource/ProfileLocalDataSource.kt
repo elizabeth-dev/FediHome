@@ -21,5 +21,6 @@ fun Profile.toEntity() = ProfileEntity(
 	instance = instance,
 	fullUsername = fullUsername,
 	avatarUrl = avatarUrl,
+	avatarBlur = avatarBlur,
 	headerUrl = headerUrl,
 )

@@ -72,6 +72,7 @@ fun SlimProfileCardPreview() {
 				username = "elizabeth",
 				name = "Elizabeth",
 				avatarUrl = null,
+				avatarBlur = null,
 				instance = "blahaj.zone",
 				fullUsername = "bar@blahaj.zone",
 				headerUrl = null,

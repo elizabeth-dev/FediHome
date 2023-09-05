@@ -82,6 +82,7 @@ fun PostPreviewPreview() {
 					username = "elizabeth",
 					name = "Elizabeth",
 					avatarUrl = null,
+					avatarBlur = null,
 					instance = "blahaj.zone",
 					fullUsername = "elizabeth@blahaj.zone",
 					headerUrl = null,

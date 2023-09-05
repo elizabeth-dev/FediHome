@@ -99,5 +99,6 @@ fun UserDetailedNotMe.toDomain(fetchedFromInstance: String): Profile = Profile(
 	fullUsername = username.contains('@')
 		.let { if (it) username else "${username}@${host ?: fetchedFromInstance}" },
 	avatarUrl = avatarUrl,
+	avatarBlur = avatarBlurhash,
 	headerUrl = bannerUrl,
 )

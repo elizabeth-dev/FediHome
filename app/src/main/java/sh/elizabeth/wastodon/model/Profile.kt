@@ -7,5 +7,6 @@ data class Profile(
 	val instance: String,
 	val fullUsername: String,
 	val avatarUrl: String?,
+	val avatarBlur: String?,
 	val headerUrl: String?,
 )

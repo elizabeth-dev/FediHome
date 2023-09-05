@@ -156,4 +156,5 @@ dependencies {
 	implementation("com.github.bumptech.glide:compose:1.0.0-alpha.5")
 	implementation("com.github.bumptech.glide:okhttp3-integration:4.16.0")
 	ksp("com.github.bumptech.glide:ksp:4.16.0")
+	implementation("com.vanniktech:blurhash:0.1.0")
 }
