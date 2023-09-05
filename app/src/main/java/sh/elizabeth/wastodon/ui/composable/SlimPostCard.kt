@@ -53,6 +53,14 @@ fun SlimPostCard(
 
 				SlimProfileSummary(profile = post.author)
 
+				if (!post.cw.isNullOrBlank()) {
+					Text(
+						text = post.cw,
+						style = MaterialTheme.typography.titleMedium
+					)
+					Divider()
+				}
+
 				if (!post.text.isNullOrBlank()) Text(
 					post.text,
 					style = MaterialTheme.typography.bodyLarge, // TODO: Maybe use a smaller font size like bodyMedium
@@ -101,7 +109,7 @@ fun SlimPostCardPreview() {
 			id = "foo",
 			createdAt = Instant.now(),
 			updatedAt = null,
-			cw = null,
+			cw = "foo",
 			text = "bar",
 			author = Profile(
 				id = "foo",
