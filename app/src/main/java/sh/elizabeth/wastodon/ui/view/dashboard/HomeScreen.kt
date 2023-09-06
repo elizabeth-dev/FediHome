@@ -19,14 +19,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.wastodon.ui.composable.SlimPostCard
 
 @Composable
-fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel(), navToCompose: (String) -> Unit) {
+fun HomeScreen(
+	homeViewModel: HomeViewModel = hiltViewModel(),
+	navToCompose: (String) -> Unit,
+	navToPost: (String) -> Unit,
+) {
 	val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
 	HomeScreen(
 		uiState = uiState,
 		onRefresh = homeViewModel::refreshTimeline,
 		onReply = navToCompose,
-		onVotePoll = homeViewModel::votePoll
+		onVotePoll = homeViewModel::votePoll,
+		navToPost = navToPost
 	)
 }
 
@@ -37,6 +42,7 @@ fun HomeScreen(
 	onRefresh: (String) -> Unit,
 	onReply: (String) -> Unit,
 	onVotePoll: (String, String, List<Int>) -> Unit,
+	navToPost: (String) -> Unit,
 ) {
 	val pullRefreshState =
 		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
@@ -61,7 +67,7 @@ fun HomeScreen(
 				items(uiState.posts) { post ->
 					SlimPostCard(post = post, onReply = onReply, onVotePoll = { postId, choices ->
 						onVotePoll(uiState.activeAccount, postId, choices)
-					})
+					}, navToPost = navToPost)
 				}
 			}
 		}

@@ -1,6 +1,7 @@
 package sh.elizabeth.wastodon.ui.composable
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import sh.elizabeth.wastodon.model.Poll
@@ -33,11 +35,13 @@ fun SlimPostCard(
 	post: Post,
 	onReply: (String) -> Unit,
 	onVotePoll: (postId: String, choices: List<Int>) -> Unit,
+	navToPost: (postId: String) -> Unit,
 ) { // TODO: Check if it's better to pass individual props
 	Surface(
-		Modifier.fillMaxWidth(),
+		modifier = Modifier.fillMaxWidth(),
 		color = MaterialTheme.colorScheme.surface,
-		contentColor = MaterialTheme.colorScheme.onSurface
+		contentColor = MaterialTheme.colorScheme.onSurface,
+		onClick = { navToPost(post.id) },
 	) {
 		Column {
 			Column(
@@ -55,8 +59,7 @@ fun SlimPostCard(
 
 				if (!post.cw.isNullOrBlank()) {
 					Text(
-						text = post.cw,
-						style = MaterialTheme.typography.titleMedium
+						text = post.cw, style = MaterialTheme.typography.titleMedium
 					)
 					Divider()
 				}
@@ -72,7 +75,9 @@ fun SlimPostCard(
 				if (post.quote != null) PostPreview(
 					modifier = Modifier
 						.fillMaxWidth()
-						.padding(top = 4.dp), post = post.quote
+						.padding(top = 4.dp),
+					post = post.quote,
+					navToPost = navToPost
 				)
 			}
 
@@ -104,6 +109,7 @@ fun SlimPostCard(
 @Preview(showBackground = true)
 @Composable
 fun SlimPostCardPreview() {
+	val ctx = LocalContext.current
 	WastodonTheme {
 		SlimPostCard(post = Post(
 			id = "foo",
@@ -172,6 +178,9 @@ fun SlimPostCardPreview() {
 					)
 				)
 			)
-		), onReply = {}, onVotePoll = { _, _ -> })
+		),
+			onReply = {},
+			onVotePoll = { _, _ -> },
+			navToPost = { Toast.makeText(ctx, it, Toast.LENGTH_SHORT).show() })
 	}
 }

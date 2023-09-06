@@ -13,6 +13,7 @@ import androidx.navigation.navDeepLink
 import sh.elizabeth.wastodon.ui.view.compose.ComposeRoute
 import sh.elizabeth.wastodon.ui.view.dashboard.DashboardRoute
 import sh.elizabeth.wastodon.ui.view.login.LoginRoute
+import sh.elizabeth.wastodon.ui.view.post.PostRoute
 import sh.elizabeth.wastodon.util.APP_DEEPLINK_URI
 
 const val TOKEN_PARAM = "token"
@@ -31,7 +32,8 @@ fun MainNavGraph(
 			DashboardRoute(
 				windowSizeClass = windowSizeClass,
 				navToLogin = navActions::navigateToLogin,
-				navToCompose = navActions::navigateToCompose
+				navToCompose = navActions::navigateToCompose,
+				navToPost = navActions::navigateToPost
 			)
 		}
 
@@ -52,6 +54,15 @@ fun MainNavGraph(
 			})
 		) {
 			ComposeRoute(onFinish = navActions::navigateUp)
+		}
+
+		composable(
+			route = MainDestinations.POST_ROUTE,
+		) {
+			PostRoute(
+				navBack = navActions::navigateUp,
+				navToCompose = navActions::navigateToCompose
+			)
 		}
 	}
 

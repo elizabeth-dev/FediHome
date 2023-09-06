@@ -22,6 +22,8 @@ class PostRepository @Inject constructor(
 
 	suspend fun getPost(postId: String): Post? = postLocalDataSource.getPost(postId)
 
+	fun getPostFlow(postId: String) = postLocalDataSource.getPostFlow(postId)
+
 	suspend fun fetchPost(instance: String, postId: String) {
 		val postRes = postRemoteDataSource.fetchPost(instance, postId)
 		postLocalDataSource.insertOrReplace(postRes.toDomain(instance))

@@ -26,7 +26,7 @@ import sh.elizabeth.wastodon.ui.theme.WastodonTheme
 import java.time.Instant
 
 @Composable
-fun PostPreview(modifier: Modifier, post: Post) {
+fun PostPreview(modifier: Modifier, post: Post, navToPost: (postId: String) -> Unit) {
 	Surface(
 		modifier = modifier.border(
 			1.dp,
@@ -36,6 +36,7 @@ fun PostPreview(modifier: Modifier, post: Post) {
 		color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
 		contentColor = MaterialTheme.colorScheme.onSurface,
 		shape = MaterialTheme.shapes.medium,
+		onClick = { navToPost(post.id) },
 	) {
 		Column(
 			Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
@@ -71,7 +72,8 @@ fun PostPreviewPreview() {
 		PostPreview(
 			modifier = Modifier
 				.padding(8.dp)
-				.fillMaxWidth(), post = Post(
+				.fillMaxWidth(),
+			post = Post(
 				id = "foo",
 				createdAt = Instant.now(),
 				updatedAt = null,
@@ -99,7 +101,8 @@ fun PostPreviewPreview() {
 						)
 					)
 				),
-			)
+			),
+			navToPost = {},
 		)
 	}
 }

@@ -7,9 +7,10 @@ object MainDestinations {
 	const val DASHBOARD_ROUTE = "dashboard"
 	const val LOGIN_ROUTE = "login"
 	const val COMPOSE_ROUTE = "compose"
+	const val POST_ROUTE = "post/{postId}"
 }
 
-class MainNavigationActions(val navController: NavHostController) {
+class MainNavigationActions(private val navController: NavHostController) {
 	fun navigateToDashboard() {
 		navController.navigate(MainDestinations.DASHBOARD_ROUTE) {
 			popUpTo(navController.graph.findStartDestination().id) {
@@ -33,6 +34,18 @@ class MainNavigationActions(val navController: NavHostController) {
 	fun navigateToCompose(replyTo: String? = null) {
 		navController.navigate(
 			if (replyTo.isNullOrBlank()) MainDestinations.COMPOSE_ROUTE else "${MainDestinations.COMPOSE_ROUTE}?replyTo=$replyTo"
+		) {
+			popUpTo(navController.graph.findStartDestination().id) {
+				saveState = true
+			}
+			launchSingleTop = true
+			restoreState = true
+		}
+	}
+
+	fun navigateToPost(postId: String) {
+		navController.navigate(
+			MainDestinations.POST_ROUTE.replace("{postId}", postId)
 		) {
 			popUpTo(navController.graph.findStartDestination().id) {
 				saveState = true

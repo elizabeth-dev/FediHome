@@ -29,6 +29,7 @@ fun DashboardRoute(
 	windowSizeClass: WindowSizeClass,
 	navToLogin: () -> Unit,
 	navToCompose: (String?) -> Unit,
+	navToPost: (String) -> Unit,
 ) {
 	val uiState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -43,12 +44,17 @@ fun DashboardRoute(
 
 	DashboardRoute(
 		windowWidthSizeClass = windowSizeClass.widthSizeClass,
-		navToCompose = navToCompose
+		navToCompose = navToCompose,
+		navToPost = navToPost
 	)
 }
 
 @Composable
-fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass, navToCompose: (String?) -> Unit) {
+fun DashboardRoute(
+	windowWidthSizeClass: WindowWidthSizeClass,
+	navToCompose: (String?) -> Unit,
+	navToPost: (String) -> Unit,
+) {
 	var selectedTab by remember { mutableStateOf(HOME.route) }
 	Scaffold(bottomBar = {
 		if (windowWidthSizeClass == WindowWidthSizeClass.Compact) {
@@ -69,7 +75,10 @@ fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass, navToCompose: (St
 					selectedTab = it
 				}
 			}
-			if (selectedTab == HOME.route) HomeScreen(navToCompose = navToCompose)
+			if (selectedTab == HOME.route) HomeScreen(
+				navToCompose = navToCompose,
+				navToPost = navToPost
+			)
 			if (selectedTab == NOTIFICATIONS.route) Text("Notifications screen")
 			if (selectedTab == SEARCH.route) Text("Search screen")
 
@@ -81,5 +90,5 @@ fun DashboardRoute(windowWidthSizeClass: WindowWidthSizeClass, navToCompose: (St
 @Preview
 @Composable
 fun DashboardRoutePreview() {
-	WastodonTheme { DashboardRoute(WindowWidthSizeClass.Compact) {} }
+	WastodonTheme { DashboardRoute(WindowWidthSizeClass.Compact, {}) {} }
 }

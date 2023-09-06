@@ -9,14 +9,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun LoginRoute(loginViewModel: LoginViewModel = hiltViewModel(), navToDashboard: () -> Unit) {
 	val uiState by loginViewModel.uiState.collectAsStateWithLifecycle()
 
-	LoginRoute(uiState = uiState, navToDashboard = navToDashboard, onLogin = loginViewModel::getLoginUrl)
-}
-
-@Composable
-fun LoginRoute(uiState: LoginUiState, navToDashboard: () -> Unit, onLogin: (String) -> Unit) {
 	LoginScreen(
 		uiState = uiState,
 		navToDashboard = navToDashboard,
-		onLogin = onLogin
+		onLogin = loginViewModel::getLoginUrl
 	)
 }
