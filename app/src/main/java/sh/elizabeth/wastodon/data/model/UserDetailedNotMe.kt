@@ -3,6 +3,7 @@ package sh.elizabeth.wastodon.data.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import sh.elizabeth.wastodon.model.Profile
+import sh.elizabeth.wastodon.model.ProfileField
 import sh.elizabeth.wastodon.util.InstantAsString
 
 @Serializable
@@ -40,7 +41,7 @@ data class UserDetailedNotMe(
 	val host: String? = null,
 	val avatarUrl: String? = null,
 	val avatarBlurhash: String? = null,
-	val avatarColor: String? = null,
+	val avatarColor: String? = null, // Usually null
 	val isAdmin: Boolean? = null,
 	val isModerator: Boolean? = null,
 	val isBot: Boolean? = null,
@@ -70,8 +71,7 @@ data class UserDetailedNotMe(
 	val followingCount: Int,
 	val notesCount: Int,
 	val pinnedNoteIds: List<String>,
-	// TODO: should be List<Note>
-	val pinnedNotes: List<String>,
+	val pinnedNotes: List<Post>,
 	val pinnedPageId: String? = null,
 	// TODO: should be Page
 	val pinnedPage: String? = null,
@@ -101,4 +101,11 @@ fun UserDetailedNotMe.toDomain(fetchedFromInstance: String): Profile = Profile(
 	avatarUrl = avatarUrl,
 	avatarBlur = avatarBlurhash,
 	headerUrl = bannerUrl,
+	headerBlur = bannerBlurhash,
+	following = followingCount,
+	followers = followersCount,
+	postCount = notesCount,
+	createdAt = createdAt,
+	fields = fields.map { ProfileField(it.name, it.value) },
+	description = description,
 )

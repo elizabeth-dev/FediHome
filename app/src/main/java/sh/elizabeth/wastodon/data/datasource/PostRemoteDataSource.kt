@@ -8,6 +8,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import sh.elizabeth.wastodon.data.model.CreatePostRequest
 import sh.elizabeth.wastodon.data.model.CreatePostResponse
+import sh.elizabeth.wastodon.data.model.GetPostsByProfile
 import sh.elizabeth.wastodon.data.model.PollVoteRequest
 import sh.elizabeth.wastodon.data.model.Post
 import sh.elizabeth.wastodon.data.model.SelectPostRequest
@@ -25,6 +26,12 @@ class PostRemoteDataSource @Inject constructor(private val httpClient: HttpClien
 		httpClient.post("https://$instance/api/notes/show") {
 			contentType(ContentType.Application.Json)
 			setBody(SelectPostRequest(noteId = postId))
+		}.body()
+
+	suspend fun fetchPostsByProfile(instance: String, profile: String): List<Post> =
+		httpClient.post("https://$instance/api/users/notes") {
+			contentType(ContentType.Application.Json)
+			setBody(GetPostsByProfile(userId = profile))
 		}.body()
 
 	suspend fun votePoll(instance: String, postId: String, choice: Int) {

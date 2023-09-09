@@ -8,6 +8,8 @@ object MainDestinations {
 	const val LOGIN_ROUTE = "login"
 	const val COMPOSE_ROUTE = "compose"
 	const val POST_ROUTE = "post/{postId}"
+	const val PROFILE_ROUTE = "profile/{profileId}"
+
 }
 
 class MainNavigationActions(private val navController: NavHostController) {
@@ -46,6 +48,18 @@ class MainNavigationActions(private val navController: NavHostController) {
 	fun navigateToPost(postId: String) {
 		navController.navigate(
 			MainDestinations.POST_ROUTE.replace("{postId}", postId)
+		) {
+			popUpTo(navController.graph.findStartDestination().id) {
+				saveState = true
+			}
+			launchSingleTop = true
+			restoreState = true
+		}
+	}
+
+	fun navigateToProfile(profileId: String) {
+		navController.navigate(
+			MainDestinations.PROFILE_ROUTE.replace("{profileId}", profileId)
 		) {
 			popUpTo(navController.graph.findStartDestination().id) {
 				saveState = true

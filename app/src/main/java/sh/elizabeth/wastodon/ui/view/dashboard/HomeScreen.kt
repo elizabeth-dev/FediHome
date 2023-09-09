@@ -23,6 +23,7 @@ fun HomeScreen(
 	homeViewModel: HomeViewModel = hiltViewModel(),
 	navToCompose: (String) -> Unit,
 	navToPost: (String) -> Unit,
+	navToProfile: (String) -> Unit,
 ) {
 	val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -31,7 +32,8 @@ fun HomeScreen(
 		onRefresh = homeViewModel::refreshTimeline,
 		onReply = navToCompose,
 		onVotePoll = homeViewModel::votePoll,
-		navToPost = navToPost
+		navToPost = navToPost,
+		navToProfile = navToProfile
 	)
 }
 
@@ -43,6 +45,7 @@ fun HomeScreen(
 	onReply: (String) -> Unit,
 	onVotePoll: (String, String, List<Int>) -> Unit,
 	navToPost: (String) -> Unit,
+	navToProfile: (String) -> Unit,
 ) {
 	val pullRefreshState =
 		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
@@ -67,7 +70,7 @@ fun HomeScreen(
 				items(uiState.posts) { post ->
 					SlimPostCard(post = post, onReply = onReply, onVotePoll = { postId, choices ->
 						onVotePoll(uiState.activeAccount, postId, choices)
-					}, navToPost = navToPost)
+					}, navToPost = navToPost, navToProfile = navToProfile)
 				}
 			}
 		}

@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import sh.elizabeth.wastodon.model.Poll
@@ -71,8 +72,7 @@ fun PollDisplay(modifier: Modifier = Modifier, poll: Poll, onVote: (choices: Lis
 			horizontalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			Text(
-				text = "$totalVotes votes",
-				style = MaterialTheme.typography.labelLarge.copy(
+				text = "$totalVotes votes", style = MaterialTheme.typography.labelLarge.copy(
 					color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 				)
 			)
@@ -93,14 +93,14 @@ fun PollDisplay(modifier: Modifier = Modifier, poll: Poll, onVote: (choices: Lis
 		}
 
 		if (!disabledPoll) TextButton(
-			onClick = { onVote(selectedChoices) },
-			enabled = selectedChoices.size > 0
+			onClick = { onVote(selectedChoices) }, enabled = selectedChoices.size > 0
 		) {
 			Text(text = "Vote")
 		}
 	}
 }
 
+// TODO: Maybe unify these two composables?
 @Composable
 fun ResultPollChoiceButton(choice: PollChoice, multiple: Boolean, totalVotes: Int) {
 	val (icon, description) = calcButtonIcon(multiple, choice.isVoted)
@@ -122,15 +122,18 @@ fun ResultPollChoiceButton(choice: PollChoice, multiple: Boolean, totalVotes: In
 			contentDescription = description,
 			modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
 		)
-		Text(text = choice.text)
-		Spacer(Modifier.weight(1f))
+		Text(
+			text = choice.text,
+			overflow = TextOverflow.Ellipsis,
+			modifier = Modifier.weight(1f),
+		)
 		Text(
 			text = "${
 				if (totalVotes == 0) 0 else choice.votes.toFloat()
 					.div(totalVotes)
 					.times(100)
 					.roundToInt()
-			}%"
+			}%",
 		)
 	}
 }

@@ -14,6 +14,7 @@ import sh.elizabeth.wastodon.ui.view.compose.ComposeRoute
 import sh.elizabeth.wastodon.ui.view.dashboard.DashboardRoute
 import sh.elizabeth.wastodon.ui.view.login.LoginRoute
 import sh.elizabeth.wastodon.ui.view.post.PostRoute
+import sh.elizabeth.wastodon.ui.view.profile.ProfileRoute
 import sh.elizabeth.wastodon.util.APP_DEEPLINK_URI
 
 const val TOKEN_PARAM = "token"
@@ -33,7 +34,8 @@ fun MainNavGraph(
 				windowSizeClass = windowSizeClass,
 				navToLogin = navActions::navigateToLogin,
 				navToCompose = navActions::navigateToCompose,
-				navToPost = navActions::navigateToPost
+				navToPost = navActions::navigateToPost,
+				navToProfile = navActions::navigateToProfile,
 			)
 		}
 
@@ -61,7 +63,19 @@ fun MainNavGraph(
 		) {
 			PostRoute(
 				navBack = navActions::navigateUp,
-				navToCompose = navActions::navigateToCompose
+				navToCompose = navActions::navigateToCompose,
+				navToProfile = navActions::navigateToProfile
+			)
+		}
+
+		composable(
+			route = MainDestinations.PROFILE_ROUTE,
+		) {
+			ProfileRoute(
+				navBack = navActions::navigateUp,
+				navToCompose = navActions::navigateToCompose,
+				navToPost = navActions::navigateToPost,
+				navToProfile = navActions::navigateToProfile,
 			)
 		}
 	}

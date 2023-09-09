@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1c58ff9e6d9213f3e65659a76c86a3b8",
+    "identityHash": "7bc21f394cf9c08ac2605922abb766f1",
     "entities": [
       {
         "tableName": "ProfileEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileId` TEXT NOT NULL, `name` TEXT, `username` TEXT NOT NULL, `instance` TEXT NOT NULL, `fullUsername` TEXT NOT NULL, `avatarUrl` TEXT, `avatarBlur` TEXT, `headerUrl` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileId` TEXT NOT NULL, `name` TEXT, `username` TEXT NOT NULL, `instance` TEXT NOT NULL, `fullUsername` TEXT NOT NULL, `avatarUrl` TEXT, `avatarBlur` TEXT, `headerUrl` TEXT, `headerBlur` TEXT, `description` TEXT, `following` INTEGER, `followers` INTEGER, `postCount` INTEGER, `createdAt` INTEGER, `fields` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "profileRow",
@@ -61,6 +61,48 @@
             "columnName": "headerUrl",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "headerBlur",
+            "columnName": "headerBlur",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "following",
+            "columnName": "following",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "followers",
+            "columnName": "followers",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "postCount",
+            "columnName": "postCount",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fields",
+            "columnName": "fields",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -305,7 +347,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1c58ff9e6d9213f3e65659a76c86a3b8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7bc21f394cf9c08ac2605922abb766f1')"
     ]
   }
 }

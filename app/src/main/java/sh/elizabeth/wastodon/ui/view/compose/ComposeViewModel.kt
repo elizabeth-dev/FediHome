@@ -26,6 +26,7 @@ data class ComposeUiState(
 	val replyTo: Post? = null,
 )
 
+@Suppress("unused")
 @HiltViewModel
 class ComposeViewModel @Inject constructor(
 	private val createPostUseCase: CreatePostUseCase,

@@ -14,10 +14,12 @@ class PostLocalDataSource @Inject constructor(private val postDao: PostDao) {
 	suspend fun insertOrReplace(vararg posts: Post): List<Long> =
 		postDao.insertOrReplace(*posts.map(Post::toEntity).toTypedArray())
 
-	suspend fun getPost(postId: String): Post? =
-		postDao.getPost(postId)?.toPostDomain()
+	suspend fun getPost(postId: String): Post? = postDao.getPost(postId)?.toPostDomain()
 
 	fun getPostFlow(postId: String) = postDao.getPostFlow(postId).map(PostWithAuthor::toPostDomain)
+
+	fun getPostsByProfileFlow(profileId: String) =
+		postDao.getPostsByProfileFlow(profileId).map { it.map(PostWithAuthor::toPostDomain) }
 }
 
 fun Post.toEntity() = PostEntity(
@@ -31,12 +33,8 @@ fun Post.toEntity() = PostEntity(
 	poll = if (poll != null) PollEntity(
 		choices = poll.choices.map {
 			PollChoiceEntity(
-				text = it.text,
-				votes = it.votes,
-				isVoted = it.isVoted
+				text = it.text, votes = it.votes, isVoted = it.isVoted
 			)
-		},
-		expiresAt = poll.expiresAt,
-		multiple = poll.multiple
+		}, expiresAt = poll.expiresAt, multiple = poll.multiple
 	) else null
 )

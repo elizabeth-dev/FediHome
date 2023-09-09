@@ -12,6 +12,7 @@ import sh.elizabeth.wastodon.data.database.dao.TimelineDao
 import sh.elizabeth.wastodon.data.database.entity.PollEntity
 import sh.elizabeth.wastodon.data.database.entity.PostEntity
 import sh.elizabeth.wastodon.data.database.entity.ProfileEntity
+import sh.elizabeth.wastodon.data.database.entity.ProfileFieldEntity
 import sh.elizabeth.wastodon.data.database.entity.TimelinePostCrossRefEntity
 import java.time.Instant
 
@@ -41,17 +42,25 @@ class Converters {
 	fun pollFromJson(value: String?): PollEntity? {
 		if (value == null) return null
 
-		val gson = Gson()
 		val type = object : TypeToken<PollEntity>() {}.type
-		return gson.fromJson(value, type)
+		return Gson().fromJson(value, type)
 	}
 
 	@TypeConverter
 	fun pollToJson(poll: PollEntity?): String? {
 		if (poll == null) return null
 
-		val gson = Gson()
 		val type = object : TypeToken<PollEntity>() {}.type
-		return gson.toJson(poll, type)
+		return Gson().toJson(poll, type)
 	}
+
+	@TypeConverter
+	fun profileFieldListFromJson(value: String?): List<ProfileFieldEntity> {
+		val listType = object : TypeToken<ArrayList<ProfileFieldEntity?>?>() {}.type
+		return Gson().fromJson(value, listType)
+	}
+
+	@TypeConverter
+	fun profileFieldListToJson(list: List<ProfileFieldEntity?>?): String = Gson().toJson(list)
+
 }

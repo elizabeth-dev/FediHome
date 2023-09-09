@@ -26,7 +26,12 @@ import sh.elizabeth.wastodon.ui.theme.WastodonTheme
 import java.time.Instant
 
 @Composable
-fun PostPreview(modifier: Modifier, post: Post, navToPost: (postId: String) -> Unit) {
+fun PostPreview(
+	modifier: Modifier,
+	post: Post,
+	navToPost: (postId: String) -> Unit,
+	navToProfile: (profileId: String) -> Unit,
+) {
 	Surface(
 		modifier = modifier.border(
 			1.dp,
@@ -42,7 +47,7 @@ fun PostPreview(modifier: Modifier, post: Post, navToPost: (postId: String) -> U
 			Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-			SlimProfileSummary(profile = post.author)
+			SlimProfileSummary(profile = post.author, navToProfile = navToProfile)
 			if (!post.text.isNullOrBlank()) Text(
 				post.text,
 				style = MaterialTheme.typography.bodyMedium,
@@ -87,7 +92,13 @@ fun PostPreviewPreview() {
 					avatarBlur = null,
 					instance = "blahaj.zone",
 					fullUsername = "elizabeth@blahaj.zone",
-					headerUrl = null,
+					headerUrl = null, headerBlur = null,
+					following = null,
+					followers = null,
+					postCount = null,
+					createdAt = null,
+					fields = emptyList(),
+					description = "Lorem Ipsum Dolor Sit Amet",
 
 					),
 				quote = null,
@@ -103,6 +114,7 @@ fun PostPreviewPreview() {
 				),
 			),
 			navToPost = {},
+			navToProfile = {},
 		)
 	}
 }

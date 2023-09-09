@@ -11,7 +11,7 @@ data class UserLite(
 	val host: String? = null,
 	val avatarUrl: String? = null,
 	val avatarBlurhash: String? = null,
-	val avatarColor: String? = null,
+	val avatarColor: String? = null, // Usually null
 	val isAdmin: Boolean? = null,
 	val isModerator: Boolean? = null,
 	val isBot: Boolean? = null,
@@ -31,5 +31,14 @@ fun UserLite.toDomain(fetchedFromInstance: String): Profile = Profile(
 		.let { if (it) username else "${username}@${host ?: fetchedFromInstance}" },
 	avatarUrl = avatarUrl,
 	avatarBlur = avatarBlurhash,
-	headerUrl = null
+
+	// Below is extra
+	headerUrl = null, // FIXME: this is overwriting a potentially existing url with null
+	headerBlur = null,
+	following = null,
+	followers = null,
+	postCount = null,
+	createdAt = null,
+	fields = emptyList(),
+	description = null,
 )

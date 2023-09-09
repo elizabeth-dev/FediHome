@@ -4,6 +4,8 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import sh.elizabeth.wastodon.model.Profile
+import sh.elizabeth.wastodon.model.ProfileField
+import java.time.Instant
 
 @Entity(
 	indices = [
@@ -28,6 +30,18 @@ data class ProfileEntity(
 	val avatarUrl: String?,
 	val avatarBlur: String?,
 	val headerUrl: String?,
+	val headerBlur: String?,
+	val description: String?,
+	val following: Int?,
+	val followers: Int?,
+	val postCount: Int?,
+	val createdAt: Instant?,
+	val fields: List<ProfileFieldEntity>,
+)
+
+data class ProfileFieldEntity(
+	val name: String,
+	val value: String,
 )
 
 fun ProfileEntity.toDomain() = Profile(
@@ -38,5 +52,12 @@ fun ProfileEntity.toDomain() = Profile(
 	fullUsername = fullUsername,
 	avatarUrl = avatarUrl,
 	avatarBlur = avatarBlur,
-	headerUrl = headerUrl
+	headerUrl = headerUrl,
+	headerBlur = headerBlur,
+	following = following,
+	followers = followers,
+	postCount = postCount,
+	createdAt = createdAt,
+	fields = fields.map { ProfileField(it.name, it.value) },
+	description = description,
 )

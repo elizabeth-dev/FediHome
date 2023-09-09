@@ -1,7 +1,6 @@
 package sh.elizabeth.wastodon.ui.composable
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,7 +19,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import sh.elizabeth.wastodon.model.Poll
@@ -36,6 +34,7 @@ fun SlimPostCard(
 	onReply: (String) -> Unit,
 	onVotePoll: (postId: String, choices: List<Int>) -> Unit,
 	navToPost: (postId: String) -> Unit,
+	navToProfile: (profileId: String) -> Unit,
 ) { // TODO: Check if it's better to pass individual props
 	Surface(
 		modifier = Modifier.fillMaxWidth(),
@@ -55,7 +54,7 @@ fun SlimPostCard(
 					text = "Reposted by ${post.repostedBy.name}"
 				)
 
-				SlimProfileSummary(profile = post.author)
+				SlimProfileSummary(profile = post.author, navToProfile = navToProfile)
 
 				if (!post.cw.isNullOrBlank()) {
 					Text(
@@ -77,7 +76,8 @@ fun SlimPostCard(
 						.fillMaxWidth()
 						.padding(top = 4.dp),
 					post = post.quote,
-					navToPost = navToPost
+					navToPost = navToPost,
+					navToProfile = navToProfile
 				)
 			}
 
@@ -109,7 +109,6 @@ fun SlimPostCard(
 @Preview(showBackground = true)
 @Composable
 fun SlimPostCardPreview() {
-	val ctx = LocalContext.current
 	WastodonTheme {
 		SlimPostCard(post = Post(
 			id = "foo",
@@ -126,6 +125,13 @@ fun SlimPostCardPreview() {
 				instance = "blahaj.zone",
 				fullUsername = "elizabeth@blahaj.zone",
 				headerUrl = null,
+				headerBlur = null,
+				following = null,
+				followers = null,
+				postCount = null,
+				createdAt = null,
+				fields = emptyList(),
+				description = "Lorem Ipsum Dolor Sit Amet",
 
 				),
 			quote = Post(
@@ -143,6 +149,13 @@ fun SlimPostCardPreview() {
 					instance = "blahaj.zone",
 					fullUsername = "elizabeth@blahaj.zone",
 					headerUrl = null,
+					headerBlur = null,
+					following = null,
+					followers = null,
+					postCount = null,
+					createdAt = null,
+					fields = emptyList(),
+					description = "Lorem Ipsum Dolor Sit Amet",
 
 					),
 				quote = null,
@@ -168,6 +181,13 @@ fun SlimPostCardPreview() {
 				instance = "blahaj.zone",
 				fullUsername = "elizabeth@blahaj.zone",
 				headerUrl = null,
+				headerBlur = null,
+				following = null,
+				followers = null,
+				postCount = null,
+				createdAt = null,
+				fields = emptyList(),
+				description = "Lorem Ipsum Dolor Sit Amet",
 			),
 			poll = Poll(
 				voted = false, expiresAt = null, multiple = false, choices = listOf(
@@ -178,9 +198,6 @@ fun SlimPostCardPreview() {
 					)
 				)
 			)
-		),
-			onReply = {},
-			onVotePoll = { _, _ -> },
-			navToPost = { Toast.makeText(ctx, it, Toast.LENGTH_SHORT).show() })
+		), onReply = {}, onVotePoll = { _, _ -> }, navToPost = { }, navToProfile = { })
 	}
 }
