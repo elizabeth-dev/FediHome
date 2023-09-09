@@ -37,9 +37,6 @@ class MainNavigationActions(private val navController: NavHostController) {
 		navController.navigate(
 			if (replyTo.isNullOrBlank()) MainDestinations.COMPOSE_ROUTE else "${MainDestinations.COMPOSE_ROUTE}?replyTo=$replyTo"
 		) {
-			popUpTo(navController.graph.findStartDestination().id) {
-				saveState = true
-			}
 			launchSingleTop = true
 			restoreState = true
 		}
@@ -49,10 +46,7 @@ class MainNavigationActions(private val navController: NavHostController) {
 		navController.navigate(
 			MainDestinations.POST_ROUTE.replace("{postId}", postId)
 		) {
-			popUpTo(navController.graph.findStartDestination().id) {
-				saveState = true
-			}
-			launchSingleTop = true
+			launchSingleTop = false
 			restoreState = true
 		}
 	}
@@ -61,10 +55,7 @@ class MainNavigationActions(private val navController: NavHostController) {
 		navController.navigate(
 			MainDestinations.PROFILE_ROUTE.replace("{profileId}", profileId)
 		) {
-			popUpTo(navController.graph.findStartDestination().id) {
-				saveState = true
-			}
-			launchSingleTop = true
+			launchSingleTop = false
 			restoreState = true
 		}
 	}
