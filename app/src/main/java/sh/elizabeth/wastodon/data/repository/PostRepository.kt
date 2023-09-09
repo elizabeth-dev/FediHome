@@ -41,7 +41,7 @@ class PostRepository @Inject constructor(
 			.flatMap { it.unwrapQuotes() }
 		val profiles = posts.flatMap { it.unwrapProfiles() }.toSet()
 
-		profileRepository.insertOrReplace(*profiles.toTypedArray())
+		profileRepository.insertOrReplaceMain(*profiles.toTypedArray())
 		insertOrReplace(*posts.toTypedArray())
 	}
 

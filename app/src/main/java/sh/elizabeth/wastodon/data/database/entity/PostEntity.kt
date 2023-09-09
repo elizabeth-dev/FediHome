@@ -58,16 +58,16 @@ data class PostWithAuthor(
 	val post: PostEntity,
 
 	@Embedded(prefix = "author_")
-	val author: ProfileEntity,
+	val author: FullProfileEntity,
 
 	@Embedded(prefix = "repostedBy_")
-	val repostedBy: ProfileEntity?,
+	val repostedBy: FullProfileEntity?,
 
 	@Embedded(prefix = "quotePost_")
 	val quotePost: PostEntity?,
 
 	@Embedded(prefix = "quoteAuthor_")
-	val quoteAuthor: ProfileEntity?,
+	val quoteAuthor: FullProfileEntity?,
 )
 
 fun PostWithAuthor.toPostDomain(): Post = Post(

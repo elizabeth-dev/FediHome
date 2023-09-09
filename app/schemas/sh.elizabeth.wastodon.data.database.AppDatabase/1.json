@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "7bc21f394cf9c08ac2605922abb766f1",
+    "identityHash": "24eacb87aeb999b7fbb33bb1efd397a7",
     "entities": [
       {
         "tableName": "ProfileEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileId` TEXT NOT NULL, `name` TEXT, `username` TEXT NOT NULL, `instance` TEXT NOT NULL, `fullUsername` TEXT NOT NULL, `avatarUrl` TEXT, `avatarBlur` TEXT, `headerUrl` TEXT, `headerBlur` TEXT, `description` TEXT, `following` INTEGER, `followers` INTEGER, `postCount` INTEGER, `createdAt` INTEGER, `fields` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileId` TEXT NOT NULL, `name` TEXT, `username` TEXT NOT NULL, `instance` TEXT NOT NULL, `fullUsername` TEXT NOT NULL, `avatarUrl` TEXT, `avatarBlur` TEXT)",
         "fields": [
           {
             "fieldPath": "profileRow",
@@ -53,6 +53,52 @@
           {
             "fieldPath": "avatarBlur",
             "columnName": "avatarBlur",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "profileRow"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ProfileEntity_instance_profileId",
+            "unique": true,
+            "columnNames": [
+              "instance",
+              "profileId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ProfileEntity_instance_profileId` ON `${TABLE_NAME}` (`instance`, `profileId`)"
+          },
+          {
+            "name": "index_ProfileEntity_profileId",
+            "unique": true,
+            "columnNames": [
+              "profileId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ProfileEntity_profileId` ON `${TABLE_NAME}` (`profileId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "ProfileExtraEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileExtraRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileRef` TEXT, `headerUrl` TEXT, `headerBlur` TEXT, `description` TEXT, `following` INTEGER, `followers` INTEGER, `postCount` INTEGER, `createdAt` INTEGER, `fields` TEXT NOT NULL, FOREIGN KEY(`profileRef`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "profileExtraRow",
+            "columnName": "profileExtraRow",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileRef",
+            "columnName": "profileRef",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -108,31 +154,33 @@
         "primaryKey": {
           "autoGenerate": true,
           "columnNames": [
-            "profileRow"
+            "profileExtraRow"
           ]
         },
         "indices": [
           {
-            "name": "index_ProfileEntity_instance_profileId",
+            "name": "index_ProfileExtraEntity_profileRef",
             "unique": true,
             "columnNames": [
-              "instance",
-              "profileId"
+              "profileRef"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ProfileEntity_instance_profileId` ON `${TABLE_NAME}` (`instance`, `profileId`)"
-          },
-          {
-            "name": "index_ProfileEntity_profileId",
-            "unique": true,
-            "columnNames": [
-              "profileId"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ProfileEntity_profileId` ON `${TABLE_NAME}` (`profileId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ProfileExtraEntity_profileRef` ON `${TABLE_NAME}` (`profileRef`)"
           }
         ],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "ProfileEntity",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "profileRef"
+            ],
+            "referencedColumns": [
+              "profileId"
+            ]
+          }
+        ]
       },
       {
         "tableName": "PostEntity",
@@ -347,7 +395,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7bc21f394cf9c08ac2605922abb766f1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '24eacb87aeb999b7fbb33bb1efd397a7')"
     ]
   }
 }

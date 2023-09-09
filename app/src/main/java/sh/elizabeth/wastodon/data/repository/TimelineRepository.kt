@@ -24,7 +24,7 @@ class TimelineRepository @Inject constructor(
 		val unWrappedPosts = posts.flatMap { it.unwrapQuotes() }
 		val profiles = unWrappedPosts.flatMap { it.unwrapProfiles() }.toSet()
 
-		profileRepository.insertOrReplace(*profiles.toTypedArray())
+		profileRepository.insertOrReplaceMain(*profiles.toTypedArray())
 		postRepository.insertOrReplace(*unWrappedPosts.toTypedArray())
 		timelineLocalDataSource.insert(
 			profileIdentifier,

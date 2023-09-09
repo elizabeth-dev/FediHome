@@ -33,7 +33,7 @@ fun UserLite.toDomain(fetchedFromInstance: String): Profile = Profile(
 	avatarBlur = avatarBlurhash,
 
 	// Below is extra
-	headerUrl = null, // FIXME: this is overwriting a potentially existing url with null
+	headerUrl = null,
 	headerBlur = null,
 	following = null,
 	followers = null,

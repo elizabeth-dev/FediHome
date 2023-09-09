@@ -12,12 +12,13 @@ import sh.elizabeth.wastodon.data.database.dao.TimelineDao
 import sh.elizabeth.wastodon.data.database.entity.PollEntity
 import sh.elizabeth.wastodon.data.database.entity.PostEntity
 import sh.elizabeth.wastodon.data.database.entity.ProfileEntity
+import sh.elizabeth.wastodon.data.database.entity.ProfileExtraEntity
 import sh.elizabeth.wastodon.data.database.entity.ProfileFieldEntity
 import sh.elizabeth.wastodon.data.database.entity.TimelinePostCrossRefEntity
 import java.time.Instant
 
 @Database(
-	entities = [ProfileEntity::class, PostEntity::class, TimelinePostCrossRefEntity::class],
+	entities = [ProfileEntity::class, ProfileExtraEntity::class, PostEntity::class, TimelinePostCrossRefEntity::class],
 	version = 1
 )
 @TypeConverters(Converters::class)
@@ -56,6 +57,8 @@ class Converters {
 
 	@TypeConverter
 	fun profileFieldListFromJson(value: String?): List<ProfileFieldEntity> {
+		if (value == null) return emptyList()
+
 		val listType = object : TypeToken<ArrayList<ProfileFieldEntity?>?>() {}.type
 		return Gson().fromJson(value, listType)
 	}
