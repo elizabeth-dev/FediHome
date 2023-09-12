@@ -89,16 +89,28 @@ fun SlimPostCard(
 				)
 			) { // TODO: No padding in the bottom makes the buttons ripple touch the divider
 				IconButton(onClick = { onReply(post.id) }) {
-					Icon(Icons.Outlined.Message, contentDescription = "Reply")
+					Icon(
+						Icons.Outlined.Message,
+						contentDescription = "Reply",
+						tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+					)
 				}
 
 				Spacer(modifier = Modifier.weight(1f))
 
 				IconButton(onClick = { /*TODO*/ }) {
-					Icon(Icons.Rounded.Repeat, contentDescription = "Repost")
+					Icon(
+						Icons.Rounded.Repeat,
+						contentDescription = "Repost",
+						tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+					)
 				}
 				IconButton(onClick = { /*TODO*/ }) {
-					Icon(Icons.Rounded.StarBorder, contentDescription = "Star")
+					Icon(
+						Icons.Rounded.StarBorder,
+						contentDescription = "Star",
+						tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+					)
 				}
 
 			}

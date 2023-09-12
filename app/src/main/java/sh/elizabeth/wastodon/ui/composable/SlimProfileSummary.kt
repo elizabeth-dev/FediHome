@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -60,10 +61,13 @@ fun SlimProfileSummary(
 		}
 	}
 
-	Surface(color = Color.Transparent,
+	Surface(
+		color = Color.Transparent,
 		contentColor = MaterialTheme.colorScheme.onSurface,
-		onClick = { navToProfile(profile.id) }) {
-		Row(modifier = modifier) {
+		onClick = { navToProfile(profile.id) },
+		modifier = Modifier.clip(MaterialTheme.shapes.extraSmall)
+	) {
+		Row(modifier = modifier.padding(end = 8.dp)) {
 			GlideImage(
 				model = profile.avatarUrl,
 				contentDescription = null,

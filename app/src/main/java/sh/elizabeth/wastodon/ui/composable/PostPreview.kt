@@ -36,10 +36,12 @@ fun PostPreview(
 	Surface(
 		modifier = modifier.border(
 			1.dp,
-			color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
+			color = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
 			shape = MaterialTheme.shapes.medium,
 		),
-		color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
+		color = MaterialTheme.colorScheme.primary.copy(
+			alpha = 0.05f
+		),
 		contentColor = MaterialTheme.colorScheme.onSurface,
 		shape = MaterialTheme.shapes.medium,
 		onClick = { navToPost(post.id) },

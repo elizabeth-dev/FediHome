@@ -115,7 +115,7 @@ fun ResultPollChoiceButton(choice: PollChoice, multiple: Boolean, totalVotes: In
 		), disabledContentColor = MaterialTheme.colorScheme.onSurface.let {
 			if (choice.isVoted) it else it.copy(alpha = 0.6f)
 		}),
-		contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+		contentPadding = ButtonDefaults.TextButtonWithIconContentPadding
 	) {
 		Icon(
 			icon,
@@ -150,7 +150,7 @@ fun PollChoiceButton(choice: PollChoice, multiple: Boolean, isVoted: Boolean, on
 			containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
 			contentColor = MaterialTheme.colorScheme.onSurface
 		),
-		contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+		contentPadding = ButtonDefaults.TextButtonWithIconContentPadding
 	) {
 		Icon(
 			icon,
