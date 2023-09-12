@@ -119,6 +119,7 @@ fun SlimProfileCardPreview() {
 				createdAt = null,
 				fields = emptyList(),
 				description = "Lorem Ipsum Dolor Sit Amet",
+				emojis = emptyMap(),
 			)
 
 		)

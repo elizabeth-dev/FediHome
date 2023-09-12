@@ -103,8 +103,8 @@ fun ProfileRoutePreview() {
 				createdAt = null,
 				fields = emptyList(),
 				description = "Lorem Ipsum Dolor Sit Amet",
-
-				), posts = listOf(
+				emojis = emptyMap(),
+			), posts = listOf(
 				Post(
 					id = "foo",
 					createdAt = Instant.now(),
@@ -127,8 +127,8 @@ fun ProfileRoutePreview() {
 						createdAt = null,
 						fields = emptyList(),
 						description = "Lorem Ipsum Dolor Sit Amet",
-
-						),
+						emojis = emptyMap(),
+					),
 					quote = Post(
 						id = "foo",
 						createdAt = Instant.now(),
@@ -151,8 +151,8 @@ fun ProfileRoutePreview() {
 							createdAt = null,
 							fields = emptyList(),
 							description = "Lorem Ipsum Dolor Sit Amet",
-
-							),
+							emojis = emptyMap(),
+						),
 						quote = null,
 						repostedBy = null,
 						poll = Poll(
@@ -164,8 +164,8 @@ fun ProfileRoutePreview() {
 								)
 							)
 
-						)
-
+						),
+						emojis = emptyMap(),
 					),
 					repostedBy = null,
 					poll = Poll(
@@ -176,7 +176,8 @@ fun ProfileRoutePreview() {
 								text = "bar", votes = 0, isVoted = false
 							)
 						)
-					)
+					),
+					emojis = emptyMap(),
 				)
 			), activeAccount = "foo", isLoading = false
 		),

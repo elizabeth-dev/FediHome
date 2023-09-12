@@ -66,8 +66,7 @@ fun SlimProfileSummary(
 			GlideImage(
 				model = profile.avatarUrl,
 				contentDescription = null,
-				modifier = Modifier
-					.size(AVATAR_SIZE)
+				modifier = Modifier.size(AVATAR_SIZE)
 			) { _it ->
 				let {
 					if (avatarBlurHash != null) _it.placeholder(avatarBlurHash?.toDrawable(resources = resources))
@@ -79,8 +78,9 @@ fun SlimProfileSummary(
 					.align(Alignment.CenterVertically)
 					.padding(start = 8.dp)
 			) {
-				Text(
+				TextWithEmoji(
 					profile.name ?: "",
+					emojis = profile.emojis,
 					style = MaterialTheme.typography.titleMedium,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis
@@ -118,6 +118,7 @@ fun SlimProfileSummaryPreview() {
 			createdAt = null,
 			fields = emptyList(),
 			description = "Lorem Ipsum Dolor Sit Amet",
+			emojis = emptyMap(),
 		), navToProfile = {})
 	}
 }

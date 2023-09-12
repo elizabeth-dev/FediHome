@@ -101,8 +101,8 @@ fun PostRoutePreview() {
 					createdAt = null,
 					fields = emptyList(),
 					description = "Lorem Ipsum Dolor Sit Amet",
-
-					),
+					emojis = emptyMap(),
+				),
 				quote = Post(
 					id = "foo",
 					createdAt = Instant.now(),
@@ -125,8 +125,8 @@ fun PostRoutePreview() {
 						createdAt = null,
 						fields = emptyList(),
 						description = "Lorem Ipsum Dolor Sit Amet",
-
-						),
+						emojis = emptyMap(),
+					),
 					quote = null,
 					repostedBy = null,
 					poll = Poll(
@@ -138,9 +138,10 @@ fun PostRoutePreview() {
 							)
 						)
 
-					)
+					),
+					emojis = emptyMap(),
 
-				),
+					),
 				repostedBy = null,
 				poll = Poll(
 					voted = false, expiresAt = null, multiple = false, choices = listOf(
@@ -150,7 +151,8 @@ fun PostRoutePreview() {
 							text = "bar", votes = 0, isVoted = false
 						)
 					)
-				)
+				),
+				emojis = emptyMap(),
 			), activeAccount = "foo", isLoading = false
 		),
 			navBack = {},

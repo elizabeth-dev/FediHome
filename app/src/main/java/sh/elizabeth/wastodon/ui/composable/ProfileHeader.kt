@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.graphics.drawable.toDrawable
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -138,8 +139,10 @@ fun ProfileHeader(profile: Profile) {
 					verticalArrangement = Arrangement.spacedBy(12.dp),
 				) {
 					Column {
-						Text(
+						TextWithEmoji(
 							text = profile.name ?: "",
+							emojis = profile.emojis,
+							emojiSize = 30.sp,
 							style = MaterialTheme.typography.headlineSmall
 						)
 						Text(
@@ -149,8 +152,9 @@ fun ProfileHeader(profile: Profile) {
 							color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 						)
 					}
-					if (!profile.description.isNullOrBlank()) Text(
-						profile.description,
+					if (!profile.description.isNullOrBlank()) TextWithEmoji(
+						text = profile.description,
+						emojis = profile.emojis,
 						style = MaterialTheme.typography.bodyLarge,
 					)
 
@@ -160,8 +164,7 @@ fun ProfileHeader(profile: Profile) {
 					}
 
 					Row(
-						Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.spacedBy(16.dp)
+						Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
 					) {
 						Row(verticalAlignment = Alignment.Bottom) {
 							Text(
@@ -220,6 +223,7 @@ fun ProfileHeaderPreview() {
 					ProfileField("Foo", "Bar"),
 				),
 				description = "Lorem Ipsum Dolor Sit Amet",
+				emojis = emptyMap(),
 			)
 
 		)

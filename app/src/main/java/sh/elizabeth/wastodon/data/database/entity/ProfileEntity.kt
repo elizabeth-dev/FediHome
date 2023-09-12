@@ -1,12 +1,9 @@
 package sh.elizabeth.wastodon.data.database.entity
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import sh.elizabeth.wastodon.model.Profile
-import sh.elizabeth.wastodon.model.ProfileField
 import java.time.Instant
 
 @Entity(
@@ -55,32 +52,4 @@ data class ProfileExtraEntity(
 data class ProfileFieldEntity(
 	val name: String,
 	val value: String,
-)
-
-data class FullProfileEntity(
-	@Embedded val profile: ProfileEntity,
-
-	@Embedded val extra: ProfileExtraEntity,
-)
-
-fun FullProfileEntity.toDomain() = Profile(
-	id = profile.profileId,
-	name = profile.name,
-	username = profile.username,
-	instance = profile.instance,
-	fullUsername = profile.fullUsername,
-	avatarUrl = profile.avatarUrl,
-	avatarBlur = profile.avatarBlur,
-	headerUrl = extra.headerUrl,
-	headerBlur = extra.headerBlur,
-	following = extra.following,
-	followers = extra.followers,
-	postCount = extra.postCount,
-	createdAt = extra.createdAt,
-	fields = extra.fields.map {
-		ProfileField(
-			it.name, it.value
-		)
-	},
-	description = extra.description,
 )

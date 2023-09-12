@@ -6,19 +6,23 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import sh.elizabeth.wastodon.data.database.dao.EmojiDao
 import sh.elizabeth.wastodon.data.database.dao.PostDao
 import sh.elizabeth.wastodon.data.database.dao.ProfileDao
 import sh.elizabeth.wastodon.data.database.dao.TimelineDao
+import sh.elizabeth.wastodon.data.database.entity.EmojiEntity
 import sh.elizabeth.wastodon.data.database.entity.PollEntity
+import sh.elizabeth.wastodon.data.database.entity.PostEmojiCrossRef
 import sh.elizabeth.wastodon.data.database.entity.PostEntity
+import sh.elizabeth.wastodon.data.database.entity.ProfileEmojiCrossRef
 import sh.elizabeth.wastodon.data.database.entity.ProfileEntity
 import sh.elizabeth.wastodon.data.database.entity.ProfileExtraEntity
 import sh.elizabeth.wastodon.data.database.entity.ProfileFieldEntity
-import sh.elizabeth.wastodon.data.database.entity.TimelinePostCrossRefEntity
+import sh.elizabeth.wastodon.data.database.entity.TimelinePostEntity
 import java.time.Instant
 
 @Database(
-	entities = [ProfileEntity::class, ProfileExtraEntity::class, PostEntity::class, TimelinePostCrossRefEntity::class],
+	entities = [ProfileEntity::class, ProfileExtraEntity::class, PostEntity::class, TimelinePostEntity::class, EmojiEntity::class, PostEmojiCrossRef::class, ProfileEmojiCrossRef::class],
 	version = 1
 )
 @TypeConverters(Converters::class)
@@ -26,6 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
 	abstract fun profileDao(): ProfileDao
 	abstract fun postDao(): PostDao
 	abstract fun timelineDao(): TimelineDao
+	abstract fun emojiDao(): EmojiDao
 }
 
 class Converters {

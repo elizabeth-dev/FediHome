@@ -51,7 +51,8 @@ fun SlimPostCard(
 				if (post.repostedBy != null) TopDisclaimer(
 					icon = Icons.Rounded.Repeat,
 					iconDescription = "Repost",
-					text = "Reposted by ${post.repostedBy.name}"
+					text = "Reposted by ${post.repostedBy.name}",
+					emojis = post.repostedBy.emojis
 				)
 
 				SlimProfileSummary(profile = post.author, navToProfile = navToProfile)
@@ -63,8 +64,9 @@ fun SlimPostCard(
 					Divider()
 				}
 
-				if (!post.text.isNullOrBlank()) Text(
+				if (!post.text.isNullOrBlank()) TextWithEmoji(
 					post.text,
+					emojis = post.emojis,
 					style = MaterialTheme.typography.bodyLarge, // TODO: Maybe use a smaller font size like bodyMedium
 					modifier = Modifier
 				)
@@ -132,8 +134,8 @@ fun SlimPostCardPreview() {
 				createdAt = null,
 				fields = emptyList(),
 				description = "Lorem Ipsum Dolor Sit Amet",
-
-				),
+				emojis = emptyMap(),
+			),
 			quote = Post(
 				id = "foo",
 				createdAt = Instant.now(),
@@ -156,8 +158,8 @@ fun SlimPostCardPreview() {
 					createdAt = null,
 					fields = emptyList(),
 					description = "Lorem Ipsum Dolor Sit Amet",
-
-					),
+					emojis = emptyMap(),
+				),
 				quote = null,
 				repostedBy = null,
 				poll = Poll(
@@ -169,9 +171,10 @@ fun SlimPostCardPreview() {
 						)
 					)
 
-				)
+				),
+				emojis = emptyMap(),
 
-			),
+				),
 			repostedBy = Profile(
 				id = "foo",
 				username = "elizabeth",
@@ -188,7 +191,9 @@ fun SlimPostCardPreview() {
 				createdAt = null,
 				fields = emptyList(),
 				description = "Lorem Ipsum Dolor Sit Amet",
-			),
+				emojis = emptyMap(),
+
+				),
 			poll = Poll(
 				voted = false, expiresAt = null, multiple = false, choices = listOf(
 					PollChoice(
@@ -197,7 +202,8 @@ fun SlimPostCardPreview() {
 						text = "bar", votes = 0, isVoted = false
 					)
 				)
-			)
+			),
+			emojis = emptyMap(),
 		), onReply = {}, onVotePoll = { _, _ -> }, navToPost = { }, navToProfile = { })
 	}
 }

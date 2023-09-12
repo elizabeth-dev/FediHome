@@ -18,6 +18,7 @@ data class Profile(
 	val avatarBlur: String?,
 	val headerUrl: String?,
 	val headerBlur: String?,
+	val emojis: Map<String, Emoji>,
 )
 
 data class ProfileField(

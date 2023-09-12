@@ -192,6 +192,7 @@ fun ComposeScreenPreview() {
 				createdAt = null,
 				fields = emptyList(),
 				description = "Lorem Ipsum Dolor Sit Amet",
+				emojis = emptyMap(),
 			),
 			isReply = true,
 			replyTo = Post(
@@ -215,11 +216,12 @@ fun ComposeScreenPreview() {
 					createdAt = null,
 					fields = emptyList(),
 					description = "Lorem Ipsum Dolor Sit Amet",
-
-					),
+					emojis = emptyMap(),
+				),
 				quote = null,
 				repostedBy = null,
 				poll = null,
+				emojis = emptyMap(),
 			)
 		), { _, _ -> }, {})
 	}

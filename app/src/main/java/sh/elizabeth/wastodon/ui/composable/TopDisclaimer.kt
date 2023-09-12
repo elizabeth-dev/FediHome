@@ -10,13 +10,14 @@ import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import sh.elizabeth.wastodon.model.Emoji
 import sh.elizabeth.wastodon.ui.theme.WastodonTheme
 
 @Composable
@@ -25,6 +26,7 @@ fun TopDisclaimer(
 	icon: ImageVector,
 	iconDescription: String,
 	text: String,
+	emojis: Map<String, Emoji> = emptyMap(),
 ) {
 	Surface(
 		modifier = Modifier.fillMaxWidth(),
@@ -40,8 +42,10 @@ fun TopDisclaimer(
 				contentDescription = iconDescription,
 				modifier = Modifier.size(20.dp)
 			)
-			Text(
-				text,
+			TextWithEmoji(
+				text = text,
+				emojis = emojis,
+				emojiSize = 21.sp,
 				style = MaterialTheme.typography.bodyMedium,
 				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 			)

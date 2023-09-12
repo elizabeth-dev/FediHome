@@ -74,6 +74,8 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			repostedBy = user.toDomain(fetchedFromInstance),
 			quote = renote.renote?.toDomain(fetchedFromInstance),
 			poll = renote.poll?.toDomain(),
+			// TODO: Add reaction emojis
+			emojis = renote.emojis.associate { Pair(it.name, it.toDomain(fetchedFromInstance)) },
 		)
 	}
 	return DomainPost(
@@ -86,6 +88,8 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		repostedBy = null,
 		quote = renote?.toDomain(fetchedFromInstance),
 		poll = poll?.toDomain(),
+		// TODO: Add reaction emojis
+		emojis = emojis.associate { Pair(it.name, it.toDomain(fetchedFromInstance)) },
 	)
 }
 
@@ -104,15 +108,11 @@ data class PollChoice(
 	val isVoted: Boolean,
 )
 
-fun Poll.toDomain() = DomainPoll(
-	voted = choices.any { it.isVoted },
+fun Poll.toDomain() = DomainPoll(voted = choices.any { it.isVoted },
 	multiple = multiple,
 	expiresAt = expiresAt,
 	choices = choices.map {
 		DomainPollChoice(
-			text = it.text,
-			votes = it.votes,
-			isVoted = it.isVoted
+			text = it.text, votes = it.votes, isVoted = it.isVoted
 		)
-	}
-)
+	})

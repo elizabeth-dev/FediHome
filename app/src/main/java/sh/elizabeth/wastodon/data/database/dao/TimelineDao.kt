@@ -2,13 +2,13 @@ package sh.elizabeth.wastodon.data.database.dao
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import sh.elizabeth.wastodon.data.database.entity.PostWithAuthor
-import sh.elizabeth.wastodon.data.database.entity.TimelinePostCrossRefEntity
+import sh.elizabeth.wastodon.data.database.entity.EnrichedTimelinePost
+import sh.elizabeth.wastodon.data.database.entity.TimelinePostEntity
 
 @Dao
 interface TimelineDao {
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
-	suspend fun insertTimelinePost(vararg timelinePost: TimelinePostCrossRefEntity): List<Long>
+	suspend fun insertTimelinePost(vararg timelinePost: TimelinePostEntity): List<Long>
 
 	@Transaction
 	@Query(
@@ -23,18 +23,18 @@ interface TimelineDao {
 		
 		quoteAuthor.profileRow AS quoteAuthor_profileRow, quoteAuthor.profileId AS quoteAuthor_profileId, quoteAuthor.avatarUrl AS quoteAuthor_avatarUrl, quoteAuthor.avatarBlur AS quoteAuthor_avatarBlur, quoteAuthor.fullUsername AS quoteAuthor_fullUsername, quoteAuthor.instance AS quoteAuthor_instance, quoteAuthor.name AS quoteAuthor_name, quoteAuthor.username AS quoteAuthor_username, quoteAuthorExtra.profileExtraRow AS quoteAuthor_profileExtraRow, quoteAuthorExtra.profileRef AS quoteAuthor_profileRef, quoteAuthorExtra.headerUrl AS quoteAuthor_headerUrl, quoteAuthorExtra.headerBlur AS quoteAuthor_headerBlur, quoteAuthorExtra.description AS quoteAuthor_description, quoteAuthorExtra.following AS quoteAuthor_following, quoteAuthorExtra.followers AS quoteAuthor_followers, quoteAuthorExtra.postCount AS quoteAuthor_postCount, quoteAuthorExtra.createdAt AS quoteAuthor_createdAt, quoteAuthorExtra.fields AS quoteAuthor_fields
 
-		FROM TimelinePostCrossRefEntity 
-		JOIN PostEntity ON PostEntity.postId = TimelinePostCrossRefEntity.timelinePostId
+		FROM TimelinePostEntity 
+		JOIN PostEntity ON PostEntity.postId = TimelinePostEntity.timelinePostId
 		JOIN ProfileEntity author ON author.profileId = PostEntity.authorId
 		LEFT JOIN ProfileExtraEntity authorExtra ON authorExtra.profileRef = PostEntity.authorId
-		LEFT JOIN ProfileEntity repostedBy ON repostedBy.profileId = TimelinePostCrossRefEntity.repostedBy
-		LEFT JOIN ProfileExtraEntity repostedByExtra ON repostedByExtra.profileRef = TimelinePostCrossRefEntity.repostedBy
+		LEFT JOIN ProfileEntity repostedBy ON repostedBy.profileId = TimelinePostEntity.repostedBy
+		LEFT JOIN ProfileExtraEntity repostedByExtra ON repostedByExtra.profileRef = TimelinePostEntity.repostedBy
 		LEFT JOIN PostEntity quote ON quote.postId = PostEntity.quoteId
 		LEFT JOIN ProfileEntity quoteAuthor ON quoteAuthor.profileId = quote.authorId
 		LEFT JOIN ProfileExtraEntity quoteAuthorExtra ON quoteAuthorExtra.profileRef = quote.authorId
 		
-		WHERE TimelinePostCrossRefEntity.profileIdentifier = :profileIdentifier
-		ORDER BY TimelinePostCrossRefEntity.timelinePostRow DESC"""
+		WHERE TimelinePostEntity.profileIdentifier = :profileIdentifier
+		ORDER BY TimelinePostEntity.timelinePostRow DESC"""
 	)
-	fun getTimelinePosts(profileIdentifier: String): Flow<List<PostWithAuthor>>
+	fun getTimelinePosts(profileIdentifier: String): Flow<List<EnrichedTimelinePost>>
 }

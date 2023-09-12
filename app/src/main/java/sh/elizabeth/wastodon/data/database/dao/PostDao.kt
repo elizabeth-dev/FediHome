@@ -6,8 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
+import sh.elizabeth.wastodon.data.database.entity.EnrichedPost
+import sh.elizabeth.wastodon.data.database.entity.PostEmojiCrossRef
 import sh.elizabeth.wastodon.data.database.entity.PostEntity
-import sh.elizabeth.wastodon.data.database.entity.PostWithAuthor
 
 const val GET_POST_QUERY = """
 		SELECT PostEntity.*,
@@ -31,15 +32,18 @@ interface PostDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insertOrReplace(vararg posts: PostEntity): List<Long>
 
-	@Transaction
-	@Query("$GET_POST_QUERY WHERE PostEntity.postId = :postId")
-	suspend fun getPost(postId: String): PostWithAuthor?
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	suspend fun insertOrReplaceEmojiCrossRef(vararg refs: PostEmojiCrossRef): List<Long>
 
 	@Transaction
 	@Query("$GET_POST_QUERY WHERE PostEntity.postId = :postId")
-	fun getPostFlow(postId: String): Flow<PostWithAuthor>
+	suspend fun getPost(postId: String): EnrichedPost?
+
+	@Transaction
+	@Query("$GET_POST_QUERY WHERE PostEntity.postId = :postId")
+	fun getPostFlow(postId: String): Flow<EnrichedPost>
 
 	@Transaction
 	@Query("$GET_POST_QUERY WHERE PostEntity.authorId = :profileId ORDER BY PostEntity.createdAt DESC")
-	fun getPostsByProfileFlow(profileId: String): Flow<List<PostWithAuthor>>
+	fun getPostsByProfileFlow(profileId: String): Flow<List<EnrichedPost>>
 }

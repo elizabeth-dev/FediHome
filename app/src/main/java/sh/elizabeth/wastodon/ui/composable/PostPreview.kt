@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import sh.elizabeth.wastodon.model.Poll
 import sh.elizabeth.wastodon.model.PollChoice
 import sh.elizabeth.wastodon.model.Post
@@ -48,8 +49,10 @@ fun PostPreview(
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			SlimProfileSummary(profile = post.author, navToProfile = navToProfile)
-			if (!post.text.isNullOrBlank()) Text(
-				post.text,
+			if (!post.text.isNullOrBlank()) TextWithEmoji(
+				text = post.text,
+				emojis = post.emojis,
+				emojiSize = 21.sp,
 				style = MaterialTheme.typography.bodyMedium,
 			)
 			if (post.poll != null) AssistChip(
@@ -99,8 +102,8 @@ fun PostPreviewPreview() {
 					createdAt = null,
 					fields = emptyList(),
 					description = "Lorem Ipsum Dolor Sit Amet",
-
-					),
+					emojis = emptyMap(),
+				),
 				quote = null,
 				repostedBy = null,
 				poll = Poll(
@@ -112,6 +115,7 @@ fun PostPreviewPreview() {
 						)
 					)
 				),
+				emojis = emptyMap(),
 			),
 			navToPost = {},
 			navToProfile = {},

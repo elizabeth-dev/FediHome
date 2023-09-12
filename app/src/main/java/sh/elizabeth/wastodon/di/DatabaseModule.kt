@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import sh.elizabeth.wastodon.data.database.AppDatabase
+import sh.elizabeth.wastodon.data.database.dao.EmojiDao
 import sh.elizabeth.wastodon.data.database.dao.PostDao
 import sh.elizabeth.wastodon.data.database.dao.ProfileDao
 import sh.elizabeth.wastodon.data.database.dao.TimelineDao
@@ -34,4 +35,7 @@ object DatabaseModule {
 
 	@Provides
 	fun provideTimelineDao(db: AppDatabase): TimelineDao = db.timelineDao()
+
+	@Provides
+	fun provideEmojiDao(db: AppDatabase): EmojiDao = db.emojiDao()
 }

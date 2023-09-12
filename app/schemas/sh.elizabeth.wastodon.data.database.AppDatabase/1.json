@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "24eacb87aeb999b7fbb33bb1efd397a7",
+    "identityHash": "485d7ca86e71caaa877ee00b59156e91",
     "entities": [
       {
         "tableName": "ProfileEntity",
@@ -302,7 +302,7 @@
         ]
       },
       {
-        "tableName": "TimelinePostCrossRefEntity",
+        "tableName": "TimelinePostEntity",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timelinePostRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileIdentifier` TEXT NOT NULL, `timelinePostId` TEXT NOT NULL, `repostedBy` TEXT, FOREIGN KEY(`timelinePostId`) REFERENCES `PostEntity`(`postId`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`repostedBy`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
@@ -338,32 +338,32 @@
         },
         "indices": [
           {
-            "name": "index_TimelinePostCrossRefEntity_profileIdentifier_timelinePostId",
+            "name": "index_TimelinePostEntity_profileIdentifier_timelinePostId",
             "unique": true,
             "columnNames": [
               "profileIdentifier",
               "timelinePostId"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_TimelinePostCrossRefEntity_profileIdentifier_timelinePostId` ON `${TABLE_NAME}` (`profileIdentifier`, `timelinePostId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_TimelinePostEntity_profileIdentifier_timelinePostId` ON `${TABLE_NAME}` (`profileIdentifier`, `timelinePostId`)"
           },
           {
-            "name": "index_TimelinePostCrossRefEntity_timelinePostId",
+            "name": "index_TimelinePostEntity_timelinePostId",
             "unique": false,
             "columnNames": [
               "timelinePostId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_TimelinePostCrossRefEntity_timelinePostId` ON `${TABLE_NAME}` (`timelinePostId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TimelinePostEntity_timelinePostId` ON `${TABLE_NAME}` (`timelinePostId`)"
           },
           {
-            "name": "index_TimelinePostCrossRefEntity_repostedBy",
+            "name": "index_TimelinePostEntity_repostedBy",
             "unique": false,
             "columnNames": [
               "repostedBy"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_TimelinePostCrossRefEntity_repostedBy` ON `${TABLE_NAME}` (`repostedBy`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TimelinePostEntity_repostedBy` ON `${TABLE_NAME}` (`repostedBy`)"
           }
         ],
         "foreignKeys": [
@@ -390,12 +390,198 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "EmojiEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fullEmojiId` TEXT NOT NULL, `instance` TEXT NOT NULL, `shortcode` TEXT NOT NULL, `url` TEXT NOT NULL, PRIMARY KEY(`fullEmojiId`))",
+        "fields": [
+          {
+            "fieldPath": "fullEmojiId",
+            "columnName": "fullEmojiId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "instance",
+            "columnName": "instance",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shortcode",
+            "columnName": "shortcode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "fullEmojiId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_EmojiEntity_fullEmojiId",
+            "unique": true,
+            "columnNames": [
+              "fullEmojiId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_EmojiEntity_fullEmojiId` ON `${TABLE_NAME}` (`fullEmojiId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "PostEmojiCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postId` TEXT NOT NULL, `fullEmojiId` TEXT NOT NULL, PRIMARY KEY(`postId`, `fullEmojiId`), FOREIGN KEY(`postId`) REFERENCES `PostEntity`(`postId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`fullEmojiId`) REFERENCES `EmojiEntity`(`fullEmojiId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "postId",
+            "columnName": "postId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fullEmojiId",
+            "columnName": "fullEmojiId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "postId",
+            "fullEmojiId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_PostEmojiCrossRef_fullEmojiId",
+            "unique": false,
+            "columnNames": [
+              "fullEmojiId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_PostEmojiCrossRef_fullEmojiId` ON `${TABLE_NAME}` (`fullEmojiId`)"
+          },
+          {
+            "name": "index_PostEmojiCrossRef_postId",
+            "unique": false,
+            "columnNames": [
+              "postId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_PostEmojiCrossRef_postId` ON `${TABLE_NAME}` (`postId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "PostEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "postId"
+            ],
+            "referencedColumns": [
+              "postId"
+            ]
+          },
+          {
+            "table": "EmojiEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "fullEmojiId"
+            ],
+            "referencedColumns": [
+              "fullEmojiId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "ProfileEmojiCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileId` TEXT NOT NULL, `fullEmojiId` TEXT NOT NULL, PRIMARY KEY(`profileId`, `fullEmojiId`), FOREIGN KEY(`profileId`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`fullEmojiId`) REFERENCES `EmojiEntity`(`fullEmojiId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "profileId",
+            "columnName": "profileId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fullEmojiId",
+            "columnName": "fullEmojiId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "profileId",
+            "fullEmojiId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ProfileEmojiCrossRef_profileId",
+            "unique": false,
+            "columnNames": [
+              "profileId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ProfileEmojiCrossRef_profileId` ON `${TABLE_NAME}` (`profileId`)"
+          },
+          {
+            "name": "index_ProfileEmojiCrossRef_fullEmojiId",
+            "unique": false,
+            "columnNames": [
+              "fullEmojiId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ProfileEmojiCrossRef_fullEmojiId` ON `${TABLE_NAME}` (`fullEmojiId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ProfileEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "profileId"
+            ],
+            "referencedColumns": [
+              "profileId"
+            ]
+          },
+          {
+            "table": "EmojiEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "fullEmojiId"
+            ],
+            "referencedColumns": [
+              "fullEmojiId"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '24eacb87aeb999b7fbb33bb1efd397a7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '485d7ca86e71caaa877ee00b59156e91')"
     ]
   }
 }

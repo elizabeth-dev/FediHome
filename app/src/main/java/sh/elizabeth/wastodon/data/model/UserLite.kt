@@ -27,10 +27,10 @@ fun UserLite.toDomain(fetchedFromInstance: String): Profile = Profile(
 	name = name,
 	username = username,
 	instance = host ?: fetchedFromInstance,
-	fullUsername = username.contains('@')
-		.let { if (it) username else "${username}@${host ?: fetchedFromInstance}" },
+	fullUsername = if (username.contains('@')) username else "${username}@${host ?: fetchedFromInstance}",
 	avatarUrl = avatarUrl,
 	avatarBlur = avatarBlurhash,
+	emojis = emojis.associate { Pair(it.name, it.toDomain(host ?: fetchedFromInstance)) },
 
 	// Below is extra
 	headerUrl = null,

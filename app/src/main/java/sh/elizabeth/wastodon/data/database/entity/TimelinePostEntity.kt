@@ -20,7 +20,7 @@ import androidx.room.PrimaryKey
 		childColumns = ["repostedBy"]
 	)]
 )
-data class TimelinePostCrossRefEntity(
+data class TimelinePostEntity(
 	@PrimaryKey(autoGenerate = true) var timelinePostRow: Long = 0,
 	val profileIdentifier: String,
 	val timelinePostId: String,

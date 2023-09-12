@@ -4,8 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
-import sh.elizabeth.wastodon.data.database.entity.FullProfileEntity
+import sh.elizabeth.wastodon.data.database.entity.EnrichedFullProfile
+import sh.elizabeth.wastodon.data.database.entity.ProfileEmojiCrossRef
 import sh.elizabeth.wastodon.data.database.entity.ProfileEntity
 import sh.elizabeth.wastodon.data.database.entity.ProfileExtraEntity
 
@@ -22,13 +24,22 @@ interface ProfileDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insertOrReplaceExtra(vararg profiles: ProfileExtraEntity): List<Long>
 
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	suspend fun insertOrReplaceEmojiCrossRef(vararg refs: ProfileEmojiCrossRef): List<Long>
+
+	@Transaction
 	@Query("$GET_PROFILE_QUERY WHERE fullUsername = :fullUsername")
-	suspend fun getByFullUsername(fullUsername: String): FullProfileEntity?
+	suspend fun getByFullUsername(fullUsername: String): EnrichedFullProfile?
 
 	// TODO: Maybe make this Flow<ProfileEntity> ?
+	@Transaction
 	@Query("$GET_PROFILE_QUERY WHERE instance = :instance AND profileId = :profileId LIMIT 1")
-	suspend fun getByInstanceAndProfileId(instance: String, profileId: String): FullProfileEntity?
+	suspend fun getByInstanceAndProfileId(
+		instance: String,
+		profileId: String,
+	): EnrichedFullProfile?
 
+	@Transaction
 	@Query("$GET_PROFILE_QUERY WHERE profileId = :profileId LIMIT 1")
-	fun getProfileFlow(profileId: String): Flow<FullProfileEntity?>
+	fun getProfileFlow(profileId: String): Flow<EnrichedFullProfile?>
 }

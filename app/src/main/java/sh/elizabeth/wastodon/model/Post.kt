@@ -12,6 +12,7 @@ data class Post(
 	val repostedBy: Profile?,
 	val quote: Post?,
 	val poll: Poll?,
+	val emojis: Map<String, Emoji>,
 )
 
 fun Post.unwrapQuotes(): List<Post> {
