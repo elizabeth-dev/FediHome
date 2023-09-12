@@ -34,6 +34,7 @@ import androidx.compose.ui.zIndex
 import androidx.core.graphics.drawable.toDrawable
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.vanniktech.blurhash.BlurHash
 import kotlinx.coroutines.CoroutineScope
@@ -101,10 +102,11 @@ fun ProfileHeader(profile: Profile) {
 				let {
 					if (avatarBlurHash != null) _it.placeholder(avatarBlurHash?.toDrawable(resources = resources))
 					else _it
-				}.transform(RoundedCorners(21))
+				}.transform(CenterCrop(), RoundedCorners(21))
 			}
 
-			Column(Modifier.fillMaxWidth()) {// Header
+			Column(Modifier.fillMaxWidth()) {
+				// Header
 				if (profile.headerUrl != null) GlideImage(
 					model = profile.headerUrl,
 					contentDescription = "",
