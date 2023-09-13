@@ -10,15 +10,12 @@ import java.time.Instant
 	indices = [
 		// TODO: Maybe add an Index for fullUsername? or stop storing fullUsername?
 		Index(
-			value = ["instance", "profileId"], unique = true
-		), Index(
 			value = ["profileId"],
 			unique = true // FIXME: not actually unique, although calckey api might return a unique id. check this.
 		)]
 )
 data class ProfileEntity(
-	@PrimaryKey(autoGenerate = true) var profileRow: Long = 0,
-	val profileId: String,
+	@PrimaryKey var profileId: String, // $id@$fetchedFromInstance
 	val name: String?,
 	val username: String,
 	val instance: String,
@@ -37,8 +34,7 @@ data class ProfileEntity(
 	)]
 )
 data class ProfileExtraEntity(
-	@PrimaryKey(autoGenerate = true) var profileExtraRow: Long = 0,
-	val profileRef: String?,
+	@PrimaryKey var profileRef: String,
 	val headerUrl: String?,
 	val headerBlur: String?,
 	val description: String?,

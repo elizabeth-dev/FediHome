@@ -1,6 +1,7 @@
 package sh.elizabeth.wastodon.ui.composable
 
 import android.content.res.Configuration
+import android.text.format.DateUtils
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -84,7 +85,14 @@ fun PollDisplay(modifier: Modifier = Modifier, poll: Poll, onVote: (choices: Lis
 					)
 				) // TODO: Maybe find a better solution for this?
 				Text(
-					text = if (poll.expiresAt.isBefore(Instant.now())) "Ended" else "Ends at ${poll.expiresAt}",
+					text = if (poll.expiresAt.isBefore(Instant.now())) "Ended" else "Ends ${
+						DateUtils.getRelativeTimeSpanString(
+							poll.expiresAt.toEpochMilli(),
+							Instant.now().toEpochMilli(),
+							DateUtils.MINUTE_IN_MILLIS
+
+						).toString().lowercase()
+					}",
 					style = MaterialTheme.typography.labelLarge.copy(
 						color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 					)

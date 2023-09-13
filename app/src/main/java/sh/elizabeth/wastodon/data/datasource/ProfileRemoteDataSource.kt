@@ -14,6 +14,6 @@ class ProfileRemoteDataSource @Inject constructor(private val httpClient: HttpCl
 	suspend fun fetchProfile(instance: String, profileId: String): UserDetailedNotMe =
 		httpClient.post("https://$instance/api/users/show") {
 			contentType(ContentType.Application.Json)
-			setBody(SelectUserRequest(profileId))
+			setBody(SelectUserRequest(profileId.split('@').first()))
 		}.body()
 }

@@ -92,7 +92,7 @@ data class UserDetailedNotMe(
 )
 
 fun UserDetailedNotMe.toDomain(fetchedFromInstance: String): Profile = Profile(
-	id = id,
+	id = "$id@$fetchedFromInstance",
 	name = name,
 	username = username,
 	instance = host ?: fetchedFromInstance,

@@ -2,18 +2,12 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "485d7ca86e71caaa877ee00b59156e91",
+    "identityHash": "de64ba55e7d5a4f098d1d20337f86d00",
     "entities": [
       {
         "tableName": "ProfileEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileId` TEXT NOT NULL, `name` TEXT, `username` TEXT NOT NULL, `instance` TEXT NOT NULL, `fullUsername` TEXT NOT NULL, `avatarUrl` TEXT, `avatarBlur` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileId` TEXT NOT NULL, `name` TEXT, `username` TEXT NOT NULL, `instance` TEXT NOT NULL, `fullUsername` TEXT NOT NULL, `avatarUrl` TEXT, `avatarBlur` TEXT, PRIMARY KEY(`profileId`))",
         "fields": [
-          {
-            "fieldPath": "profileRow",
-            "columnName": "profileRow",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "profileId",
             "columnName": "profileId",
@@ -58,22 +52,12 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
-            "profileRow"
+            "profileId"
           ]
         },
         "indices": [
-          {
-            "name": "index_ProfileEntity_instance_profileId",
-            "unique": true,
-            "columnNames": [
-              "instance",
-              "profileId"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ProfileEntity_instance_profileId` ON `${TABLE_NAME}` (`instance`, `profileId`)"
-          },
           {
             "name": "index_ProfileEntity_profileId",
             "unique": true,
@@ -88,19 +72,13 @@
       },
       {
         "tableName": "ProfileExtraEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileExtraRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileRef` TEXT, `headerUrl` TEXT, `headerBlur` TEXT, `description` TEXT, `following` INTEGER, `followers` INTEGER, `postCount` INTEGER, `createdAt` INTEGER, `fields` TEXT NOT NULL, FOREIGN KEY(`profileRef`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileRef` TEXT NOT NULL, `headerUrl` TEXT, `headerBlur` TEXT, `description` TEXT, `following` INTEGER, `followers` INTEGER, `postCount` INTEGER, `createdAt` INTEGER, `fields` TEXT NOT NULL, PRIMARY KEY(`profileRef`), FOREIGN KEY(`profileRef`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
-          {
-            "fieldPath": "profileExtraRow",
-            "columnName": "profileExtraRow",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "profileRef",
             "columnName": "profileRef",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "headerUrl",
@@ -152,9 +130,9 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
-            "profileExtraRow"
+            "profileRef"
           ]
         },
         "indices": [
@@ -184,14 +162,8 @@
       },
       {
         "tableName": "PostEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postRow` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `postId` TEXT NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `cw` TEXT, `text` TEXT, `authorId` TEXT NOT NULL, `quoteId` TEXT, `poll` TEXT, FOREIGN KEY(`authorId`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`quoteId`) REFERENCES `PostEntity`(`postId`) ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postId` TEXT NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `cw` TEXT, `text` TEXT, `authorId` TEXT NOT NULL, `quoteId` TEXT, `poll` TEXT, PRIMARY KEY(`postId`), FOREIGN KEY(`authorId`) REFERENCES `ProfileEntity`(`profileId`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`quoteId`) REFERENCES `PostEntity`(`postId`) ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED)",
         "fields": [
-          {
-            "fieldPath": "postRow",
-            "columnName": "postRow",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "postId",
             "columnName": "postId",
@@ -242,9 +214,9 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
-            "postRow"
+            "postId"
           ]
         },
         "indices": [
@@ -581,7 +553,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '485d7ca86e71caaa877ee00b59156e91')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'de64ba55e7d5a4f098d1d20337f86d00')"
     ]
   }
 }

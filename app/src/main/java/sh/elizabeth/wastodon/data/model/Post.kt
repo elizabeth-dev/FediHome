@@ -65,7 +65,7 @@ fun Post.isQuote(): Boolean =
 fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 	if (renote != null && !isQuote()) {
 		return DomainPost(
-			id = renote.id,
+			id = "${renote.id}@$fetchedFromInstance",
 			createdAt = renote.createdAt,
 			updatedAt = renote.updatedAt,
 			text = renote.text,
@@ -79,7 +79,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		)
 	}
 	return DomainPost(
-		id = id,
+		id = "$id@$fetchedFromInstance",
 		createdAt = createdAt,
 		updatedAt = updatedAt,
 		text = text,

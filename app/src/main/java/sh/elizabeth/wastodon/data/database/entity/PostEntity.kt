@@ -10,7 +10,9 @@ import java.time.Instant
 
 @Entity(
 	foreignKeys = [ForeignKey(
-		entity = ProfileEntity::class, parentColumns = ["profileId"], childColumns = ["authorId"]
+		entity = ProfileEntity::class,
+		parentColumns = ["profileId"],
+		childColumns = ["authorId"]
 	), ForeignKey(
 		entity = PostEntity::class,
 		parentColumns = ["postId"],
@@ -18,12 +20,11 @@ import java.time.Instant
 		deferred = true
 	)], indices = [Index("authorId"), Index(
 		value = ["postId"],
-		unique = true // FIXME: not actually unique, although calckey api might return a unique id. check this.
+		unique = true
 	), Index("quoteId")]
 )
 data class PostEntity(
-	@PrimaryKey(autoGenerate = true) var postRow: Long = 0,
-	val postId: String,
+	@PrimaryKey val postId: String,
 	val createdAt: Instant?, // Sometimes null on Calckey
 	val updatedAt: Instant?,
 	val cw: String?,

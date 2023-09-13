@@ -25,13 +25,13 @@ class PostRemoteDataSource @Inject constructor(private val httpClient: HttpClien
 	suspend fun fetchPost(instance: String, postId: String): Post =
 		httpClient.post("https://$instance/api/notes/show") {
 			contentType(ContentType.Application.Json)
-			setBody(SelectPostRequest(noteId = postId))
+			setBody(SelectPostRequest(noteId = postId.split('@').first()))
 		}.body()
 
-	suspend fun fetchPostsByProfile(instance: String, profile: String): List<Post> =
+	suspend fun fetchPostsByProfile(instance: String, profileId: String): List<Post> =
 		httpClient.post("https://$instance/api/users/notes") {
 			contentType(ContentType.Application.Json)
-			setBody(GetPostsByProfile(userId = profile))
+			setBody(GetPostsByProfile(userId = profileId.split('@').first()))
 		}.body()
 
 	suspend fun votePoll(instance: String, postId: String, choice: Int) {
@@ -39,7 +39,7 @@ class PostRemoteDataSource @Inject constructor(private val httpClient: HttpClien
 			"https://$instance/api/notes/polls/vote"
 		) {
 			contentType(ContentType.Application.Json)
-			setBody(PollVoteRequest(noteId = postId, choice = choice))
+			setBody(PollVoteRequest(noteId = postId.split('@').first(), choice = choice))
 		}
 	}
 }
