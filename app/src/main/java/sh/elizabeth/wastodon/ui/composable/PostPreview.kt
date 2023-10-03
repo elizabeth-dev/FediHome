@@ -109,6 +109,7 @@ fun PostPreviewPreview() {
 				quote = null,
 				repostedBy = null,
 				poll = Poll(
+					id = null,
 					voted = false, expiresAt = null, multiple = false, choices = listOf(
 						PollChoice(
 							text = "foo", votes = 0, isVoted = false

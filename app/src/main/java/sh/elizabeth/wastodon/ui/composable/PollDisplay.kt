@@ -46,7 +46,7 @@ private fun calcButtonIcon(multiple: Boolean, isVoted: Boolean) = if (multiple) 
 fun PollDisplay(modifier: Modifier = Modifier, poll: Poll, onVote: (choices: List<Int>) -> Unit) {
 	val selectedChoices = remember { mutableStateListOf<Int>() }
 
-	val totalVotes = poll.choices.fold(0) { acc, choice -> acc + choice.votes }
+	val totalVotes = poll.choices.fold(0) { acc, choice -> acc + (choice.votes ?: 0) }
 	val disabledPoll = poll.voted || poll.expiresAt?.isBefore(Instant.now()) == false
 
 	Column(
@@ -92,8 +92,7 @@ fun PollDisplay(modifier: Modifier = Modifier, poll: Poll, onVote: (choices: Lis
 							DateUtils.MINUTE_IN_MILLIS
 
 						).toString().lowercase()
-					}",
-					style = MaterialTheme.typography.labelLarge.copy(
+					}", style = MaterialTheme.typography.labelLarge.copy(
 						color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 					)
 				)
@@ -135,7 +134,7 @@ fun ResultPollChoiceButton(choice: PollChoice, multiple: Boolean, totalVotes: In
 			overflow = TextOverflow.Ellipsis,
 			modifier = Modifier.weight(1f),
 		)
-		Text(
+		if (choice.votes != null) Text(
 			text = "${
 				if (totalVotes == 0) 0 else choice.votes.toFloat()
 					.div(totalVotes)
@@ -180,7 +179,11 @@ fun PollDisplayPreview() {
 			contentColor = MaterialTheme.colorScheme.onSurface,
 		) {
 			PollDisplay(poll = Poll(
-				voted = false, expiresAt = Instant.EPOCH, multiple = false, choices = listOf(
+				id = null,
+				voted = false,
+				expiresAt = Instant.EPOCH,
+				multiple = false,
+				choices = listOf(
 					PollChoice(
 						text = "foo", votes = 0, isVoted = true
 					), PollChoice(

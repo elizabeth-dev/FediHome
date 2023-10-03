@@ -1,4 +1,4 @@
-package sh.elizabeth.wastodon.data.model
+package sh.elizabeth.wastodon.api.firefish.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -108,7 +108,8 @@ data class PollChoice(
 	val isVoted: Boolean,
 )
 
-fun Poll.toDomain() = DomainPoll(voted = choices.any { it.isVoted },
+fun Poll.toDomain() = DomainPoll(
+	id = null, voted = choices.any { it.isVoted },
 	multiple = multiple,
 	expiresAt = expiresAt,
 	choices = choices.map {

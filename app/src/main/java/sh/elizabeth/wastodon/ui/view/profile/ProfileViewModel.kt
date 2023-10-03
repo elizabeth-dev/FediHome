@@ -122,9 +122,9 @@ class ProfileViewModel @Inject constructor(
 		}
 	}
 
-	fun votePoll(activeAccount: String, postId: String, choices: List<Int>) {
+	fun votePoll(activeAccount: String, postId: String, pollId: String?, choices: List<Int>) {
 		viewModelScope.launch {
-			votePollUseCase(activeAccount, postId, choices)
+			votePollUseCase(activeAccount, postId, pollId, choices)
 		}
 	}
 }

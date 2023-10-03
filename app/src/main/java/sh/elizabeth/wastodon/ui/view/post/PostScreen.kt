@@ -29,7 +29,7 @@ fun PostScreen(
 	contentPadding: PaddingValues,
 	onPostRefresh: (activeAccount: String, postId: String) -> Unit,
 	onReply: (String) -> Unit,
-	onVotePoll: (postId: String, choices: List<Int>) -> Unit,
+	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 	navToProfile: (String) -> Unit,
 ) {
 	val pullRefreshState = rememberPullRefreshState(uiState.isLoading,
@@ -60,12 +60,11 @@ fun PostScreen(
 					.verticalScroll(rememberScrollState())
 			) {
 				Surface {
-					SlimPostCard(
-						post = uiState.post,
-						onReply = onReply,
-						onVotePoll = onVotePoll,
-						navToPost = {},
-						navToProfile = navToProfile
+					SlimPostCard(post = uiState.post, onReply = onReply, onVotePoll = {
+						onVotePoll(
+							uiState.activeAccount, uiState.post.id, uiState.post.poll?.id, it
+						)
+					}, navToPost = {}, navToProfile = navToProfile
 					)
 				}
 			}

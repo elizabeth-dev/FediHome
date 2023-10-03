@@ -88,14 +88,14 @@ class PostViewModel @Inject constructor(
 	fun refreshPost(activeAccount: String, postId: String) {
 		viewModelState.update { it.copy(isLoading = true) }
 		viewModelScope.launch {
-			postRepository.fetchPost(activeAccount.split(":")[0], postId)
+			postRepository.fetchPost(activeAccount, postId)
 			viewModelState.update { it.copy(isLoading = false) }
 		}
 	}
 
-	fun votePoll(activeAccount: String, postId: String, choices: List<Int>) {
+	fun votePoll(activeAccount: String, postId: String, pollId: String?, choices: List<Int>) {
 		viewModelScope.launch {
-			votePollUseCase(activeAccount, postId, choices)
+			votePollUseCase(activeAccount, postId, pollId, choices)
 		}
 	}
 }

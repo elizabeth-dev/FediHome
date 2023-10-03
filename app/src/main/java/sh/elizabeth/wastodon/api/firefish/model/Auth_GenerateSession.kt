@@ -1,4 +1,4 @@
-package sh.elizabeth.wastodon.data.model
+package sh.elizabeth.wastodon.api.firefish.model
 
 import kotlinx.serialization.Serializable
 
@@ -7,6 +7,6 @@ data class GenerateSessionRequest(val appSecret: String)
 
 @Serializable
 data class GenerateSessionResponse(
-    val token: String,
-    val url: String,
+	val token: String,
+	val url: String,
 )

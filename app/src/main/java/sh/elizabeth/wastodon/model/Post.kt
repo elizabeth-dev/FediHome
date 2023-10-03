@@ -29,10 +29,11 @@ fun Post.unwrapProfiles(): List<Profile> =
 	if (repostedBy == null) listOf(author) else listOf(author, repostedBy)
 
 data class Poll(
+	val id: String?,
 	val voted: Boolean,
 	val choices: List<PollChoice>,
 	val expiresAt: Instant?,
 	val multiple: Boolean,
 )
 
-data class PollChoice(val text: String, val votes: Int, val isVoted: Boolean)
+data class PollChoice(val text: String, val votes: Int?, val isVoted: Boolean)

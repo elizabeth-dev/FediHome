@@ -43,6 +43,8 @@ fun MainNavGraph(
 			route = MainDestinations.LOGIN_ROUTE, deepLinks = listOf(navDeepLink {
 				uriPattern =
 					"$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}?token={$TOKEN_PARAM}"
+			}, navDeepLink {
+				uriPattern = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}?code={$TOKEN_PARAM}"
 			})
 		) {
 			LoginRoute(navToDashboard = navActions::navigateToDashboard)

@@ -2,59 +2,46 @@ package sh.elizabeth.wastodon.data.repository
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import sh.elizabeth.wastodon.MainDestinations
 import sh.elizabeth.wastodon.data.datasource.AuthRemoteDataSource
-import sh.elizabeth.wastodon.data.datasource.SettingsLocalDataSource
-import sh.elizabeth.wastodon.data.model.toDomain
+import sh.elizabeth.wastodon.data.datasource.InternalDataLocalDataSource
+import sh.elizabeth.wastodon.data.datasource.MetaRemoteDataSource
 import sh.elizabeth.wastodon.model.Profile
-import sh.elizabeth.wastodon.util.APP_DEEPLINK_URI
-import sh.elizabeth.wastodon.util.APP_DESCRIPTION
-import sh.elizabeth.wastodon.util.APP_NAME
-import sh.elizabeth.wastodon.util.APP_PERMISSION
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
 	private val authRemoteDataSource: AuthRemoteDataSource,
-	private val settingsLocalDataSource: SettingsLocalDataSource,
+	private val metaRemoteDataSource: MetaRemoteDataSource,
+	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 ) {
-	val activeAccount = settingsLocalDataSource.settingsData.map { it.activeAccount }
+	val activeAccount = internalDataLocalDataSource.internalData.map { it.activeAccount }
 
 	suspend fun prepareOAuth(instance: String): String {
-		settingsLocalDataSource.setLastLoginInstance(instance)
+		internalDataLocalDataSource.setLastLoginInstance(instance)
 
-		val appSecret = settingsLocalDataSource.settingsData.first().appSecrets[instance]
-			?: authRemoteDataSource.createApp(
-				instance = instance,
-				name = APP_NAME,
-				description = APP_DESCRIPTION,
-				permission = APP_PERMISSION,
-				callbackUrl = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}"
-			).secret.also { appSecret ->
-				settingsLocalDataSource.addAppSecret(instance, appSecret)
-			}
+		val instanceType = metaRemoteDataSource.getInstanceType(instance)
+			?: throw IllegalArgumentException("Instance type not supported")
 
-		val session = authRemoteDataSource.generateSession(
-			instance = instance,
-			appSecret = appSecret,
-		)
+		internalDataLocalDataSource.addServerType(instance, instanceType)
 
-		return session.url
+		return authRemoteDataSource.prepareOAuth(instance, instanceType)
 	}
 
 	suspend fun finishOAuth(token: String): Profile {
-		val settingsData = settingsLocalDataSource.settingsData.first()
+		val settingsData = internalDataLocalDataSource.internalData.first()
 		val instance =
-			if (settingsData.lastLoginInstance != "") settingsData.lastLoginInstance else throw IllegalStateException("Last login instance not found")
-		val appSecret = settingsData.appSecrets[instance]
-			?: throw IllegalStateException("App secret for $instance not found")
+			if (settingsData.lastLoginInstance != "") settingsData.lastLoginInstance else throw IllegalStateException(
+				"Last login instance not found"
+			)
 
-		val userKey = authRemoteDataSource.getUserKey(instance, appSecret, token)
+		val instanceType = settingsData.serverTypes[instance]
+			?: throw IllegalStateException("Instance type not found")
 
-		val profile = userKey.user.toDomain(instance)
-		val identifier = "$instance:${profile.id}"
+		val (accessToken, profile) = authRemoteDataSource.finishOAuth(instance, instanceType, token)
 
-		settingsLocalDataSource.addAccessToken(identifier, userKey.accessToken)
-		settingsLocalDataSource.setActiveAccount(identifier)
+		val identifier = "$instance:${profile.id}" // FIXME: Use a "@" format?
+
+		internalDataLocalDataSource.addAccessToken(identifier, accessToken)
+		internalDataLocalDataSource.setActiveAccount(identifier)
 
 		return profile
 	}

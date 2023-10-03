@@ -3,24 +3,34 @@ package sh.elizabeth.wastodon.data.repository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
 import sh.elizabeth.wastodon.data.database.entity.PostEmojiCrossRef
 import sh.elizabeth.wastodon.data.database.entity.ProfileEmojiCrossRef
 import sh.elizabeth.wastodon.data.datasource.EmojiLocalDataSource
+import sh.elizabeth.wastodon.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.wastodon.data.datasource.PostLocalDataSource
 import sh.elizabeth.wastodon.data.datasource.PostRemoteDataSource
-import sh.elizabeth.wastodon.data.model.toDomain
 import sh.elizabeth.wastodon.model.Post
 import sh.elizabeth.wastodon.model.PostDraft
 import sh.elizabeth.wastodon.model.unwrapProfiles
 import sh.elizabeth.wastodon.model.unwrapQuotes
+import sh.elizabeth.wastodon.util.SupportedInstances
 import javax.inject.Inject
 
 class PostRepository @Inject constructor(
 	private val postLocalDataSource: PostLocalDataSource,
-	private val postRemoteDataSource: PostRemoteDataSource,
 	private val profileRepository: ProfileRepository,
 	private val emojiLocalDataSource: EmojiLocalDataSource,
+	private val postRemoteDataSource: PostRemoteDataSource,
+	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 ) {
+	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
+		activeAccount.let {
+			val internalData = internalDataLocalDataSource.internalData.first()
+			val instance = it.split(':').first()
+			Triple(instance, internalData.serverTypes[instance]!!, internalData.accessTokens[it]!!)
+		}
+
 	suspend fun insertOrReplace(vararg posts: Post) {
 		postLocalDataSource.insertOrReplace(*posts)
 	}
@@ -29,9 +39,11 @@ class PostRepository @Inject constructor(
 		postLocalDataSource.insertOrReplaceEmojiCrossRef(*refs)
 	}
 
-	suspend fun createPost(instance: String, newPost: PostDraft) {
-		val postRes = postRemoteDataSource.createPost(instance, newPost)
-		insertOrReplace(postRes.createdNote.toDomain(instance))
+	suspend fun createPost(activeAccount: String, newPost: PostDraft) {
+		val (instance, instanceType, token) = getInstanceAndTypeAndToken(activeAccount)
+
+		val postRes = postRemoteDataSource.createPost(instance, instanceType, token, newPost)
+		insertOrReplace(postRes)
 	}
 
 	suspend fun getPost(postId: String): Post? = postLocalDataSource.getPost(postId)
@@ -42,11 +54,14 @@ class PostRepository @Inject constructor(
 		postLocalDataSource.getPostsByProfileFlow(profileId)
 
 	suspend fun fetchPost(
-		instance: String,
+		activeAccount: String,
 		postId: String,
 	) {
+		val (instance, instanceType, token) = getInstanceAndTypeAndToken(activeAccount)
+
 		val posts =
-			postRemoteDataSource.fetchPost(instance, postId).toDomain(instance).unwrapQuotes()
+			postRemoteDataSource.fetchPost(instance, instanceType, token, postId.split('@').first())
+				.unwrapQuotes()
 		val profiles = posts.flatMap { it.unwrapProfiles() }.toSet()
 		val emojis =
 			posts.flatMap { it.emojis.values }.plus(profiles.flatMap { it.emojis.values }).toSet()
@@ -78,10 +93,20 @@ class PostRepository @Inject constructor(
 		}
 	}
 
-	suspend fun fetchPostsByProfile(instance: String, profileId: String) {
-		val posts = postRemoteDataSource.fetchPostsByProfile(instance, profileId)
-			.map { it.toDomain(instance) }
-			.flatMap { it.unwrapQuotes() }
+	suspend fun fetchPostsByProfile(
+		activeAccount: String,
+		profileId: String,
+	) {
+		val (instance, instanceType, token) = getInstanceAndTypeAndToken(activeAccount)
+
+		val posts =
+			postRemoteDataSource.fetchPostsByProfile(
+				instance,
+				instanceType,
+				token,
+				profileId.split('@').first()
+			)
+				.flatMap { it.unwrapQuotes() }
 		val profiles = posts.flatMap { it.unwrapProfiles() }.toSet()
 		val emojis =
 			posts.flatMap { it.emojis.values }.plus(profiles.flatMap { it.emojis.values }).toSet()
@@ -115,7 +140,20 @@ class PostRepository @Inject constructor(
 		}
 	}
 
-	suspend fun votePoll(instance: String, postId: String, choice: Int) =
-		postRemoteDataSource.votePoll(instance, postId, choice)
+	suspend fun votePoll(
+		activeAccount: String,
+		postId: String,
+		choices: List<Int>,
+	) {
+		val (instance, instanceType, token) = getInstanceAndTypeAndToken(activeAccount)
+
+		postRemoteDataSource.votePoll(
+			instance,
+			instanceType,
+			token,
+			postId.split('@').first(),
+			choices
+		)
+	}
 
 }

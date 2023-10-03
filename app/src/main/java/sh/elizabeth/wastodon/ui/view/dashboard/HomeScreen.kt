@@ -1,6 +1,9 @@
 package sh.elizabeth.wastodon.ui.view.dashboard
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -43,7 +46,7 @@ fun HomeScreen(
 	uiState: HomeUiState,
 	onRefresh: (String) -> Unit,
 	onReply: (String) -> Unit,
-	onVotePoll: (String, String, List<Int>) -> Unit,
+	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 	navToPost: (String) -> Unit,
 	navToProfile: (String) -> Unit,
 ) {
@@ -68,8 +71,8 @@ fun HomeScreen(
 
 			is HomeUiState.HasPosts -> LazyColumn(Modifier.fillMaxSize()) {
 				items(uiState.posts) { post ->
-					SlimPostCard(post = post, onReply = onReply, onVotePoll = { postId, choices ->
-						onVotePoll(uiState.activeAccount, postId, choices)
+					SlimPostCard(post = post, onReply = onReply, onVotePoll = {
+						onVotePoll(uiState.activeAccount, post.id, post.poll?.id, it)
 					}, navToPost = navToPost, navToProfile = navToProfile)
 				}
 			}

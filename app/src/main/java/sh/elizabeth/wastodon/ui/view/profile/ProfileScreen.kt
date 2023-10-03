@@ -32,7 +32,7 @@ fun ProfileScreen(
 	contentPadding: PaddingValues,
 	onRefresh: (activeAccount: String, profileId: String) -> Unit,
 	onReply: (String) -> Unit,
-	onVotePoll: (String, String, List<Int>) -> Unit,
+	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 	navToPost: (String) -> Unit,
 	navToProfile: (String) -> Unit,
 ) {
@@ -69,8 +69,8 @@ fun ProfileScreen(
 				if (uiState.posts != null) items(uiState.posts) { post ->
 					SlimPostCard(post = post,
 						onReply = onReply,
-						onVotePoll = { postId, choices ->
-							onVotePoll(uiState.activeAccount, postId, choices)
+						onVotePoll = {
+							onVotePoll(uiState.activeAccount, post.id, post.poll?.id, it)
 						},
 						navToPost = navToPost,
 						navToProfile = { if (it != uiState.profileId) navToProfile(it) })

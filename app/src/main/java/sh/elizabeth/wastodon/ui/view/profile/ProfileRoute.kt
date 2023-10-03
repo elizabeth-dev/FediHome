@@ -52,7 +52,7 @@ fun ProfileRoute(
 	navBack: () -> Unit,
 	onRefresh: (activeAccount: String, postId: String) -> Unit,
 	onReply: (String) -> Unit,
-	onVotePoll: (String, String, List<Int>) -> Unit,
+	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 	navToPost: (String) -> Unit,
 	navToProfile: (String) -> Unit,
 ) {
@@ -156,7 +156,11 @@ fun ProfileRoutePreview() {
 						quote = null,
 						repostedBy = null,
 						poll = Poll(
-							voted = false, expiresAt = null, multiple = false, choices = listOf(
+							id = null,
+							voted = false,
+							expiresAt = null,
+							multiple = false,
+							choices = listOf(
 								PollChoice(
 									text = "foo", votes = 0, isVoted = false
 								), PollChoice(
@@ -169,7 +173,11 @@ fun ProfileRoutePreview() {
 					),
 					repostedBy = null,
 					poll = Poll(
-						voted = false, expiresAt = null, multiple = false, choices = listOf(
+						id = null,
+						voted = false,
+						expiresAt = null,
+						multiple = false,
+						choices = listOf(
 							PollChoice(
 								text = "foo", votes = 0, isVoted = false
 							), PollChoice(
@@ -184,7 +192,7 @@ fun ProfileRoutePreview() {
 			navBack = {},
 			onRefresh = { _, _ -> },
 			onReply = {},
-			onVotePoll = { _, _, _ -> },
+			onVotePoll = { _, _, _, _ -> },
 			navToPost = {},
 			navToProfile = {})
 	}

@@ -32,7 +32,7 @@ import java.time.Instant
 fun SlimPostCard(
 	post: Post,
 	onReply: (String) -> Unit,
-	onVotePoll: (postId: String, choices: List<Int>) -> Unit,
+	onVotePoll: (choices: List<Int>) -> Unit,
 	navToPost: (postId: String) -> Unit,
 	navToProfile: (profileId: String) -> Unit,
 ) { // TODO: Check if it's better to pass individual props
@@ -71,7 +71,7 @@ fun SlimPostCard(
 					modifier = Modifier
 				)
 
-				if (post.poll != null) PollDisplay(poll = post.poll) { onVotePoll(post.id, it) }
+				if (post.poll != null) PollDisplay(poll = post.poll) { onVotePoll(it) }
 
 				if (post.quote != null) PostPreview(
 					modifier = Modifier
@@ -175,7 +175,11 @@ fun SlimPostCardPreview() {
 				quote = null,
 				repostedBy = null,
 				poll = Poll(
-					voted = false, expiresAt = null, multiple = false, choices = listOf(
+					id = null,
+					voted = false,
+					expiresAt = null,
+					multiple = false,
+					choices = listOf(
 						PollChoice(
 							text = "foo", votes = 0, isVoted = false
 						), PollChoice(
@@ -207,7 +211,7 @@ fun SlimPostCardPreview() {
 
 				),
 			poll = Poll(
-				voted = false, expiresAt = null, multiple = false, choices = listOf(
+				id = null, voted = false, expiresAt = null, multiple = false, choices = listOf(
 					PollChoice(
 						text = "foo", votes = 0, isVoted = false
 					), PollChoice(
@@ -216,6 +220,6 @@ fun SlimPostCardPreview() {
 				)
 			),
 			emojis = emptyMap(),
-		), onReply = {}, onVotePoll = { _, _ -> }, navToPost = { }, navToProfile = { })
+		), onReply = {}, onVotePoll = { }, navToPost = { }, navToProfile = { })
 	}
 }

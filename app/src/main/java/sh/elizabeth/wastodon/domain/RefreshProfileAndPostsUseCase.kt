@@ -12,10 +12,8 @@ class RefreshProfileAndPostsUseCase @Inject constructor(
 	private val profileRepository: ProfileRepository,
 ) {
 	suspend operator fun invoke(profileIdentifier: String, profileId: String) = coroutineScope {
-		val instance = profileIdentifier.split(':')[0]
-
-		val profileDef = async { profileRepository.fetchProfile(instance, profileId) }
-		val postsDef = async { postRepository.fetchPostsByProfile(instance, profileId) }
+		val profileDef = async { profileRepository.fetchProfile(profileIdentifier, profileId) }
+		val postsDef = async { postRepository.fetchPostsByProfile(profileIdentifier, profileId) }
 
 		awaitAll(profileDef, postsDef)
 	}

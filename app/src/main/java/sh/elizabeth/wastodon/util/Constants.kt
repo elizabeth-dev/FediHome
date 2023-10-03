@@ -1,8 +1,11 @@
 package sh.elizabeth.wastodon.util
 
+import kotlinx.serialization.SerialName
+
 const val APP_NAME = "Test Fedi Client"
 const val APP_DESCRIPTION = "Test Fedi Client by @elizabeth@tech.lgbt"
-val APP_PERMISSION = listOf(
+
+val FIREFISH_APP_PERMISSION = listOf(
 	"write:user-groups",
 	"read:user-groups",
 	"read:page-likes",
@@ -30,4 +33,22 @@ val APP_PERMISSION = listOf(
 	"read:messaging",
 	"write:messaging",
 )
+
+val MASTODON_APP_PERMISSION = listOf(
+	"read",
+	"write",
+	"push",
+)
+
 const val APP_DEEPLINK_URI = "app://sh.elizabeth.wastodon"
+
+enum class SupportedInstances {
+	@SerialName("firefish")
+	FIREFISH,
+
+	@SerialName("mastodon")
+	MASTODON,
+
+	@SerialName("glitch-soc")
+	GLITCH,
+}

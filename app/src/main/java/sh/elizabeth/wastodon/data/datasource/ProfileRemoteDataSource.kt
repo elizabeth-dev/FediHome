@@ -1,19 +1,28 @@
 package sh.elizabeth.wastodon.data.datasource
 
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import sh.elizabeth.wastodon.data.model.SelectUserRequest
-import sh.elizabeth.wastodon.data.model.UserDetailedNotMe
+import sh.elizabeth.wastodon.api.firefish.ProfileFirefishApi
+import sh.elizabeth.wastodon.api.firefish.model.toDomain
+import sh.elizabeth.wastodon.api.mastodon.ProfileMastodonApi
+import sh.elizabeth.wastodon.api.mastodon.model.toDomain
+import sh.elizabeth.wastodon.model.Profile
+import sh.elizabeth.wastodon.util.SupportedInstances
 import javax.inject.Inject
 
-class ProfileRemoteDataSource @Inject constructor(private val httpClient: HttpClient) {
-	suspend fun fetchProfile(instance: String, profileId: String): UserDetailedNotMe =
-		httpClient.post("https://$instance/api/users/show") {
-			contentType(ContentType.Application.Json)
-			setBody(SelectUserRequest(profileId.split('@').first()))
-		}.body()
+class ProfileRemoteDataSource @Inject constructor(
+	private val profileMastodonApi: ProfileMastodonApi,
+	private val profileFirefishApi: ProfileFirefishApi,
+) {
+	suspend fun fetchProfile(
+		instance: String,
+		instanceType: SupportedInstances,
+		token: String,
+		profileId: String,
+	): Profile = when (instanceType) {
+		SupportedInstances.FIREFISH -> profileFirefishApi.fetchProfile(instance, token, profileId)
+			.toDomain(instance)
+
+		SupportedInstances.GLITCH,
+		SupportedInstances.MASTODON,
+		-> profileMastodonApi.fetchProfile(instance, token, profileId).toDomain(instance)
+	}
 }

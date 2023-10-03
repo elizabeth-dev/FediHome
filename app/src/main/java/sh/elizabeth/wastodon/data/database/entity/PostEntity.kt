@@ -10,17 +10,14 @@ import java.time.Instant
 
 @Entity(
 	foreignKeys = [ForeignKey(
-		entity = ProfileEntity::class,
-		parentColumns = ["profileId"],
-		childColumns = ["authorId"]
+		entity = ProfileEntity::class, parentColumns = ["profileId"], childColumns = ["authorId"]
 	), ForeignKey(
 		entity = PostEntity::class,
 		parentColumns = ["postId"],
 		childColumns = ["quoteId"],
 		deferred = true
 	)], indices = [Index("authorId"), Index(
-		value = ["postId"],
-		unique = true
+		value = ["postId"], unique = true
 	), Index("quoteId")]
 )
 data class PostEntity(
@@ -35,14 +32,17 @@ data class PostEntity(
 )
 
 data class PollEntity(
+	val id: String?,
 	val choices: List<PollChoiceEntity>,
 	val expiresAt: Instant?,
 	val multiple: Boolean,
 )
 
-data class PollChoiceEntity(val text: String, val votes: Int, val isVoted: Boolean)
+data class PollChoiceEntity(val text: String, val votes: Int?, val isVoted: Boolean)
 
-fun PollEntity.toDomain() = Poll(voted = choices.any { it.isVoted },
+fun PollEntity.toDomain() = Poll(
+	id = id,
+	voted = choices.any { it.isVoted },
 	multiple = multiple,
 	expiresAt = expiresAt,
 	choices = choices.map { PollChoice(text = it.text, votes = it.votes, isVoted = it.isVoted) })

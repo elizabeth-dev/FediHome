@@ -1,42 +1,105 @@
 package sh.elizabeth.wastodon.data.datasource
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import sh.elizabeth.wastodon.data.model.*
+import kotlinx.coroutines.flow.first
+import sh.elizabeth.wastodon.MainDestinations
+import sh.elizabeth.wastodon.api.firefish.AuthFirefishApi
+import sh.elizabeth.wastodon.api.firefish.model.toDomain
+import sh.elizabeth.wastodon.api.mastodon.AuthMastodonApi
+import sh.elizabeth.wastodon.api.mastodon.model.toDomain
+import sh.elizabeth.wastodon.model.Profile
+import sh.elizabeth.wastodon.util.APP_DEEPLINK_URI
+import sh.elizabeth.wastodon.util.MASTODON_APP_PERMISSION
+import sh.elizabeth.wastodon.util.SupportedInstances
 import javax.inject.Inject
 
-class AuthRemoteDataSource @Inject constructor(private val httpClient: HttpClient) {
-	suspend fun createApp(
+class AuthRemoteDataSource @Inject constructor(
+	private val authMastodonApi: AuthMastodonApi,
+	private val authFirefishApi: AuthFirefishApi,
+	private val internalDataLocalDataSource: InternalDataLocalDataSource,
+) {
+
+	suspend fun prepareOAuth(instance: String, instanceType: SupportedInstances): String {
+		when (instanceType) {
+			SupportedInstances.FIREFISH -> {
+				val appSecret =
+					internalDataLocalDataSource.internalData.first().appSecrets[instance]
+						?: authFirefishApi.createApp(instance = instance).secret.also { appSecret ->
+							internalDataLocalDataSource.addAppSecret(instance, appSecret)
+						}
+				val session = authFirefishApi.generateSession(
+					instance = instance,
+					appSecret = appSecret,
+				)
+
+				return session.url
+			}
+
+			SupportedInstances.GLITCH,
+			SupportedInstances.MASTODON,
+			-> {
+				val cachedApp = internalDataLocalDataSource.internalData.first()
+					.let { it.appIds[instance] to it.appSecrets[instance] }
+
+				val appData =
+					if (cachedApp.first != null && cachedApp.second != null) cachedApp else authMastodonApi.createApp(
+						instance = instance,
+					).let { it.clientId to it.clientSecret }.also { (clientId, clientSecret) ->
+						internalDataLocalDataSource.addAppId(instance, clientId!!)
+						internalDataLocalDataSource.addAppSecret(instance, clientSecret!!)
+					}
+
+				return generateAuthUrl(
+					instance = instance,
+					clientId = appData.first!!,
+				)
+			}
+		}
+	}
+
+	suspend fun finishOAuth(
 		instance: String,
-		name: String,
-		description: String,
-		permission: List<String>,
-		callbackUrl: String,
-	): CreateAppResponse = httpClient.post("https://$instance/api/app/create") {
-		contentType(ContentType.Application.Json)
-		setBody(
-			CreateAppRequest(
-				name = name,
-				description = description,
-				permission = permission,
-				callbackUrl = callbackUrl
-			)
-		)
-	}.body()
+		instanceType: SupportedInstances,
+		token: String,
+	): Pair<String, Profile> {
+		val internalData = internalDataLocalDataSource.internalData.first()
 
-	suspend fun generateSession(instance: String, appSecret: String): GenerateSessionResponse = httpClient.post(
-		"https://$instance/api/auth/session/generate"
-	) {
-		contentType(ContentType.Application.Json)
-		setBody(GenerateSessionRequest(appSecret = appSecret))
-	}.body()
+		when (instanceType) {
+			SupportedInstances.FIREFISH -> {
+				val appSecret = internalData.appSecrets[instance]
+					?: throw IllegalStateException("App secret for $instance not found")
 
-	suspend fun getUserKey(instance: String, appSecret: String, token: String): UserKeyResponse = httpClient.post(
-		"https://$instance/api/auth/session/userkey"
-	) {
-		contentType(ContentType.Application.Json)
-		setBody(UserKeyRequest(appSecret = appSecret, token = token))
-	}.body()
+				val userKey = authFirefishApi.getUserKey(instance, appSecret, token)
+
+				return userKey.accessToken to userKey.user.toDomain(instance)
+			}
+
+			SupportedInstances.GLITCH,
+			SupportedInstances.MASTODON,
+			-> {
+				val appId = internalData.appIds[instance]
+					?: throw IllegalStateException("App id for $instance not found")
+				val appSecret = internalData.appSecrets[instance]
+					?: throw IllegalStateException("App secret for $instance not found")
+
+				val accessToken = authMastodonApi.getAccessToken(
+					instance, token, appId, appSecret
+				).access_token
+
+				val profile =
+					authMastodonApi.verifyCredentials(instance, accessToken).toDomain(instance)
+
+				return accessToken to profile
+			}
+		}
+	}
+
+	private fun generateAuthUrl(
+		instance: String,
+		clientId: String,
+		callbackUrl: String = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}",
+		scopes: List<String> = MASTODON_APP_PERMISSION,
+	): String =
+		"https://$instance/oauth/authorize?client_id=$clientId&redirect_uri=$callbackUrl&response_type=code&scope=${
+			scopes.joinToString(" ")
+		}"
 }

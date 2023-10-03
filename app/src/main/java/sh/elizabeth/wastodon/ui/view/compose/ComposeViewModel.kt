@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import sh.elizabeth.wastodon.data.model.PostVisibility
 import sh.elizabeth.wastodon.data.repository.AuthRepository
 import sh.elizabeth.wastodon.data.repository.PostRepository
 import sh.elizabeth.wastodon.data.repository.ProfileRepository
 import sh.elizabeth.wastodon.domain.CreatePostUseCase
 import sh.elizabeth.wastodon.model.Post
 import sh.elizabeth.wastodon.model.PostDraft
+import sh.elizabeth.wastodon.model.PostVisibility
 import sh.elizabeth.wastodon.model.Profile
 import javax.inject.Inject
 

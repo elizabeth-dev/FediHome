@@ -5,6 +5,6 @@ import javax.inject.Inject
 
 class RefreshTimelineUseCase @Inject constructor(private val timelineRepository: TimelineRepository) {
 	suspend operator fun invoke(profileIdentifier: String) =
-		timelineRepository.fetchTimeline(profileIdentifier.split(':')[0], profileIdentifier)
+		timelineRepository.fetchTimeline(profileIdentifier, profileIdentifier)
 
 }

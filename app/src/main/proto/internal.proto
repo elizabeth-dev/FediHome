@@ -12,9 +12,11 @@ option java_multiple_files = true;
   string banner_url = 6;
 }*/
 
-message Settings {
+message InternalData {
   map<string, string> app_secrets = 1;
-  string lastLoginInstance = 2;
-  map<string, string> accessTokens = 3;
-  string activeAccount = 4;
+  map<string, string> app_ids = 5;
+  string last_login_instance = 2;
+  map<string, string> access_tokens = 3;
+  map<string, string> server_types = 6;
+  string active_account = 4;
 }

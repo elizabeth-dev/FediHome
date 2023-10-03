@@ -6,5 +6,5 @@ import javax.inject.Inject
 
 class CreatePostUseCase @Inject constructor(private val postRepository: PostRepository) {
 	suspend operator fun invoke(profileIdentifier: String, newPost: PostDraft) =
-		postRepository.createPost(profileIdentifier.split(':')[0], newPost)
+		postRepository.createPost(profileIdentifier, newPost)
 }

@@ -48,7 +48,7 @@ fun PostRoute(
 	navBack: () -> Unit,
 	onPostRefresh: (activeAccount: String, postId: String) -> Unit,
 	onReply: (String) -> Unit,
-	onVotePoll: (activeAccount: String, postId: String, choices: List<Int>) -> Unit,
+	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 	navToProfile: (profileId: String) -> Unit,
 ) {
 	Scaffold(topBar = {
@@ -66,7 +66,7 @@ fun PostRoute(
 			onPostRefresh = onPostRefresh,
 			contentPadding = contentPadding,
 			onReply = onReply,
-			onVotePoll = { postId, choices -> onVotePoll(uiState.activeAccount, postId, choices) },
+			onVotePoll = onVotePoll,
 			navToProfile = navToProfile
 		)
 
@@ -130,6 +130,7 @@ fun PostRoutePreview() {
 					quote = null,
 					repostedBy = null,
 					poll = Poll(
+						id = null,
 						voted = false, expiresAt = null, multiple = false, choices = listOf(
 							PollChoice(
 								text = "foo", votes = 0, isVoted = false
@@ -144,6 +145,7 @@ fun PostRoutePreview() {
 					),
 				repostedBy = null,
 				poll = Poll(
+					id = null,
 					voted = false, expiresAt = null, multiple = false, choices = listOf(
 						PollChoice(
 							text = "foo", votes = 0, isVoted = false
@@ -158,7 +160,7 @@ fun PostRoutePreview() {
 			navBack = {},
 			onPostRefresh = { _, _ -> },
 			onReply = {},
-			onVotePoll = { _, _, _ -> },
+			onVotePoll = { _, _, _, _ -> },
 			navToProfile = {})
 	}
 }

@@ -1,4 +1,4 @@
-package sh.elizabeth.wastodon.data.model
+package sh.elizabeth.wastodon.api.firefish.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

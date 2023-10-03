@@ -35,7 +35,7 @@ fun Post.toEntity() = PostEntity(
 	authorId = author.id,
 	quoteId = quote?.id,
 	poll = if (poll != null) PollEntity(
-		choices = poll.choices.map {
+		id = poll.id, choices = poll.choices.map {
 			PollChoiceEntity(
 				text = it.text, votes = it.votes, isVoted = it.isVoted
 			)

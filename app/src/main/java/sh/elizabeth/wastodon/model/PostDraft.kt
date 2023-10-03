@@ -1,7 +1,5 @@
 package sh.elizabeth.wastodon.model
 
-import sh.elizabeth.wastodon.data.model.PostVisibility
-
 data class PostDraft(
 	val text: String?,
 	val cw: String?,
