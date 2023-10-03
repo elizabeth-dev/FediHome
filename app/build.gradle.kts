@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-	namespace = "sh.elizabeth.wastodon"
+	namespace = "sh.elizabeth.fedihome"
 	compileSdk = 34
 
 	defaultConfig {
-		applicationId = "sh.elizabeth.wastodon"
+		applicationId = "sh.elizabeth.fedihome"
 		minSdk = 24
 		targetSdk = 34
 		versionCode = 1
