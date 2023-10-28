@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import sh.elizabeth.fedihome.mock.defaultPoll
 import sh.elizabeth.fedihome.model.Poll
 import sh.elizabeth.fedihome.model.PollChoice
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
@@ -178,19 +179,7 @@ fun PollDisplayPreview() {
 			color = MaterialTheme.colorScheme.surface,
 			contentColor = MaterialTheme.colorScheme.onSurface,
 		) {
-			PollDisplay(poll = Poll(
-				id = null,
-				voted = false,
-				expiresAt = Instant.EPOCH,
-				multiple = false,
-				choices = listOf(
-					PollChoice(
-						text = "foo", votes = 0, isVoted = true
-					), PollChoice(
-						text = "bar", votes = 0, isVoted = false
-					)
-				)
-			), onVote = {})
+			PollDisplay(poll = defaultPoll, onVote = {})
 		}
 	}
 }

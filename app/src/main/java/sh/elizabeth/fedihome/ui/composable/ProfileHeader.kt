@@ -40,8 +40,8 @@ import com.vanniktech.blurhash.BlurHash
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import sh.elizabeth.fedihome.mock.defaultProfile
 import sh.elizabeth.fedihome.model.Profile
-import sh.elizabeth.fedihome.model.ProfileField
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 import kotlin.math.roundToInt
 
@@ -204,30 +204,7 @@ fun ProfileHeader(profile: Profile) {
 fun ProfileHeaderPreview() {
 	FediHomeTheme {
 		ProfileHeader(
-			profile = Profile(
-				id = "foo",
-				username = "elizabeth",
-				name = "Elizabeth",
-				avatarUrl = null,
-				avatarBlur = null,
-				instance = "blahaj.zone",
-				fullUsername = "bar@blahaj.zone",
-				headerUrl = null,
-				headerBlur = null,
-				following = null,
-				followers = null,
-				postCount = null,
-				createdAt = null,
-				fields = listOf(
-					ProfileField("Birthday", "April 20"),
-					ProfileField("Location", "The Moon"),
-					ProfileField("Website", "https://example.com"),
-					ProfileField("Foo", "Bar"),
-				),
-				description = "Lorem Ipsum Dolor Sit Amet",
-				emojis = emptyMap(),
-			)
-
+			profile = defaultProfile
 		)
 	}
 }

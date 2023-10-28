@@ -40,12 +40,11 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import sh.elizabeth.fedihome.model.Post
-import sh.elizabeth.fedihome.model.Profile
+import sh.elizabeth.fedihome.mock.defaultPost
+import sh.elizabeth.fedihome.mock.defaultProfile
 import sh.elizabeth.fedihome.ui.composable.SlimProfileCard
 import sh.elizabeth.fedihome.ui.composable.TopDisclaimer
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
-import java.time.Instant
 
 @Composable
 fun ComposeScreen(
@@ -176,53 +175,8 @@ fun ComposeScreen(
 @Composable
 fun ComposeScreenPreview() {
 	FediHomeTheme {
-		ComposeScreen(ComposeUiState(
-			activeProfile = Profile(
-				id = "foo",
-				username = "elizabeth",
-				name = "Elizabeth",
-				avatarUrl = null,
-				avatarBlur = null,
-				instance = "blahaj.zone",
-				fullUsername = "elizabeth@blahaj.zone",
-				headerUrl = null, headerBlur = null,
-				following = null,
-				followers = null,
-				postCount = null,
-				createdAt = null,
-				fields = emptyList(),
-				description = "Lorem Ipsum Dolor Sit Amet",
-				emojis = emptyMap(),
-			),
-			isReply = true,
-			replyTo = Post(
-				id = "foo",
-				createdAt = Instant.now(),
-				updatedAt = null,
-				cw = null,
-				text = "bar",
-				author = Profile(
-					id = "foo",
-					username = "elizabeth",
-					name = "Elizabeth",
-					avatarUrl = null,
-					avatarBlur = null,
-					instance = "blahaj.zone",
-					fullUsername = "elizabeth@blahaj.zone",
-					headerUrl = null, headerBlur = null,
-					following = null,
-					followers = null,
-					postCount = null,
-					createdAt = null,
-					fields = emptyList(),
-					description = "Lorem Ipsum Dolor Sit Amet",
-					emojis = emptyMap(),
-				),
-				quote = null,
-				repostedBy = null,
-				poll = null,
-				emojis = emptyMap(),
-			)
-		), { _, _ -> }, {})
+		ComposeScreen(uiState = ComposeUiState(
+			activeProfile = defaultProfile, isReply = true, replyTo = defaultPost
+		), onSendPost = { _, _ -> }, onClose = {})
 	}
 }

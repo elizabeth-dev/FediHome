@@ -19,12 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import sh.elizabeth.fedihome.model.Poll
-import sh.elizabeth.fedihome.model.PollChoice
+import sh.elizabeth.fedihome.mock.defaultPost
 import sh.elizabeth.fedihome.model.Post
-import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
-import java.time.Instant
 
 @Composable
 fun PostPreview(
@@ -83,43 +80,7 @@ fun PostPreviewPreview() {
 			modifier = Modifier
 				.padding(8.dp)
 				.fillMaxWidth(),
-			post = Post(
-				id = "foo",
-				createdAt = Instant.now(),
-				updatedAt = null,
-				cw = null,
-				text = "bar",
-				author = Profile(
-					id = "foo",
-					username = "elizabeth",
-					name = "Elizabeth",
-					avatarUrl = null,
-					avatarBlur = null,
-					instance = "blahaj.zone",
-					fullUsername = "elizabeth@blahaj.zone",
-					headerUrl = null, headerBlur = null,
-					following = null,
-					followers = null,
-					postCount = null,
-					createdAt = null,
-					fields = emptyList(),
-					description = "Lorem Ipsum Dolor Sit Amet",
-					emojis = emptyMap(),
-				),
-				quote = null,
-				repostedBy = null,
-				poll = Poll(
-					id = null,
-					voted = false, expiresAt = null, multiple = false, choices = listOf(
-						PollChoice(
-							text = "foo", votes = 0, isVoted = false
-						), PollChoice(
-							text = "bar", votes = 0, isVoted = false
-						)
-					)
-				),
-				emojis = emptyMap(),
-			),
+			post = defaultPost,
 			navToPost = {},
 			navToProfile = {},
 		)

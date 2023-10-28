@@ -17,12 +17,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import sh.elizabeth.fedihome.model.Poll
-import sh.elizabeth.fedihome.model.PollChoice
-import sh.elizabeth.fedihome.model.Post
-import sh.elizabeth.fedihome.model.Profile
+import sh.elizabeth.fedihome.mock.defaultPost
+import sh.elizabeth.fedihome.mock.defaultProfile
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
-import java.time.Instant
 
 @Composable
 fun ProfileRoute(
@@ -87,106 +84,8 @@ fun ProfileRoute(
 fun ProfileRoutePreview() {
 	FediHomeTheme {
 		ProfileRoute(uiState = ProfileUiState.HasProfile(
-			profileId = "foo", profile = Profile(
-				id = "foo",
-				username = "elizabeth",
-				name = "Elizabeth",
-				avatarUrl = null,
-				avatarBlur = null,
-				instance = "blahaj.zone",
-				fullUsername = "elizabeth@blahaj.zone",
-				headerUrl = null,
-				headerBlur = null,
-				following = null,
-				followers = null,
-				postCount = null,
-				createdAt = null,
-				fields = emptyList(),
-				description = "Lorem Ipsum Dolor Sit Amet",
-				emojis = emptyMap(),
-			), posts = listOf(
-				Post(
-					id = "foo",
-					createdAt = Instant.now(),
-					updatedAt = null,
-					cw = "foo",
-					text = "bar",
-					author = Profile(
-						id = "foo",
-						username = "elizabeth",
-						name = "Elizabeth",
-						avatarUrl = null,
-						avatarBlur = null,
-						instance = "blahaj.zone",
-						fullUsername = "elizabeth@blahaj.zone",
-						headerUrl = null,
-						headerBlur = null,
-						following = null,
-						followers = null,
-						postCount = null,
-						createdAt = null,
-						fields = emptyList(),
-						description = "Lorem Ipsum Dolor Sit Amet",
-						emojis = emptyMap(),
-					),
-					quote = Post(
-						id = "foo",
-						createdAt = Instant.now(),
-						updatedAt = null,
-						cw = null,
-						text = "bar",
-						author = Profile(
-							id = "foo",
-							username = "elizabeth",
-							name = "Elizabeth",
-							avatarUrl = null,
-							avatarBlur = null,
-							instance = "blahaj.zone",
-							fullUsername = "elizabeth@blahaj.zone",
-							headerUrl = null,
-							headerBlur = null,
-							following = null,
-							followers = null,
-							postCount = null,
-							createdAt = null,
-							fields = emptyList(),
-							description = "Lorem Ipsum Dolor Sit Amet",
-							emojis = emptyMap(),
-						),
-						quote = null,
-						repostedBy = null,
-						poll = Poll(
-							id = null,
-							voted = false,
-							expiresAt = null,
-							multiple = false,
-							choices = listOf(
-								PollChoice(
-									text = "foo", votes = 0, isVoted = false
-								), PollChoice(
-									text = "bar", votes = 0, isVoted = false
-								)
-							)
-
-						),
-						emojis = emptyMap(),
-					),
-					repostedBy = null,
-					poll = Poll(
-						id = null,
-						voted = false,
-						expiresAt = null,
-						multiple = false,
-						choices = listOf(
-							PollChoice(
-								text = "foo", votes = 0, isVoted = false
-							), PollChoice(
-								text = "bar", votes = 0, isVoted = false
-							)
-						)
-					),
-					emojis = emptyMap(),
-				)
+			profileId = "foo", profile = defaultProfile, posts = listOf(
+				defaultPost
 			), activeAccount = "foo", isLoading = false
 		),
 			navBack = {},
