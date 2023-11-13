@@ -27,7 +27,7 @@ class PostRepository @Inject constructor(
 	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
 		activeAccount.let {
 			val internalData = internalDataLocalDataSource.internalData.first()
-			val instance = it.split(':').first()
+			val instance = it.split('@')[1]
 			Triple(instance, internalData.serverTypes[instance]!!, internalData.accessTokens[it]!!)
 		}
 
@@ -99,14 +99,9 @@ class PostRepository @Inject constructor(
 	) {
 		val (instance, instanceType, token) = getInstanceAndTypeAndToken(activeAccount)
 
-		val posts =
-			postRemoteDataSource.fetchPostsByProfile(
-				instance,
-				instanceType,
-				token,
-				profileId.split('@').first()
-			)
-				.flatMap { it.unwrapQuotes() }
+		val posts = postRemoteDataSource.fetchPostsByProfile(
+			instance, instanceType, token, profileId.split('@').first()
+		).flatMap { it.unwrapQuotes() }
 		val profiles = posts.flatMap { it.unwrapProfiles() }.toSet()
 		val emojis =
 			posts.flatMap { it.emojis.values }.plus(profiles.flatMap { it.emojis.values }).toSet()
@@ -148,11 +143,7 @@ class PostRepository @Inject constructor(
 		val (instance, instanceType, token) = getInstanceAndTypeAndToken(activeAccount)
 
 		postRemoteDataSource.votePoll(
-			instance,
-			instanceType,
-			token,
-			postId.split('@').first(),
-			choices
+			instance, instanceType, token, postId.split('@').first(), choices
 		)
 	}
 

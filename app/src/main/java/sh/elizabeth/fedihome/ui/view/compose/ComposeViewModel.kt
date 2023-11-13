@@ -37,10 +37,9 @@ class ComposeViewModel @Inject constructor(
 ) : ViewModel() {
 	private val _uiState = MutableStateFlow(ComposeUiState())
 	val uiState = combine(authRepository.activeAccount, _uiState) { activeAccount, uiState ->
-		val (instance, profileId) = activeAccount.split(':')
 		val isReply = savedStateHandle.contains("replyTo")
 		uiState.copy(
-			activeProfile = profileRepository.getByInstanceAndProfileId(instance, profileId),
+			activeProfile = profileRepository.getByFullUsername(activeAccount),
 			isReply = isReply,
 			replyTo = if (isReply) postRepository.getPost(savedStateHandle["replyTo"]!!) else null
 		)

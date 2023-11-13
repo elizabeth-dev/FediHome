@@ -47,7 +47,10 @@ fun MainNavGraph(
 				uriPattern = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}?code={$TOKEN_PARAM}"
 			})
 		) {
-			LoginRoute(navToDashboard = navActions::navigateToDashboard)
+			LoginRoute(
+				navToDashboard = navActions::navigateToDashboard,
+				navBack = navActions::navigateUp
+			)
 		}
 
 		composable(

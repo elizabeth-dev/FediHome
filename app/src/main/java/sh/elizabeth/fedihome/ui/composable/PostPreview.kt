@@ -47,7 +47,7 @@ fun PostPreview(
 			Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-			SlimProfileSummary(profile = post.author, navToProfile = navToProfile)
+			SlimProfileSummary(profile = post.author, onClick = { navToProfile(post.author.id) })
 			if (!post.text.isNullOrBlank()) TextWithEmoji(
 				text = post.text,
 				emojis = post.emojis,

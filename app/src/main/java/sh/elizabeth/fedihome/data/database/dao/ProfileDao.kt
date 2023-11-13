@@ -27,17 +27,14 @@ interface ProfileDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insertOrReplaceEmojiCrossRef(vararg refs: ProfileEmojiCrossRef): List<Long>
 
-	@Transaction
-	@Query("$GET_PROFILE_QUERY WHERE fullUsername = :fullUsername")
-	suspend fun getByFullUsername(fullUsername: String): EnrichedFullProfile?
-
 	// TODO: Maybe make this Flow<ProfileEntity> ?
 	@Transaction
-	@Query("$GET_PROFILE_QUERY WHERE instance = :instance AND profileId = :profileId LIMIT 1")
-	suspend fun getByInstanceAndProfileId(
-		instance: String,
-		profileId: String,
-	): EnrichedFullProfile?
+	@Query("$GET_PROFILE_QUERY WHERE fullUsername = :fullUsername LIMIT 1")
+	suspend fun getByFullUsername(fullUsername: String): EnrichedFullProfile?
+
+	@Transaction
+	@Query("$GET_PROFILE_QUERY WHERE profileId IN (:profileIds)")
+	suspend fun getMultipleByIds(profileIds: List<String>): List<EnrichedFullProfile>
 
 	@Transaction
 	@Query("$GET_PROFILE_QUERY WHERE profileId = :profileId LIMIT 1")

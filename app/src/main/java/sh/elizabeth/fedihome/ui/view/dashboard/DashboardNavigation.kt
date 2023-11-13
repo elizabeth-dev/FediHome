@@ -6,18 +6,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 
 enum class DashboardDestinations(
@@ -52,41 +58,74 @@ enum class DashboardDestinations(
 
 private val dashboardDestinations = DashboardDestinations.entries
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DashboardTopBar(
+	currentProfileName: String,
+	onAccountPickerShow: () -> Unit,
+	scrollBehavior: TopAppBarScrollBehavior,
+) {
+
+	CenterAlignedTopAppBar(
+		title = {
+			Text(
+				text = currentProfileName, maxLines = 1, overflow = TextOverflow.Ellipsis
+			)
+		},
+		navigationIcon = {
+			IconButton(onClick = onAccountPickerShow) {
+				Icon(
+					imageVector = Icons.Rounded.AccountCircle,
+					contentDescription = "Account picker"
+				)
+			}
+		},
+		scrollBehavior = scrollBehavior
+	)
+}
+
 @Composable
 fun DashboardNavBar(selectedTab: String, onTabSelected: (String) -> Unit) {
 	NavigationBar {
 		dashboardDestinations.forEach { destination ->
-			NavigationBarItem(
-				icon = {
-					Icon(
-						if (destination.route == selectedTab) destination.selectedIcon else destination.unselectedIcon,
-						contentDescription = destination.iconTextId
-					)
-				},
+			NavigationBarItem(icon = {
+				Icon(
+					if (destination.route == selectedTab) destination.selectedIcon else destination.unselectedIcon,
+					contentDescription = destination.iconTextId
+				)
+			},
 				selected = destination.route == selectedTab,
 				onClick = { onTabSelected(destination.route) },
-				label = { Text(destination.iconTextId) }
-			)
+				label = { Text(destination.iconTextId) })
 		}
 	}
 }
 
 @Composable
-fun DashboardNavRail(selectedTab: String, onTabSelected: (String) -> Unit) {
-	NavigationRail {
+fun DashboardNavRail(
+	selectedTab: String,
+	onTabSelected: (String) -> Unit,
+	onAccountPickerShow: () -> Unit,
+) {
+	NavigationRail(header = {
+		IconButton(onClick = onAccountPickerShow) {
+			Icon(
+				imageVector = Icons.Rounded.AccountCircle,
+				contentDescription = "Account picker"
+			)
+		}
+	}) {
 		Spacer(Modifier.weight(1f))
 		dashboardDestinations.forEach { destination ->
-			NavigationRailItem(
-				icon = {
-					Icon(
-						if (destination.route == selectedTab) destination.selectedIcon else destination.unselectedIcon,
-						contentDescription = destination.iconTextId
-					)
-				},
+			NavigationRailItem(icon = {
+				Icon(
+					if (destination.route == selectedTab) destination.selectedIcon else destination.unselectedIcon,
+					contentDescription = destination.iconTextId
+				)
+			},
 				selected = destination.route == selectedTab,
 				onClick = { onTabSelected(destination.route) },
-				label = { Text(destination.iconTextId) }
-			)
+				label = { Text(destination.iconTextId) })
 		}
 		Spacer(Modifier.weight(1f))
 

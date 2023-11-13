@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import sh.elizabeth.fedihome.TOKEN_PARAM
@@ -18,6 +19,7 @@ data class LoginUiState(
 	val oauthUrl: String? = null,
 	val errorMessage: String? = null,
 	val successfulLogin: Boolean = false,
+	val canNavBack: Boolean = false,
 )
 
 @HiltViewModel
@@ -26,6 +28,7 @@ class LoginViewModel @Inject constructor(
 	private val authRepository: AuthRepository,
 	private val finishOAuthUseCase: FinishOAuthUseCase,
 ) : ViewModel() {
+
 	private val _uiState = MutableStateFlow(LoginUiState(isLoading = false))
 	val uiState = _uiState.asStateFlow()
 
@@ -35,6 +38,17 @@ class LoginViewModel @Inject constructor(
 				_uiState.update { it.copy(isLoading = true) }
 				onTokenReceived(savedStateHandle.get<String>(TOKEN_PARAM)!!)
 				_uiState.update { it.copy(successfulLogin = true, isLoading = false) }
+			} else {
+				_uiState.update { it.copy(isLoading = true) }
+				val loggedIn = authRepository.loggedInAccounts.first().isNotEmpty()
+
+				_uiState.update {
+					if (loggedIn) {
+						it.copy(canNavBack = true, isLoading = false)
+					} else {
+						it.copy(isLoading = false)
+					}
+				}
 			}
 		}
 	}

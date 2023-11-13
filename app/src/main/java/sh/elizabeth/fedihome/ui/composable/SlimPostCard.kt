@@ -52,7 +52,9 @@ fun SlimPostCard(
 					emojis = post.repostedBy.emojis
 				)
 
-				SlimProfileSummary(profile = post.author, navToProfile = navToProfile)
+				SlimProfileSummary(
+					profile = post.author,
+					onClick = { navToProfile(post.author.id) })
 
 				if (!post.cw.isNullOrBlank()) {
 					Text(

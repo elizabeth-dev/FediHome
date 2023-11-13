@@ -45,7 +45,7 @@ private val AVATAR_SIZE = 48.dp
 fun SlimProfileSummary(
 	modifier: Modifier = Modifier,
 	profile: Profile,
-	navToProfile: (profileId: String) -> Unit,
+	onClick: () -> Unit,
 ) {
 	val resources = LocalContext.current.resources
 	val avatarSizeInPx =
@@ -65,7 +65,7 @@ fun SlimProfileSummary(
 	Surface(
 		color = Color.Transparent,
 		contentColor = MaterialTheme.colorScheme.onSurface,
-		onClick = { navToProfile(profile.id) },
+		onClick = onClick,
 		modifier = Modifier.clip(MaterialTheme.shapes.extraSmall)
 	) {
 		Row(modifier = modifier.padding(end = 8.dp)) {
@@ -108,6 +108,6 @@ fun SlimProfileSummary(
 @Composable
 fun SlimProfileSummaryPreview() {
 	FediHomeTheme {
-		SlimProfileSummary(profile = defaultProfile, navToProfile = {})
+		SlimProfileSummary(profile = defaultProfile, onClick = {})
 	}
 }

@@ -6,16 +6,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,8 +38,14 @@ import sh.elizabeth.fedihome.util.openLinkInCustomTab
 
 val padding = 16.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(uiState: LoginUiState, navToDashboard: () -> Unit, onLogin: (String) -> Unit) {
+fun LoginScreen(
+	uiState: LoginUiState,
+	navToDashboard: () -> Unit,
+	onLogin: (String) -> Unit,
+	navBack: () -> Unit,
+) {
 	val context = LocalContext.current
 	val (instance, setInstance) = remember { mutableStateOf("") }
 
@@ -45,29 +58,44 @@ fun LoginScreen(uiState: LoginUiState, navToDashboard: () -> Unit, onLogin: (Str
 		return
 	}
 
-	Surface(Modifier.fillMaxSize()) {
+	Scaffold(topBar = {
+		if (uiState.canNavBack && !uiState.isLoading) TopAppBar(
+			title = {},
+			navigationIcon = {
+				IconButton(
+					onClick = navBack
+				) {
+					Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
+				}
+			})
+	}) { contentPadding ->
 		Column(
-			Modifier.wrapContentSize(Alignment.Center),
+			Modifier
+				.padding(contentPadding)
+				.wrapContentSize(Alignment.Center)
+				.fillMaxSize(),
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.Center
 		) {
 			if (uiState.isLoading) {
 				CircularProgressIndicator()
 			} else {
-				TextField(
-					value = instance,
-					onValueChange = { setInstance(it) },
-					label = { Text("Instance") },
-					singleLine = true,
-					keyboardOptions = KeyboardOptions(
-						imeAction = ImeAction.Go,
-						keyboardType = KeyboardType.Uri
-					),
-					keyboardActions = KeyboardActions(onGo = { onLogin(instance) })
-				)
-				Spacer(Modifier.size(padding))
-				Button(modifier = Modifier.align(Alignment.End), onClick = { onLogin(instance) }) {
-					Text("Login", style = MaterialTheme.typography.labelLarge)
+				Column {
+					TextField(
+						value = instance,
+						onValueChange = { setInstance(it) },
+						label = { Text("Instance") },
+						singleLine = true,
+						keyboardOptions = KeyboardOptions(
+							imeAction = ImeAction.Go, keyboardType = KeyboardType.Uri
+						),
+						keyboardActions = KeyboardActions(onGo = { onLogin(instance) })
+					)
+					Spacer(Modifier.size(padding))
+					Button(modifier = Modifier.align(Alignment.End),
+						onClick = { onLogin(instance) }) {
+						Text("Login", style = MaterialTheme.typography.labelLarge)
+					}
 				}
 			}
 		}
@@ -79,10 +107,14 @@ fun LoginScreen(uiState: LoginUiState, navToDashboard: () -> Unit, onLogin: (Str
 @Composable
 fun LoginScreenPreview() {
 	FediHomeTheme {
-		LoginScreen(
-			uiState = LoginUiState(isLoading = false, errorMessage = "Login failed"),
+		LoginScreen(uiState = LoginUiState(
+			isLoading = false,
+			errorMessage = "Login failed",
+			canNavBack = true
+		),
 			navToDashboard = {},
-			onLogin = {})
+			onLogin = {},
+			navBack = {})
 	}
 }
 
@@ -91,9 +123,9 @@ fun LoginScreenPreview() {
 @Composable
 fun LoginScreenLoadingPreview() {
 	FediHomeTheme {
-		LoginScreen(
-			uiState = LoginUiState(isLoading = true, errorMessage = "Login failed"),
+		LoginScreen(uiState = LoginUiState(isLoading = true, errorMessage = "Login failed"),
 			navToDashboard = {},
-			onLogin = {})
+			onLogin = {},
+			navBack = {})
 	}
 }

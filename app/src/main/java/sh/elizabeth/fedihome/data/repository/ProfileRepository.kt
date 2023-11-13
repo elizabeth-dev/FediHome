@@ -22,7 +22,7 @@ class ProfileRepository @Inject constructor(
 	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
 		activeAccount.let {
 			val internalData = internalDataLocalDataSource.internalData.first()
-			val instance = it.split(':').first()
+			val instance = it.split('@')[1]
 			Triple(instance, internalData.serverTypes[instance]!!, internalData.accessTokens[it]!!)
 		}
 
@@ -38,8 +38,11 @@ class ProfileRepository @Inject constructor(
 		profileLocalDataSource.insertOrReplaceEmojiCrossRef(*refs)
 	}
 
-	suspend fun getByInstanceAndProfileId(instance: String, profileId: String): Profile? =
-		profileLocalDataSource.getByInstanceAndProfileId(instance, profileId)
+	suspend fun getByFullUsername(fullUsername: String): Profile? =
+		profileLocalDataSource.getByFullUsername(fullUsername = fullUsername)
+
+	suspend fun getMultipleByIds(fullUsernames: List<String>): List<Profile> =
+		profileLocalDataSource.getMultipleByIds(fullUsernames)
 
 	fun getProfileFlow(profileId: String) = profileLocalDataSource.getProfileFlow(profileId)
 
@@ -49,13 +52,9 @@ class ProfileRepository @Inject constructor(
 	) {
 		val (instance, instanceType, token) = getInstanceAndTypeAndToken(activeAccount)
 
-		val profileRes =
-			profileRemoteDataSource.fetchProfile(
-				instance,
-				instanceType,
-				token,
-				profileId.split('@').first()
-			)
+		val profileRes = profileRemoteDataSource.fetchProfile(
+			instance, instanceType, token, profileId.split('@').first()
+		)
 		val emojiRefs = profileRes.emojis.values.map {
 			ProfileEmojiCrossRef(profileId = profileRes.id, fullEmojiId = it.fullEmojiId)
 		}

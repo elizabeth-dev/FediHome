@@ -29,7 +29,7 @@ class TimelineRepository @Inject constructor(
 	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
 		activeAccount.let {
 			val internalData = internalDataLocalDataSource.internalData.first()
-			val instance = it.split(':').first()
+			val instance = it.split('@')[1]
 			Triple(instance, internalData.serverTypes[instance]!!, internalData.accessTokens[it]!!)
 		}
 

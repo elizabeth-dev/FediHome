@@ -13,7 +13,11 @@ class AuthRepository @Inject constructor(
 	private val metaRemoteDataSource: MetaRemoteDataSource,
 	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 ) {
+	val internalData = internalDataLocalDataSource.internalData
+
 	val activeAccount = internalDataLocalDataSource.internalData.map { it.activeAccount }
+
+	val loggedInAccounts = internalDataLocalDataSource.internalData.map { it.accessTokens.keys }
 
 	suspend fun prepareOAuth(instance: String): String {
 		internalDataLocalDataSource.setLastLoginInstance(instance)
@@ -38,11 +42,13 @@ class AuthRepository @Inject constructor(
 
 		val (accessToken, profile) = authRemoteDataSource.finishOAuth(instance, instanceType, token)
 
-		val identifier = "$instance:${profile.id}" // FIXME: Use a "@" format?
-
-		internalDataLocalDataSource.addAccessToken(identifier, accessToken)
-		internalDataLocalDataSource.setActiveAccount(identifier)
+		internalDataLocalDataSource.addAccessToken(profile.id, accessToken)
+		internalDataLocalDataSource.setActiveAccount(profile.id)
 
 		return profile
+	}
+
+	suspend fun setActiveAccount(profileId: String) {
+		internalDataLocalDataSource.setActiveAccount(profileId)
 	}
 }

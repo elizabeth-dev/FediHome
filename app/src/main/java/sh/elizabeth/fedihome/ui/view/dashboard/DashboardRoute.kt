@@ -4,8 +4,11 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -17,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import sh.elizabeth.fedihome.mock.defaultProfile
+import sh.elizabeth.fedihome.model.Profile
+import sh.elizabeth.fedihome.ui.composable.AccountPicker
 import sh.elizabeth.fedihome.ui.composable.PostFAB
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 import sh.elizabeth.fedihome.ui.view.dashboard.DashboardDestinations.HOME
@@ -34,37 +40,58 @@ fun DashboardRoute(
 ) {
 	val uiState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
 
-	if (uiState.isAuthLoading) {
-		return
+	when (uiState) {
+		is DashboardUiState.Loading -> return
+		is DashboardUiState.NotLoggedIn -> {
+			navToLogin()
+			return
+		}
+
+		is DashboardUiState.LoggedIn -> DashboardRoute(
+			windowWidthSizeClass = windowSizeClass.widthSizeClass,
+			loggedInProfiles = (uiState as DashboardUiState.LoggedIn).loggedInProfiles,
+			activeAccount = (uiState as DashboardUiState.LoggedIn).activeAccount,
+			navToCompose = navToCompose,
+			navToPost = navToPost,
+			navToProfile = navToProfile,
+			navToAddAccount = navToLogin,
+			switchActiveProfile = dashboardViewModel::switchActiveProfile
+		)
 	}
 
-	if (!uiState.isLoggedIn) {
-		navToLogin()
-		return
-	}
-
-	DashboardRoute(
-		windowWidthSizeClass = windowSizeClass.widthSizeClass,
-		navToCompose = navToCompose,
-		navToPost = navToPost,
-		navToProfile = navToProfile,
-	)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardRoute(
 	windowWidthSizeClass: WindowWidthSizeClass,
+	loggedInProfiles: List<Profile>,
+	activeAccount: String,
 	navToCompose: (String?) -> Unit,
 	navToPost: (String) -> Unit,
 	navToProfile: (String) -> Unit,
+	navToAddAccount: () -> Unit,
+	switchActiveProfile: (profileId: String) -> Unit,
 ) {
 	var selectedTab by remember { mutableStateOf(HOME.route) }
+	val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+	var showAccountPicker by remember { mutableStateOf(false) }
+
+	// FIXME: activeAccount might not be cached?
+	val activeProfile = loggedInProfiles.find { it.id == activeAccount }!!
+
 	Scaffold(bottomBar = {
 		if (windowWidthSizeClass == WindowWidthSizeClass.Compact) {
 			DashboardNavBar(selectedTab) {
 				selectedTab = it
 			}
 		}
+	}, topBar = {
+		if (windowWidthSizeClass == WindowWidthSizeClass.Compact) DashboardTopBar(
+			currentProfileName = "@${activeProfile.username}",
+			onAccountPickerShow = { showAccountPicker = true },
+			scrollBehavior = scrollBehavior
+		)
 	}, floatingActionButton = {
 		PostFAB(onClick = { navToCompose(null) })
 	}) { contentPadding ->
@@ -74,9 +101,9 @@ fun DashboardRoute(
 				.padding(contentPadding)
 		) {
 			if (windowWidthSizeClass != WindowWidthSizeClass.Compact) {
-				DashboardNavRail(selectedTab) {
+				DashboardNavRail(selectedTab = selectedTab, onTabSelected = {
 					selectedTab = it
-				}
+				}, onAccountPickerShow = { showAccountPicker = true })
 			}
 			if (selectedTab == HOME.route) HomeScreen(
 				navToCompose = navToCompose,
@@ -86,7 +113,14 @@ fun DashboardRoute(
 			if (selectedTab == NOTIFICATIONS.route) Text("Notifications screen")
 			if (selectedTab == SEARCH.route) Text("Search screen")
 
+			AccountPicker(isVisible = showAccountPicker,
+				profiles = loggedInProfiles,
+				onSwitch = switchActiveProfile,
+				onAddProfile = navToAddAccount,
+				onDismiss = { showAccountPicker = false })
+
 		}
+
 	}
 }
 
@@ -95,9 +129,15 @@ fun DashboardRoute(
 @Composable
 fun DashboardRoutePreview() {
 	FediHomeTheme {
-		DashboardRoute(windowWidthSizeClass = WindowWidthSizeClass.Compact,
+		DashboardRoute(
+			windowWidthSizeClass = WindowWidthSizeClass.Compact,
 			navToCompose = {},
 			navToPost = {},
-			navToProfile = {})
+			navToProfile = {},
+			loggedInProfiles = listOf(defaultProfile, defaultProfile),
+			switchActiveProfile = {},
+			activeAccount = "foo",
+			navToAddAccount = {}
+		)
 	}
 }
