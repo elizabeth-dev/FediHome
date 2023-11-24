@@ -37,6 +37,10 @@ interface ProfileDao {
 	suspend fun getMultipleByIds(profileIds: List<String>): List<EnrichedFullProfile>
 
 	@Transaction
+	@Query("$GET_PROFILE_QUERY WHERE profileId IN (:profileIds)")
+	fun getMultipleByIdsFlow(profileIds: List<String>): Flow<List<EnrichedFullProfile>>
+
+	@Transaction
 	@Query("$GET_PROFILE_QUERY WHERE profileId = :profileId LIMIT 1")
 	fun getProfileFlow(profileId: String): Flow<EnrichedFullProfile?>
 }

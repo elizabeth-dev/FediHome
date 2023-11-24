@@ -3,6 +3,7 @@ package sh.elizabeth.fedihome.data.repository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import sh.elizabeth.fedihome.data.database.entity.ProfileEmojiCrossRef
 import sh.elizabeth.fedihome.data.datasource.EmojiLocalDataSource
@@ -43,6 +44,9 @@ class ProfileRepository @Inject constructor(
 
 	suspend fun getMultipleByIds(fullUsernames: List<String>): List<Profile> =
 		profileLocalDataSource.getMultipleByIds(fullUsernames)
+
+	fun getMultipleByIdsFlow(fullUsernames: List<String>): Flow<List<Profile>> =
+		profileLocalDataSource.getMultipleByIdsFlow(fullUsernames)
 
 	fun getProfileFlow(profileId: String) = profileLocalDataSource.getProfileFlow(profileId)
 

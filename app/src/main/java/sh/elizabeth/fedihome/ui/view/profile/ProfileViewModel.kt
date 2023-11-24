@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -40,13 +40,14 @@ sealed interface ProfileUiState {
 }
 
 private data class ProfileViewModelState(
-	val profile: Profile? = null,
-	val posts: List<Post>? = null,
 	val isLoading: Boolean = false,
-	val activeAccount: String = "",
 	val profileId: String,
 ) {
-	fun toUiState(): ProfileUiState = if (profile == null) {
+	fun toUiState(
+		activeAccount: String = "",
+		profile: Profile?,
+		posts: List<Post>?,
+	): ProfileUiState = if (profile == null) {
 		ProfileUiState.NoProfile(
 			isLoading = isLoading, activeAccount = activeAccount, profileId = profileId
 		)
@@ -65,8 +66,8 @@ private data class ProfileViewModelState(
 class ProfileViewModel @Inject constructor(
 	private val votePollUseCase: VotePollUseCase,
 	private val refreshProfileAndPostsUseCase: RefreshProfileAndPostsUseCase,
-	private val profileRepository: ProfileRepository,
-	private val postRepository: PostRepository,
+	profileRepository: ProfileRepository,
+	postRepository: PostRepository,
 	authRepository: AuthRepository,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -80,35 +81,18 @@ class ProfileViewModel @Inject constructor(
 		)
 	)
 
-	val uiState = viewModelState.map(ProfileViewModelState::toUiState)
-		.stateIn(viewModelScope, SharingStarted.Lazily, viewModelState.value.toUiState())
-
-	init {
-		viewModelScope.launch {
-			authRepository.activeAccount.collect { activeAccount ->
-				refreshProfile(activeAccount, profileId)
-				viewModelState.update {
-					it.copy(activeAccount = activeAccount)
-				}
-			}
-		}
-
-		viewModelScope.launch {
-			postRepository.getPostsByProfileFlow(profileId).collect { posts ->
-				viewModelState.update {
-					it.copy(posts = posts)
-				}
-			}
-		}
-
-		viewModelScope.launch {
-			profileRepository.getProfileFlow(profileId).collect { profile ->
-				viewModelState.update {
-					it.copy(profile = profile)
-				}
-			}
-		}
-	}
+	val uiState = combine(
+		viewModelState,
+		authRepository.activeAccount,
+		profileRepository.getProfileFlow(profileId),
+		postRepository.getPostsByProfileFlow(profileId)
+	) { state, activeAccount, profile, posts ->
+		state.toUiState(activeAccount, profile, posts)
+	}.stateIn(
+		viewModelScope,
+		SharingStarted.Eagerly,
+		viewModelState.value.toUiState(profile = null, posts = null)
+	)
 
 	fun refreshProfile(activeAccount: String, profileId: String) {
 		viewModelState.update {

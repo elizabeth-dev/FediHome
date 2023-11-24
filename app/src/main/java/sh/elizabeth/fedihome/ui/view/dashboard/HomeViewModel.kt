@@ -6,9 +6,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,22 +36,25 @@ sealed interface HomeUiState {
 }
 
 private data class HomeViewModelState(
-	val posts: List<Post>? = null,
 	val isLoading: Boolean = false,
-	val activeAccount: String = "",
 ) {
-	fun toUiState(): HomeUiState = if (posts.isNullOrEmpty()) {
-		HomeUiState.NoPosts(isLoading = isLoading, activeAccount = activeAccount)
-	} else {
-		HomeUiState.HasPosts(posts = posts, isLoading = isLoading, activeAccount = activeAccount)
-	}
+	fun toUiState(posts: List<Post>?, activeAccount: String = ""): HomeUiState =
+		if (posts.isNullOrEmpty()) {
+			HomeUiState.NoPosts(isLoading = isLoading, activeAccount = activeAccount)
+		} else {
+			HomeUiState.HasPosts(
+				posts = posts,
+				isLoading = isLoading,
+				activeAccount = activeAccount
+			)
+		}
 
 }
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
 	private val getTimelineUseCase: GetTimelineUseCase,
-	private val authRepository: AuthRepository,
+	authRepository: AuthRepository,
 	private val refreshTimelineUseCase: RefreshTimelineUseCase,
 	private val votePollUseCase: VotePollUseCase,
 ) : ViewModel() {
@@ -61,25 +64,17 @@ class HomeViewModel @Inject constructor(
 	private val timeline =
 		authRepository.activeAccount.flatMapLatest { getTimelineUseCase(it) }.distinctUntilChanged()
 
-	val uiState =
-		viewModelState
-			.map(HomeViewModelState::toUiState)
-			.stateIn(viewModelScope, SharingStarted.Eagerly, viewModelState.value.toUiState())
-
-	// TODO: https://developer.android.com/topic/architecture/ui-layer/state-production#initializing-state-production
-	init {
-		viewModelScope.launch {
-			authRepository.activeAccount.collect { activeAccount ->
-				refreshTimeline(activeAccount)
-				viewModelState.update { it.copy(activeAccount = activeAccount) }
-			}
-		}
-		viewModelScope.launch {
-			timeline.collect { posts ->
-				viewModelState.update { it.copy(posts = posts) }
-			}
-		}
-	}
+	val uiState = combine(
+		viewModelState,
+		authRepository.activeAccount,
+		timeline
+	) { state, activeAccount, posts ->
+		state.toUiState(posts, activeAccount)
+	}.stateIn(
+		viewModelScope, SharingStarted.Eagerly, viewModelState.value.toUiState(
+			posts = null,
+		)
+	)
 
 	fun refreshTimeline(profileIdentifier: String) {
 		viewModelState.update { it.copy(isLoading = true) }

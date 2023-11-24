@@ -11,6 +11,8 @@ fun LoginRoute(
 	navToDashboard: () -> Unit,
 	navBack: () -> Unit,
 ) {
+	loginViewModel.initialize()
+	
 	val uiState by loginViewModel.uiState.collectAsStateWithLifecycle()
 
 	LoginScreen(

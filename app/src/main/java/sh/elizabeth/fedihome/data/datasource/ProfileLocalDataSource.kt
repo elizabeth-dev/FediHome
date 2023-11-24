@@ -1,5 +1,6 @@
 package sh.elizabeth.fedihome.data.datasource
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import sh.elizabeth.fedihome.data.database.dao.ProfileDao
@@ -31,6 +32,9 @@ class ProfileLocalDataSource @Inject constructor(private val profileDao: Profile
 
 	suspend fun getMultipleByIds(fullUsernames: List<String>): List<Profile> =
 		profileDao.getMultipleByIds(fullUsernames).map(EnrichedFullProfile::toDomain)
+
+	fun getMultipleByIdsFlow(fullUsernames: List<String>): Flow<List<Profile>> =
+		profileDao.getMultipleByIdsFlow(fullUsernames).map { it.map(EnrichedFullProfile::toDomain) }
 
 	fun getProfileFlow(profileId: String) = profileDao.getProfileFlow(profileId)
 		.filterNotNull()

@@ -1,5 +1,6 @@
 package sh.elizabeth.fedihome.ui.view.login
 
+import androidx.annotation.MainThread
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,7 +25,7 @@ data class LoginUiState(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-	savedStateHandle: SavedStateHandle,
+	private val savedStateHandle: SavedStateHandle,
 	private val authRepository: AuthRepository,
 	private val finishOAuthUseCase: FinishOAuthUseCase,
 ) : ViewModel() {
@@ -32,7 +33,13 @@ class LoginViewModel @Inject constructor(
 	private val _uiState = MutableStateFlow(LoginUiState(isLoading = false))
 	val uiState = _uiState.asStateFlow()
 
-	init {
+	private var initializeCalled = false
+
+	@MainThread
+	fun initialize() {
+		if (initializeCalled) return
+		initializeCalled = true
+
 		viewModelScope.launch {
 			if (savedStateHandle.contains(TOKEN_PARAM)) {
 				_uiState.update { it.copy(isLoading = true) }
