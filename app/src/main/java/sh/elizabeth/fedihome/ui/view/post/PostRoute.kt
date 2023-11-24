@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +48,10 @@ fun PostRoute(
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 	navToProfile: (profileId: String) -> Unit,
 ) {
+	LaunchedEffect(key1 = uiState.activeAccount, key2 = uiState.postId) {
+		if (uiState.activeAccount.isNotBlank()) onPostRefresh(uiState.activeAccount, uiState.postId)
+	}
+
 	Scaffold(topBar = {
 		TopAppBar(title = { Text(text = "Post", maxLines = 1, overflow = TextOverflow.Ellipsis) },
 			navigationIcon = {

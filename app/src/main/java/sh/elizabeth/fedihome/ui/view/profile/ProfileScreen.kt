@@ -19,7 +19,6 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -41,10 +40,6 @@ fun ProfileScreen(
 		uiState.isLoading,
 		{ onRefresh(uiState.activeAccount, uiState.profileId) })
 
-	LaunchedEffect(key1 = uiState.profileId, key2 = uiState.activeAccount) {
-		if (uiState.activeAccount.isNotBlank()) onRefresh(uiState.activeAccount, uiState.profileId)
-
-	}
 	Box(
 		modifier = Modifier
 			.fillMaxSize()

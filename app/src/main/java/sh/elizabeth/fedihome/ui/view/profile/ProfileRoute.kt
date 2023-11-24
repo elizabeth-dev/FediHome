@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,6 +54,11 @@ fun ProfileRoute(
 	navToPost: (String) -> Unit,
 	navToProfile: (String) -> Unit,
 ) {
+	LaunchedEffect(key1 = uiState.profileId, key2 = uiState.activeAccount) {
+		if (uiState.activeAccount.isNotBlank()) onRefresh(uiState.activeAccount, uiState.profileId)
+
+	}
+
 	Scaffold(topBar = {
 		TopAppBar(
 			title = { Text(text = "", maxLines = 1, overflow = TextOverflow.Ellipsis) },
