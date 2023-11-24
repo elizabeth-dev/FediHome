@@ -29,8 +29,8 @@ interface ProfileDao {
 
 	// TODO: Maybe make this Flow<ProfileEntity> ?
 	@Transaction
-	@Query("$GET_PROFILE_QUERY WHERE fullUsername = :fullUsername LIMIT 1")
-	suspend fun getByFullUsername(fullUsername: String): EnrichedFullProfile?
+	@Query("$GET_PROFILE_QUERY WHERE profileId = :profileId LIMIT 1")
+	suspend fun getById(profileId: String): EnrichedFullProfile?
 
 	@Transaction
 	@Query("$GET_PROFILE_QUERY WHERE profileId IN (:profileIds)")

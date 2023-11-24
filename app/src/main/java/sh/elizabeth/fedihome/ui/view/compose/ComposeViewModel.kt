@@ -39,7 +39,7 @@ class ComposeViewModel @Inject constructor(
 	val uiState = combine(authRepository.activeAccount, _uiState) { activeAccount, uiState ->
 		val isReply = savedStateHandle.contains("replyTo")
 		uiState.copy(
-			activeProfile = profileRepository.getByFullUsername(activeAccount),
+			activeProfile = profileRepository.getById(activeAccount),
 			isReply = isReply,
 			replyTo = if (isReply) postRepository.getPost(savedStateHandle["replyTo"]!!) else null
 		)

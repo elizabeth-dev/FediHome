@@ -46,7 +46,7 @@ fun Profile.toDomain(fetchedFromInstance: String): DomainProfile {
 		name = displayName,
 		username = username,
 		instance = instance,
-		fullUsername = acct,
+		fullUsername = if (acct.contains('@')) acct else "$acct@$instance",
 		avatarUrl = avatar,
 		avatarBlur = null,
 		headerUrl = header,

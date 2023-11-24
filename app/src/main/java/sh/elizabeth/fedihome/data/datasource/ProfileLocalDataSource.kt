@@ -27,8 +27,8 @@ class ProfileLocalDataSource @Inject constructor(private val profileDao: Profile
 	suspend fun insertOrReplaceMain(vararg profiles: Profile): List<Long> =
 		profileDao.insertOrReplaceMain(*profiles.map(Profile::toEntity).toTypedArray())
 
-	suspend fun getByFullUsername(fullUsername: String): Profile? =
-		profileDao.getByFullUsername(fullUsername)?.toDomain()
+	suspend fun getById(profileId: String): Profile? =
+		profileDao.getById(profileId)?.toDomain()
 
 	suspend fun getMultipleByIds(fullUsernames: List<String>): List<Profile> =
 		profileDao.getMultipleByIds(fullUsernames).map(EnrichedFullProfile::toDomain)

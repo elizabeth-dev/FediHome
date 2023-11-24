@@ -39,8 +39,8 @@ class ProfileRepository @Inject constructor(
 		profileLocalDataSource.insertOrReplaceEmojiCrossRef(*refs)
 	}
 
-	suspend fun getByFullUsername(fullUsername: String): Profile? =
-		profileLocalDataSource.getByFullUsername(fullUsername = fullUsername)
+	suspend fun getById(profileId: String): Profile? =
+		profileLocalDataSource.getById(profileId = profileId)
 
 	suspend fun getMultipleByIds(fullUsernames: List<String>): List<Profile> =
 		profileLocalDataSource.getMultipleByIds(fullUsernames)
