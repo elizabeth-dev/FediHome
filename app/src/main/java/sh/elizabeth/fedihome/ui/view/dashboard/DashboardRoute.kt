@@ -55,7 +55,12 @@ fun DashboardRoute(
 			navToPost = navToPost,
 			navToProfile = navToProfile,
 			navToAddAccount = navToLogin,
-			switchActiveProfile = dashboardViewModel::switchActiveProfile
+			switchActiveProfile = {
+				dashboardViewModel.switchActiveProfile(
+					it,
+					(uiState as DashboardUiState.LoggedIn).activeAccount
+				)
+			}
 		)
 	}
 

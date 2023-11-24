@@ -11,7 +11,6 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import javax.inject.Singleton
 
 @Module
@@ -21,7 +20,7 @@ object HttpModule {
 	@OptIn(ExperimentalSerializationApi::class)
 	@Singleton
 	@Provides
-	fun provideHttpClient(settingsLocalDataSource: InternalDataLocalDataSource): HttpClient =
+	fun provideHttpClient(): HttpClient =
 		HttpClient {
 			install(ContentNegotiation) {
 				json(Json {
