@@ -82,7 +82,7 @@ fun DashboardRoute(
 	val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 	var showAccountPicker by remember { mutableStateOf(false) }
 
-	// FIXME: activeAccount might not be cached?
+	// FIXME: activeAccount might not be cached? cache on startup?
 	val activeProfile = loggedInProfiles.find { it.id == activeAccount }!!
 
 	Scaffold(bottomBar = {
@@ -120,6 +120,8 @@ fun DashboardRoute(
 
 			AccountPicker(isVisible = showAccountPicker,
 				profiles = loggedInProfiles,
+				activeProfileId = activeAccount,
+				canAddProfile = true,
 				onSwitch = switchActiveProfile,
 				onAddProfile = navToAddAccount,
 				onDismiss = { showAccountPicker = false })

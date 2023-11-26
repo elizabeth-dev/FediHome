@@ -43,6 +43,7 @@ private val AVATAR_SIZE = 48.dp
 fun SlimProfileCard(
 	modifier: Modifier = Modifier,
 	profile: Profile,
+	onClick: () -> Unit = {},
 ) { // TODO: Check if it's better to pass individual props
 	val resources = LocalContext.current.resources
 	val avatarSizeInPx =
@@ -60,9 +61,10 @@ fun SlimProfileCard(
 	}
 
 	Surface(
-		modifier.fillMaxWidth(),
+		modifier = modifier.fillMaxWidth(),
 		color = MaterialTheme.colorScheme.surface,
-		contentColor = MaterialTheme.colorScheme.onSurface
+		contentColor = MaterialTheme.colorScheme.onSurface,
+		onClick = onClick
 	) {
 		Row(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
 			GlideImage(

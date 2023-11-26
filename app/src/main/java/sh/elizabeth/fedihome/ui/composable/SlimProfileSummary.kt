@@ -2,10 +2,12 @@ package sh.elizabeth.fedihome.ui.composable
 
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,7 +47,7 @@ private val AVATAR_SIZE = 48.dp
 fun SlimProfileSummary(
 	modifier: Modifier = Modifier,
 	profile: Profile,
-	onClick: () -> Unit,
+	onClick: (() -> Unit)? = null,
 ) {
 	val resources = LocalContext.current.resources
 	val avatarSizeInPx =
@@ -62,12 +64,15 @@ fun SlimProfileSummary(
 		}
 	}
 
-	Surface(
-		color = Color.Transparent,
+	Surface(color = Color.Transparent,
 		contentColor = MaterialTheme.colorScheme.onSurface,
-		onClick = onClick,
-		modifier = Modifier.clip(MaterialTheme.shapes.extraSmall)
-	) {
+		modifier = Modifier
+			.clip(MaterialTheme.shapes.extraSmall)
+			.let {
+				if (onClick != null) it
+					.minimumInteractiveComponentSize()
+					.clickable(onClick = onClick) else it
+			}) {
 		Row(modifier = modifier.padding(end = 8.dp)) {
 			GlideImage(
 				model = profile.avatarUrl,
@@ -108,6 +113,6 @@ fun SlimProfileSummary(
 @Composable
 fun SlimProfileSummaryPreview() {
 	FediHomeTheme {
-		SlimProfileSummary(profile = defaultProfile, onClick = {})
+		SlimProfileSummary(profile = defaultProfile) {}
 	}
 }

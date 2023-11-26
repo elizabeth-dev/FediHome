@@ -30,8 +30,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import sh.elizabeth.fedihome.mock.defaultPost
 import sh.elizabeth.fedihome.mock.defaultProfile
+import sh.elizabeth.fedihome.ui.composable.AccountPicker
 import sh.elizabeth.fedihome.ui.composable.SlimProfileCard
 import sh.elizabeth.fedihome.ui.composable.TopDisclaimer
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
@@ -51,6 +54,7 @@ fun ComposeScreen(
 	uiState: ComposeUiState,
 	onSendPost: (String, String?) -> Unit,
 	onClose: () -> Unit,
+	onSwitchActiveProfile: (profileId: String) -> Unit,
 ) {
 	val (postText, setPostText) = remember { mutableStateOf("") }
 	val (contentWarning, setContentWarning) = remember { mutableStateOf("") }
@@ -58,6 +62,11 @@ fun ComposeScreen(
 
 	val postFocus = remember { FocusRequester() }
 	val cwFocus = remember { FocusRequester() }
+
+	var showAccountPicker by remember { mutableStateOf(false) }
+
+	// FIXME: activeAccount might not be cached?
+	val activeProfile = uiState.loggedInProfiles.find { it.id == uiState.activeAccount }
 
 	LaunchedEffect(Unit) {
 		postFocus.requestFocus()
@@ -108,8 +117,9 @@ fun ComposeScreen(
 				text = "Replying to ${uiState.replyTo.author.name}"
 			)
 
-			if (uiState.activeProfile != null) SlimProfileCard(
-				profile = uiState.activeProfile
+			if (activeProfile != null) SlimProfileCard(
+				profile = activeProfile,
+				onClick = { if (uiState.loggedInProfiles.size > 1) showAccountPicker = true }
 			)
 
 			AnimatedVisibility(visible = isCWVisible) {
@@ -166,6 +176,14 @@ fun ComposeScreen(
 					}
 				}
 			}
+
+			AccountPicker(isVisible = showAccountPicker,
+				profiles = uiState.loggedInProfiles,
+				activeProfileId = uiState.activeAccount,
+				canAddProfile = false,
+				onSwitch = onSwitchActiveProfile,
+				onAddProfile = {},
+				onDismiss = { showAccountPicker = false })
 		}
 	}
 }
@@ -176,7 +194,10 @@ fun ComposeScreen(
 fun ComposeScreenPreview() {
 	FediHomeTheme {
 		ComposeScreen(uiState = ComposeUiState(
-			activeProfile = defaultProfile, isReply = true, replyTo = defaultPost
-		), onSendPost = { _, _ -> }, onClose = {})
+			activeAccount = defaultProfile.id,
+			loggedInProfiles = listOf(defaultProfile),
+			isReply = true,
+			replyTo = defaultPost
+		), onSendPost = { _, _ -> }, onClose = {}, onSwitchActiveProfile = {})
 	}
 }
