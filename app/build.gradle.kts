@@ -10,6 +10,8 @@ plugins {
 android {
 	namespace = "sh.elizabeth.fedihome"
 	compileSdk = 34
+	buildToolsVersion = "34.0.0"
+	ndkVersion = "26.1.10909125"
 
 	defaultConfig {
 		applicationId = "sh.elizabeth.fedihome"
@@ -96,8 +98,8 @@ protobuf {
 
 dependencies {
 	implementation("androidx.core:core-ktx:1.12.0")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0-rc01")
-	implementation("androidx.activity:activity-compose:1.8.1")
+	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0-rc02")
+	implementation("androidx.activity:activity-compose:1.8.2")
 	implementation(platform("androidx.compose:compose-bom:2023.10.01"))
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
@@ -114,9 +116,9 @@ dependencies {
 	debugImplementation("androidx.compose.ui:ui-tooling")
 	debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-	implementation("androidx.navigation:navigation-compose:2.7.5")
-	implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-rc01")
-	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0-rc01")
+	implementation("androidx.navigation:navigation-compose:2.7.6")
+	implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-rc02")
+	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0-rc02")
 	implementation("androidx.compose.material3:material3-window-size-class")
 
 	implementation("com.google.dagger:hilt-android:2.48.1")
@@ -141,7 +143,7 @@ dependencies {
 	implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 	implementation("io.ktor:ktor-client-auth:$ktorVersion")
 
-	val roomVersion = "2.6.0"
+	val roomVersion = "2.6.1"
 	implementation("androidx.room:room-runtime:$roomVersion")
 	ksp("androidx.room:room-compiler:$roomVersion")
 	implementation("androidx.room:room-ktx:$roomVersion")
