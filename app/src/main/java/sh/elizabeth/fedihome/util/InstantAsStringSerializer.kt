@@ -12,7 +12,11 @@ import java.time.Instant
 typealias InstantAsString = @Serializable(InstantAsStringSerializer::class) Instant
 
 object InstantAsStringSerializer : KSerializer<Instant> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.STRING)
-    override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeString(value.toString())
-    override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
+	override val descriptor: SerialDescriptor =
+		PrimitiveSerialDescriptor("Instant", PrimitiveKind.STRING)
+
+	override fun serialize(encoder: Encoder, value: Instant) =
+		encoder.encodeString(value.toString())
+
+	override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
 }

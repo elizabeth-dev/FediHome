@@ -11,11 +11,11 @@ import sh.elizabeth.fedihome.util.Dispatcher
 @Module
 @InstallIn(SingletonComponent::class)
 object DispatchersModule {
-    @Provides
-    @Dispatcher(sh.elizabeth.fedihome.util.Dispatchers.IO)
-    fun providesIODispatcher(): CoroutineDispatcher = Dispatchers.IO
+	@Provides
+	@Dispatcher(sh.elizabeth.fedihome.util.Dispatchers.IO)
+	fun providesIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 
-    @Provides
-    @Dispatcher(sh.elizabeth.fedihome.util.Dispatchers.Default)
-    fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+	@Provides
+	@Dispatcher(sh.elizabeth.fedihome.util.Dispatchers.Default)
+	fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 }

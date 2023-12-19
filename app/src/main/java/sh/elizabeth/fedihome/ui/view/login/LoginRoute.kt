@@ -12,7 +12,7 @@ fun LoginRoute(
 	navBack: () -> Unit,
 ) {
 	loginViewModel.initialize()
-	
+
 	val uiState by loginViewModel.uiState.collectAsStateWithLifecycle()
 
 	LoginScreen(
