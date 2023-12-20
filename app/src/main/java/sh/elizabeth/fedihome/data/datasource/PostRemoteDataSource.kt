@@ -7,6 +7,8 @@ import sh.elizabeth.fedihome.api.firefish.PostFirefishApi
 import sh.elizabeth.fedihome.api.firefish.model.toDomain
 import sh.elizabeth.fedihome.api.mastodon.PostMastodonApi
 import sh.elizabeth.fedihome.api.mastodon.model.toDomain
+import sh.elizabeth.fedihome.api.sharkey.PostSharkeyApi
+import sh.elizabeth.fedihome.api.sharkey.model.toDomain
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.PostDraft
 import sh.elizabeth.fedihome.util.SupportedInstances
@@ -14,6 +16,7 @@ import javax.inject.Inject
 
 class PostRemoteDataSource @Inject constructor(
 	private val postFirefishApi: PostFirefishApi,
+	private val postSharkeyApi: PostSharkeyApi,
 	private val postMastodonApi: PostMastodonApi,
 ) {
 	suspend fun createPost(
@@ -23,6 +26,10 @@ class PostRemoteDataSource @Inject constructor(
 		newPost: PostDraft,
 	): Post = when (instanceType) {
 		SupportedInstances.FIREFISH -> postFirefishApi.createPost(
+			instance, token, newPost
+		).createdNote.toDomain(instance)
+
+		SupportedInstances.SHARKEY -> postSharkeyApi.createPost(
 			instance, token, newPost
 		).createdNote.toDomain(instance)
 
@@ -41,6 +48,9 @@ class PostRemoteDataSource @Inject constructor(
 		SupportedInstances.FIREFISH -> postFirefishApi.fetchPost(instance, token, postId)
 			.toDomain(instance)
 
+		SupportedInstances.SHARKEY -> postSharkeyApi.fetchPost(instance, token, postId)
+			.toDomain(instance)
+
 		SupportedInstances.GLITCH,
 		SupportedInstances.MASTODON,
 		-> postMastodonApi.fetchPost(instance, token, postId).toDomain(instance)
@@ -53,9 +63,11 @@ class PostRemoteDataSource @Inject constructor(
 		profileId: String,
 	): List<Post> = when (instanceType) {
 		SupportedInstances.FIREFISH -> postFirefishApi.fetchPostsByProfile(
-			instance,
-			token,
-			profileId
+			instance, token, profileId
+		).map { it.toDomain(instance) }
+
+		SupportedInstances.SHARKEY -> postSharkeyApi.fetchPostsByProfile(
+			instance, token, profileId
 		).map { it.toDomain(instance) }
 
 		SupportedInstances.GLITCH,
@@ -71,7 +83,7 @@ class PostRemoteDataSource @Inject constructor(
 		pollId: String,
 		choices: List<Int>,
 	) = when (instanceType) {
-		SupportedInstances.FIREFISH -> coroutineScope {
+		SupportedInstances.FIREFISH, SupportedInstances.SHARKEY -> coroutineScope {
 			val voteCoroutines = choices.map {
 				async { postFirefishApi.votePoll(instance, token, pollId, it) }
 			}

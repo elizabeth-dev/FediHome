@@ -4,12 +4,15 @@ import sh.elizabeth.fedihome.api.firefish.TimelineFirefishApi
 import sh.elizabeth.fedihome.api.firefish.model.toDomain
 import sh.elizabeth.fedihome.api.mastodon.TimelineMastodonApi
 import sh.elizabeth.fedihome.api.mastodon.model.toDomain
+import sh.elizabeth.fedihome.api.sharkey.TimelineSharkeyApi
+import sh.elizabeth.fedihome.api.sharkey.model.toDomain
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.util.SupportedInstances
 import javax.inject.Inject
 
 class TimelineRemoteDataSource @Inject constructor(
 	private val timelineFirefishApi: TimelineFirefishApi,
+	private val timelineSharkeyApi: TimelineSharkeyApi,
 	private val timelineMastodonApi: TimelineMastodonApi,
 ) {
 	suspend fun getHome(
@@ -18,6 +21,9 @@ class TimelineRemoteDataSource @Inject constructor(
 		token: String,
 	): List<Post> = when (instanceType) {
 		SupportedInstances.FIREFISH -> timelineFirefishApi.getHome(instance, token)
+			.map { it.toDomain(instance) }
+
+		SupportedInstances.SHARKEY -> timelineSharkeyApi.getHome(instance, token)
 			.map { it.toDomain(instance) }
 
 		SupportedInstances.GLITCH,

@@ -6,6 +6,8 @@ import sh.elizabeth.fedihome.api.firefish.AuthFirefishApi
 import sh.elizabeth.fedihome.api.firefish.model.toDomain
 import sh.elizabeth.fedihome.api.mastodon.AuthMastodonApi
 import sh.elizabeth.fedihome.api.mastodon.model.toDomain
+import sh.elizabeth.fedihome.api.sharkey.AuthSharkeyApi
+import sh.elizabeth.fedihome.api.sharkey.model.toDomain
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.util.APP_DEEPLINK_URI
 import sh.elizabeth.fedihome.util.MASTODON_APP_PERMISSION
@@ -15,12 +17,13 @@ import javax.inject.Inject
 class AuthRemoteDataSource @Inject constructor(
 	private val authMastodonApi: AuthMastodonApi,
 	private val authFirefishApi: AuthFirefishApi,
+	private val authSharkeyApi: AuthSharkeyApi,
 	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 ) {
 
 	suspend fun prepareOAuth(instance: String, instanceType: SupportedInstances): String {
 		when (instanceType) {
-			SupportedInstances.FIREFISH -> {
+			SupportedInstances.FIREFISH, SupportedInstances.SHARKEY -> {
 				val appSecret =
 					internalDataLocalDataSource.internalData.first().appSecrets[instance]
 						?: authFirefishApi.createApp(instance = instance).secret.also { appSecret ->
@@ -69,6 +72,15 @@ class AuthRemoteDataSource @Inject constructor(
 					?: throw IllegalStateException("App secret for $instance not found")
 
 				val userKey = authFirefishApi.getUserKey(instance, appSecret, token)
+
+				return userKey.accessToken to userKey.user.toDomain(instance)
+			}
+
+			SupportedInstances.SHARKEY -> {
+				val appSecret = internalData.appSecrets[instance]
+					?: throw IllegalStateException("App secret for $instance not found")
+
+				val userKey = authSharkeyApi.getUserKey(instance, appSecret, token)
 
 				return userKey.accessToken to userKey.user.toDomain(instance)
 			}

@@ -43,6 +43,9 @@ val MASTODON_APP_PERMISSION = listOf(
 const val APP_DEEPLINK_URI = "app://sh.elizabeth.fedihome"
 
 enum class SupportedInstances {
+	@SerialName("sharkey")
+	SHARKEY,
+
 	@SerialName("firefish")
 	FIREFISH,
 
