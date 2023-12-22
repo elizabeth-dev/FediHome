@@ -8,6 +8,7 @@ import sh.elizabeth.fedihome.model.Post
 class EnrichedPost(
 	@Embedded val post: PostEntity,
 
+	// TODO: this must have poor performance
 	@Relation(
 		parentColumn = "postId",
 		entityColumn = "fullEmojiId",

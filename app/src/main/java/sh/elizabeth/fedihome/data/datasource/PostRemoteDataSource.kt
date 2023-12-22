@@ -24,7 +24,7 @@ class PostRemoteDataSource @Inject constructor(
 		instanceType: SupportedInstances,
 		token: String,
 		newPost: PostDraft,
-	): Post = when (instanceType) {
+): Post = when (instanceType) {
 		SupportedInstances.FIREFISH -> postFirefishApi.createPost(
 			instance, token, newPost
 		).createdNote.toDomain(instance)
