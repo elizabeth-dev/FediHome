@@ -63,9 +63,9 @@ fun PostPreview(
 					disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
 					disabledLeadingIconContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
 				),
-				border = AssistChipDefaults.assistChipBorder(
-					disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-				),
+//				border = AssistChipDefaults.assistChipBorder(
+//					disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+//				),
 			)
 		}
 	}

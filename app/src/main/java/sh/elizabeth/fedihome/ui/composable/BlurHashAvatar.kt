@@ -8,8 +8,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toDrawable
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -23,7 +25,7 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun BlurHashImage(imageUrl: String?, imageBlur: String?, imageSize: Dp) {
+fun BlurHashAvatar(modifier: Modifier = Modifier, imageUrl: String?, imageBlur: String?, imageSize: Dp = 48.dp, roundingRadius: Int = 16) {
 	val resources = LocalContext.current.resources
 	val imageSizeInPx =
 		resources.displayMetrics.densityDpi.div(160f).times(imageSize.value).roundToInt()
@@ -42,11 +44,11 @@ fun BlurHashImage(imageUrl: String?, imageBlur: String?, imageSize: Dp) {
 	GlideImage(
 		model = imageUrl,
 		contentDescription = null,
-		modifier = androidx.compose.ui.Modifier.size(imageSize)
-	) { _it ->
-		let {
+		modifier = modifier.size(imageSize)
+	) {
+		it.let { _it ->
 			if (imageBlurHash != null) _it.placeholder(imageBlurHash?.toDrawable(resources = resources))
 			else _it
-		}.transform(CenterCrop(), RoundedCorners(21))
+		}.transform(CenterCrop(), RoundedCorners(roundingRadius))
 	}
 }
