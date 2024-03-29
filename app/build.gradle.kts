@@ -141,13 +141,13 @@ dependencies {
 	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
 	implementation("androidx.compose.material3:material3-window-size-class")
 
-	implementation("com.google.dagger:hilt-android:2.49")
+	implementation("com.google.dagger:hilt-android:2.51")
 	ksp("com.google.dagger:hilt-android-compiler:2.48.1")
 	implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 	implementation("androidx.datastore:datastore:1.0.0")
-	implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.1")
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+	implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.2")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
 	implementation("androidx.browser:browser:1.8.0")
 
@@ -158,7 +158,7 @@ dependencies {
 	val ktorVersion = "2.3.6"
 	implementation("io.ktor:ktor-client-core:$ktorVersion")
 	implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 	implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 	implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 	implementation("io.ktor:ktor-client-auth:$ktorVersion")
