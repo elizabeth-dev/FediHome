@@ -1,33 +1,40 @@
 package sh.elizabeth.fedihome.data.datasource
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import sh.elizabeth.fedihome.data.database.dao.NotificationDao
-import sh.elizabeth.fedihome.data.database.entity.EnrichedNotification
-import sh.elizabeth.fedihome.data.database.entity.NotificationEntity
+import sh.elizabeth.fedihome.NotificationEntity
+import sh.elizabeth.fedihome.data.database.AppDatabase
 import sh.elizabeth.fedihome.data.database.entity.toDomain
 import sh.elizabeth.fedihome.model.Notification
 import javax.inject.Inject
 
-class NotificationLocalDataSource @Inject constructor(private val notificationDao: NotificationDao) {
-	suspend fun insertOrReplace(vararg notifications: Notification): List<Long> {
-		return notificationDao.insertOrReplace(
-			*notifications.map(Notification::toEntity).toTypedArray()
-		)
-	}
+class NotificationLocalDataSource @Inject constructor(private val appDatabase: AppDatabase) {
+	fun insertOrReplace(vararg notifications: Notification) =
+		appDatabase.notificationQueries.transaction {
+			notifications.forEach { notification ->
+				appDatabase.notificationQueries.insertOrReplace(
+					NotificationEntity(
+						notificationId = notification.id,
+						forAccount = notification.forAccount,
+						createdAt = notification.createdAt,
+						type = notification.type,
+						reaction = notification.reaction,
+						profileId = notification.profile?.id,
+						postId = notification.post?.id
+					)
+				)
+			}
+		}
 
 	fun getNotificationsFlow(forAccount: String): Flow<List<Notification>> =
-		notificationDao.getNotificationsFlow(forAccount)
-			.map { it.map(EnrichedNotification::toDomain) }
+		appDatabase.notificationQueries.getNotificationByAccount(forAccount)
+			.asFlow()
+			.mapToList(Dispatchers.IO)
+			.map { notifications ->
+				notifications.map { it.toDomain() }
+			}
 
 }
-
-fun Notification.toEntity() = NotificationEntity(
-	notificationId = id,
-	forAccount = forAccount,
-	createdAt = createdAt,
-	type = type,
-	reaction = reaction,
-	profileId = profile?.id,
-	postId = post?.id
-)

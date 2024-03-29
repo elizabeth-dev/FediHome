@@ -1,0 +1,42 @@
+import java.time.Instant;
+import kotlin.collections.List;
+import sh.elizabeth.fedihome.data.database.entity.ProfileFieldEntity;
+
+CREATE TABLE ProfileEntity (
+    profileId TEXT PRIMARY KEY NOT NULL,
+    name TEXT,
+    username TEXT NOT NULL UNIQUE ON CONFLICT REPLACE,
+    instance TEXT NOT NULL,
+    avatarUrl TEXT,
+    avatarBlur TEXT,
+    headerUrl TEXT,
+    headerBlur TEXT,
+    description TEXT,
+    following INTEGER,
+    followers INTEGER,
+    postCount INTEGER,
+    createdAt INTEGER AS Instant,
+    fields TEXT AS List<ProfileFieldEntity> NOT NULL
+);
+
+CREATE TABLE ProfileEmojiCrossRef (
+	profileId TEXT NOT NULL,
+	emojiId TEXT NOT NULL,
+	PRIMARY KEY(profileId, emojiId),
+	FOREIGN KEY(profileId) REFERENCES ProfileEntity(profileId),
+	FOREIGN KEY(emojiId) REFERENCES EmojiEntity(emojiId)
+);
+
+CREATE INDEX profile_username ON ProfileEntity (username);
+
+insertOrReplace:
+INSERT OR REPLACE INTO ProfileEntity VALUES ?;
+
+insertOrReplaceProfileEmojiCrossRef:
+INSERT OR REPLACE INTO ProfileEmojiCrossRef VALUES ?;
+
+getProfileById:
+SELECT * FROM ProfileEntity WHERE profileId = ?;
+
+getMultipleProfilesByIds:
+SELECT * FROM ProfileEntity WHERE profileId IN ?;

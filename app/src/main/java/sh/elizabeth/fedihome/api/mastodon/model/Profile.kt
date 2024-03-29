@@ -46,14 +46,14 @@ fun Profile.toDomain(fetchedFromInstance: String): DomainProfile {
 		name = displayName,
 		username = username,
 		instance = instance,
-		fullUsername = if (acct.contains('@')) acct else "$acct@$instance",
+//		fullUsername = if (acct.contains('@')) acct else "$acct@$instance",
 		avatarUrl = avatar,
 		avatarBlur = null,
 		headerUrl = header,
 		headerBlur = null,
-		following = followingCount,
-		followers = followersCount,
-		postCount = statusesCount,
+		following = followingCount.toLong(),
+		followers = followersCount.toLong(),
+		postCount = statusesCount.toLong(),
 		createdAt = createdAt,
 		fields = fields.map {
 			DomainProfileField(

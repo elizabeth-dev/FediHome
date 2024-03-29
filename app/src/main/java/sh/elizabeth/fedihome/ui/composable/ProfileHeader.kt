@@ -78,12 +78,12 @@ fun ProfileHeader(profile: Profile) {
                 imageBlur = profile.avatarBlur,
                 imageSize = AVATAR_SIZE,
                 modifier = Modifier
-					.zIndex(1f)
-					.offset(
-						y = maxWidth
-							.div(HEADER_RATIO)
-							.minus(AVATAR_SIZE.div(2)), x = 16.dp
-					)
+                    .zIndex(1f)
+                    .offset(
+                        y = maxWidth
+                            .div(HEADER_RATIO)
+                            .minus(AVATAR_SIZE.div(2)), x = 16.dp
+                    )
             )
 
             Column(Modifier.fillMaxWidth()) {
@@ -92,8 +92,8 @@ fun ProfileHeader(profile: Profile) {
                     model = profile.headerUrl,
                     contentDescription = "",
                     modifier = Modifier
-						.width(_maxWidth)
-						.aspectRatio(HEADER_RATIO),
+                        .width(_maxWidth)
+                        .aspectRatio(HEADER_RATIO),
                 ) { _it ->
                     let {
                         if (headerBlurHash != null) _it.placeholder(
@@ -105,20 +105,27 @@ fun ProfileHeader(profile: Profile) {
                     }.centerCrop()
                 } else BoxWithConstraints( // FIXME: temporal placeholder
                     modifier = Modifier
-						.width(_maxWidth)
-						.aspectRatio(HEADER_RATIO)
-						.background(MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.25f))
+                        .width(_maxWidth)
+                        .aspectRatio(HEADER_RATIO)
+                        .background(
+                            MaterialTheme.colorScheme.inverseSurface.copy(
+                                alpha = 0.25f
+                            )
+                        )
                 ) {}
 
                 // Profile data
                 Column(
                     modifier = Modifier
-						.fillMaxWidth()
-						.padding(
-							top = AVATAR_SIZE
-								.div(2)
-								.plus(8.dp), start = 16.dp, end = 16.dp, bottom = 8.dp
-						),
+                        .fillMaxWidth()
+                        .padding(
+                            top = AVATAR_SIZE
+                                .div(2)
+                                .plus(8.dp),
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 8.dp
+                        ),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Column {
@@ -129,7 +136,7 @@ fun ProfileHeader(profile: Profile) {
                             style = MaterialTheme.typography.headlineSmall
                         )
                         Text(
-                            "@${profile.fullUsername}",
+                            "@${profile.username}",
                             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
                             maxLines = 1,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)

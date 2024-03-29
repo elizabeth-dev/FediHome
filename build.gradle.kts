@@ -6,5 +6,6 @@ plugins {
 	kotlin("plugin.serialization") version "1.9.20" apply false
 	id("com.google.protobuf") version "0.9.4" apply false
 	id("com.google.devtools.ksp") version "1.9.20-1.0.14" apply false
+	id("app.cash.sqldelight") version "2.0.1" apply false
 }
 val ktorClientAuthVersion by extra("2.3.6")

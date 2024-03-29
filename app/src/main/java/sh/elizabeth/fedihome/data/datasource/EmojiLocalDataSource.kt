@@ -1,18 +1,22 @@
 package sh.elizabeth.fedihome.data.datasource
 
-import sh.elizabeth.fedihome.data.database.dao.EmojiDao
-import sh.elizabeth.fedihome.data.database.entity.EmojiEntity
+import sh.elizabeth.fedihome.EmojiEntity
+import sh.elizabeth.fedihome.data.database.AppDatabase
 import sh.elizabeth.fedihome.model.Emoji
 import javax.inject.Inject
 
-class EmojiLocalDataSource @Inject constructor(private val emojiDao: EmojiDao) {
-	suspend fun insertOrReplace(vararg emojis: Emoji): List<Long> =
-		emojiDao.insertOrReplace(*emojis.map(Emoji::toEntity).toTypedArray())
+class EmojiLocalDataSource @Inject constructor(private val appDatabase: AppDatabase) {
+	fun insertOrReplace(vararg emojis: Emoji) =
+		appDatabase.emojiQueries.transaction {
+			emojis.forEach { emoji ->
+				appDatabase.emojiQueries.insertOrReplace(
+					EmojiEntity(
+						emojiId = emoji.fullEmojiId,
+						instance = emoji.instance,
+						shortcode = emoji.shortcode,
+						url = emoji.url,
+					)
+				)
+			}
+		}
 }
-
-fun Emoji.toEntity() = EmojiEntity(
-	fullEmojiId = fullEmojiId,
-	instance = instance,
-	shortcode = shortcode,
-	url = url,
-)

@@ -1,0 +1,25 @@
+CREATE TABLE TimelinePostEntity (
+    rowId INTEGER PRIMARY KEY AUTOINCREMENT,
+    timelineProfileId TEXT NOT NULL,
+    postId TEXT NOT NULL,
+    repostedBy TEXT,
+    UNIQUE (timelineProfileId, postId) ON CONFLICT IGNORE,
+    FOREIGN KEY (timelineProfileId) REFERENCES ProfileEntity(profileId),
+    FOREIGN KEY (postId) REFERENCES PostEntity(postId),
+    FOREIGN KEY (repostedBy) REFERENCES ProfileEntity(profileId)
+);
+
+insert:
+INSERT INTO TimelinePostEntity (timelineProfileId, postId, repostedBy) VALUES (?, ?, ?);
+
+getTimelinePosts:
+SELECT * FROM TimelinePostEntity
+JOIN PostEntity ON TimelinePostEntity.postId = PostEntity.postId
+JOIN ProfileEntity ON PostEntity.authorId = ProfileEntity.profileId
+
+LEFT JOIN ProfileEntity AS RepostProfile ON TimelinePostEntity.repostedBy = RepostProfile.profileId
+LEFT JOIN PostEntity AS QuotedPost ON PostEntity.quoteId = QuotedPost.postId
+LEFT JOIN ProfileEntity AS QuotedProfile ON QuotedPost.authorId = QuotedProfile.profileId
+
+WHERE TimelinePostEntity.timelineProfileId = ?
+ORDER BY TimelinePostEntity.rowId DESC;

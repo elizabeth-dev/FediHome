@@ -1,0 +1,26 @@
+import java.time.Instant;
+import sh.elizabeth.fedihome.model.NotificationType;
+
+CREATE TABLE NotificationEntity (
+    notificationId TEXT PRIMARY KEY NOT NULL,
+    forAccount TEXT NOT NULL,
+    createdAt INTEGER AS Instant NOT NULL,
+    type TEXT AS NotificationType NOT NULL,
+    reaction TEXT,
+    profileId TEXT,
+    postId TEXT,
+    FOREIGN KEY (postId) REFERENCES PostEntity(postId)
+);
+
+CREATE INDEX notiication_forAccount ON NotificationEntity(forAccount);
+
+insertOrReplace:
+INSERT OR REPLACE INTO NotificationEntity VALUES ?;
+
+getNotificationByAccount:
+SELECT * FROM NotificationEntity
+LEFT JOIN ProfileEntity ON NotificationEntity.profileId = ProfileEntity.profileId
+LEFT JOIN PostEntity ON NotificationEntity.postId = PostEntity.postId
+LEFT JOIN ProfileEntity AS PostProfile ON PostEntity.authorId = PostProfile.profileId
+
+WHERE forAccount = ? ORDER BY NotificationEntity.createdAt DESC;

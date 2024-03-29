@@ -2,7 +2,7 @@ package sh.elizabeth.fedihome.ui.view.post
 
 import android.content.res.Configuration
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,18 +49,29 @@ fun PostRoute(
 	navToProfile: (profileId: String) -> Unit,
 ) {
 	LaunchedEffect(key1 = uiState.activeAccount, key2 = uiState.postId) {
-		if (uiState.activeAccount.isNotBlank()) onPostRefresh(uiState.activeAccount, uiState.postId)
+		if (uiState.activeAccount.isNotBlank()) onPostRefresh(
+			uiState.activeAccount,
+			uiState.postId
+		)
 	}
 
 	Scaffold(topBar = {
-		TopAppBar(title = { Text(text = "Post", maxLines = 1, overflow = TextOverflow.Ellipsis) },
-			navigationIcon = {
-				IconButton(
-					onClick = navBack
-				) {
-					Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
-				}
-			})
+		TopAppBar(title = {
+			Text(
+				text = "Post",
+				maxLines = 1,
+				overflow = TextOverflow.Ellipsis
+			)
+		}, navigationIcon = {
+			IconButton(
+				onClick = navBack
+			) {
+				Icon(
+					Icons.AutoMirrored.Outlined.ArrowBack,
+					contentDescription = "Back"
+				)
+			}
+		})
 	}) { contentPadding ->
 		PostScreen(
 			uiState = uiState,
@@ -80,7 +91,10 @@ fun PostRoute(
 fun PostRoutePreview() {
 	FediHomeTheme {
 		PostRoute(uiState = PostUiState.HasPost(
-			postId = "foo", post = defaultPost, activeAccount = "foo", isLoading = false
+			postId = "foo",
+			post = defaultPost,
+			activeAccount = "foo",
+			isLoading = false
 		),
 			navBack = {},
 			onPostRefresh = { _, _ -> },

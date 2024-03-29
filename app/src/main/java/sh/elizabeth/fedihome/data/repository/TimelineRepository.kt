@@ -5,8 +5,8 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import sh.elizabeth.fedihome.data.database.entity.PostEmojiCrossRef
-import sh.elizabeth.fedihome.data.database.entity.ProfileEmojiCrossRef
+import sh.elizabeth.fedihome.PostEmojiCrossRef
+import sh.elizabeth.fedihome.ProfileEmojiCrossRef
 import sh.elizabeth.fedihome.data.datasource.EmojiLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.TimelineLocalDataSource
@@ -26,11 +26,16 @@ class TimelineRepository @Inject constructor(
 	private val timelineRemoteDataSource: TimelineRemoteDataSource,
 	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 ) {
-	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
+	private suspend fun getInstanceAndTypeAndToken(activeAccount: String):
+			Triple<String, SupportedInstances, String> =
 		activeAccount.let {
 			val internalData = internalDataLocalDataSource.internalData.first()
 			val instance = it.split('@')[1]
-			Triple(instance, internalData.serverTypes[instance]!!, internalData.accessTokens[it]!!)
+			Triple(
+				instance,
+				internalData.serverTypes[instance]!!,
+				internalData.accessTokens[it]!!
+			)
 		}
 
 	fun getTimeline(profileIdentifier: String): Flow<List<Post>> =
@@ -40,37 +45,49 @@ class TimelineRepository @Inject constructor(
 		activeAccount: String,
 		profileIdentifier: String,
 	) {
-		val (instance, instanceType, token) = getInstanceAndTypeAndToken(activeAccount)
+		val (instance, instanceType, token) = getInstanceAndTypeAndToken(
+			activeAccount
+		)
 
-		val posts = timelineRemoteDataSource.getHome(instance, instanceType, token)
+		val posts =
+			timelineRemoteDataSource.getHome(instance, instanceType, token)
 		val unWrappedPosts = posts.flatMap { it.unwrapQuotes() }
 		val profiles = unWrappedPosts.flatMap { it.unwrapProfiles() }.toSet()
-		val emojis = unWrappedPosts.flatMap { it.emojis.values }
-			.plus(profiles.flatMap { it.emojis.values })
-			.toSet()
+		val emojis =
+			unWrappedPosts.flatMap { it.emojis.values }
+				.plus(profiles.flatMap { it.emojis.values })
+				.toSet()
 
 		val postEmojiCrossRefs = unWrappedPosts.flatMap { post ->
 			post.emojis.values.map { emoji ->
-				PostEmojiCrossRef(postId = post.id, fullEmojiId = emoji.fullEmojiId)
+				PostEmojiCrossRef(postId = post.id, emojiId = emoji.fullEmojiId)
 			}
 		}
 		val profileEmojiCrossRefs = profiles.flatMap { profile ->
 			profile.emojis.values.map { emoji ->
-				ProfileEmojiCrossRef(profileId = profile.id, fullEmojiId = emoji.fullEmojiId)
+				ProfileEmojiCrossRef(
+					profileId = profile.id, emojiId = emoji.fullEmojiId
+				)
 			}
 		}
 
-		coroutineScope {
-			val emojiRef = async { emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray()) }
 
-			profileRepository.insertOrReplaceMain(*profiles.toTypedArray())
+		coroutineScope {
+			val emojiRef =
+				async { emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray()) }
+
+			profileRepository.insertOrReplace(*profiles.toTypedArray())
 			postRepository.insertOrReplace(*unWrappedPosts.toTypedArray())
 
 			val timelineRef = async {
 				timelineLocalDataSource.insert(profileIdentifier,
-					*posts.map { TimelinePost(postId = it.id, repostedById = it.repostedBy?.id) }
-						.reversed()
-						.toTypedArray())
+					*posts.map {
+						TimelinePost(
+							postId = it.id,
+							repostedById = it.repostedBy?.id
+						)
+					}.reversed().toTypedArray()
+				)
 			}
 
 			emojiRef.await()

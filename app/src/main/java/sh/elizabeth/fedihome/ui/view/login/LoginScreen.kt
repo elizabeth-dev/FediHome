@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -65,7 +65,10 @@ fun LoginScreen(
 				IconButton(
 					onClick = navBack
 				) {
-					Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
+					Icon(
+						Icons.AutoMirrored.Outlined.ArrowBack,
+						contentDescription = "Back"
+					)
 				}
 			})
 	}) { contentPadding ->
@@ -87,14 +90,20 @@ fun LoginScreen(
 						label = { Text("Instance") },
 						singleLine = true,
 						keyboardOptions = KeyboardOptions(
-							imeAction = ImeAction.Go, keyboardType = KeyboardType.Uri
+							imeAction = ImeAction.Go,
+							keyboardType = KeyboardType.Uri
 						),
-						keyboardActions = KeyboardActions(onGo = { onLogin(instance) })
+						keyboardActions = KeyboardActions(onGo = {
+							onLogin(instance)
+						})
 					)
 					Spacer(Modifier.size(padding))
 					Button(modifier = Modifier.align(Alignment.End),
 						onClick = { onLogin(instance) }) {
-						Text("Login", style = MaterialTheme.typography.labelLarge)
+						Text(
+							"Login",
+							style = MaterialTheme.typography.labelLarge
+						)
 					}
 				}
 			}
@@ -111,10 +120,7 @@ fun LoginScreenPreview() {
 			isLoading = false,
 			errorMessage = "Login failed",
 			canNavBack = true
-		),
-			navToDashboard = {},
-			onLogin = {},
-			navBack = {})
+		), navToDashboard = {}, onLogin = {}, navBack = {})
 	}
 }
 
@@ -123,9 +129,9 @@ fun LoginScreenPreview() {
 @Composable
 fun LoginScreenLoadingPreview() {
 	FediHomeTheme {
-		LoginScreen(uiState = LoginUiState(isLoading = true, errorMessage = "Login failed"),
-			navToDashboard = {},
-			onLogin = {},
-			navBack = {})
+		LoginScreen(uiState = LoginUiState(
+			isLoading = true,
+			errorMessage = "Login failed"
+		), navToDashboard = {}, onLogin = {}, navBack = {})
 	}
 }

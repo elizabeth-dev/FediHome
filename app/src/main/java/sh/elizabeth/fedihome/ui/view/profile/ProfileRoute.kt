@@ -2,7 +2,7 @@ package sh.elizabeth.fedihome.ui.view.profile
 
 import android.content.res.Configuration
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,18 +55,30 @@ fun ProfileRoute(
 	navToProfile: (String) -> Unit,
 ) {
 	LaunchedEffect(key1 = uiState.profileId, key2 = uiState.activeAccount) {
-		if (uiState.activeAccount.isNotBlank()) onRefresh(uiState.activeAccount, uiState.profileId)
+		if (uiState.activeAccount.isNotBlank()) onRefresh(
+			uiState.activeAccount,
+			uiState.profileId
+		)
 
 	}
 
 	Scaffold(topBar = {
 		TopAppBar(
-			title = { Text(text = "", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+			title = {
+				Text(
+					text = "",
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis
+				)
+			},
 			navigationIcon = {
 				IconButton(
 					onClick = navBack
 				) {
-					Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
+					Icon(
+						Icons.AutoMirrored.Outlined.ArrowBack,
+						contentDescription = "Back"
+					)
 				}
 			},
 			colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)

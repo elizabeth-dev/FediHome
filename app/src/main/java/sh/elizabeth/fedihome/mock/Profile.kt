@@ -10,7 +10,7 @@ val defaultProfile = Profile(
 	avatarUrl = null,
 	avatarBlur = null,
 	instance = "blahaj.zone",
-	fullUsername = "elizabeth@blahaj.zone",
+//	fullUsername = "elizabeth@blahaj.zone",
 	headerUrl = null, headerBlur = null,
 	following = 12,
 	followers = 323,

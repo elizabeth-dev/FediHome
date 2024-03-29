@@ -1,0 +1,50 @@
+import java.time.Instant;
+import sh.elizabeth.fedihome.data.database.entity.PollEntity;
+
+CREATE TABLE PostEntity (
+    postId TEXT PRIMARY KEY NOT NULL,
+    createdAt INTEGER AS Instant,
+    updatedAt INTEGER AS Instant,
+    cw TEXT,
+    text TEXT,
+    authorId TEXT NOT NULL,
+    quoteId TEXT,
+    poll TEXT AS PollEntity,
+    FOREIGN KEY (authorId) REFERENCES ProfileEntity(profileId),
+    FOREIGN KEY (quoteId) REFERENCES PostEntity(postId)
+);
+
+CREATE TABLE PostEmojiCrossRef (
+	postId TEXT,
+	emojiId TEXT,
+	PRIMARY KEY (postId, emojiId),
+	FOREIGN KEY (postId) REFERENCES PostEntity(postId),
+	FOREIGN KEY (emojiId) REFERENCES EmojiEntity(emojiId)
+);
+
+-- TODO: Add indexes
+
+insertOrReplace:
+INSERT OR REPLACE INTO PostEntity VALUES ?;
+
+insertOrReplacePostEmojiCrossRef:
+INSERT OR REPLACE INTO PostEmojiCrossRef VALUES ?;
+
+getPostById:
+SELECT * FROM PostEntity
+
+JOIN ProfileEntity ON PostEntity.authorId = ProfileEntity.profileId
+LEFT JOIN PostEntity AS Quote ON PostEntity.quoteId = Quote.postId
+LEFT JOIN ProfileEntity AS QuoteProfile ON Quote.authorId = QuoteProfile.profileId
+
+WHERE PostEntity.postId = ?;
+
+getPostByAuthor:
+SELECT * FROM PostEntity
+
+JOIN ProfileEntity ON PostEntity.authorId = ProfileEntity.profileId
+LEFT JOIN PostEntity AS Quote ON PostEntity.quoteId = Quote.postId
+LEFT JOIN ProfileEntity AS QuoteProfile ON Quote.authorId = QuoteProfile.profileId
+
+WHERE PostEntity.authorId = ?
+ORDER BY PostEntity.createdAt DESC;

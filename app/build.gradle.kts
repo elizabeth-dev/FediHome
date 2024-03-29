@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
 	id("com.android.application")
 	id("org.jetbrains.kotlin.android")
@@ -5,6 +7,7 @@ plugins {
 	id("com.google.protobuf")
 	kotlin("plugin.serialization")
 	id("com.google.devtools.ksp")
+	id("app.cash.sqldelight")
 }
 
 android {
@@ -48,7 +51,7 @@ android {
 		compose = true
 	}
 	composeOptions {
-		kotlinCompilerExtensionVersion = "1.5.4"
+		kotlinCompilerExtensionVersion = "1.5.7"
 	}
 	packaging {
 		resources {
@@ -59,23 +62,32 @@ android {
 
 androidComponents {
 	beforeVariants {
-
 		android.sourceSets.getByName(it.name) {
 			java.srcDir(layout.buildDirectory.dir("generated/source/proto/${it.name}/java"))
 			kotlin.srcDir(layout.buildDirectory.dir("generated/source/proto/${it.name}/kotlin"))
 		}
 	}
+	onVariants(selector().all()) { variant ->
+		afterEvaluate {
+			val capName = variant.name.replaceFirstChar { it.uppercase() }
+			tasks.getByName<KotlinCompile>("ksp${capName}Kotlin") {
+				setSource(
+					tasks.getByName("generate${capName}AppDatabaseInterface").outputs
+				)
+			}
+		}
+	}
 }
 
 afterEvaluate {
-	tasks.named("kspDebugKotlin").configure { dependsOn("generateDebugProto") }
-	tasks.named("kspReleaseKotlin").configure { dependsOn("generateReleaseProto") }
-}
-
-ksp {
-	arg("room.schemaLocation", "$projectDir/schemas")
-	arg("room.incremental", "true")
-	arg("room.generateKotlin", "true")
+	tasks.named("kspDebugKotlin").configure {
+		dependsOn(
+			"generateDebugProto"
+		)
+	}
+	tasks.named("kspReleaseKotlin").configure {
+		dependsOn("generateReleaseProto")
+	}
 }
 
 protobuf {
@@ -92,6 +104,14 @@ protobuf {
 					option("lite")
 				}
 			}
+		}
+	}
+}
+
+sqldelight {
+	databases {
+		create("AppDatabase") {
+			packageName.set("sh.elizabeth.fedihome.data.database")
 		}
 	}
 }
@@ -143,16 +163,14 @@ dependencies {
 	implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 	implementation("io.ktor:ktor-client-auth:$ktorVersion")
 
-	val roomVersion = "2.6.1"
-	implementation("androidx.room:room-runtime:$roomVersion")
-	ksp("androidx.room:room-compiler:$roomVersion")
-	implementation("androidx.room:room-ktx:$roomVersion")
-	//implementation("androidx.room:room-paging:$room_version")
-	implementation("com.google.code.gson:gson:2.10.1")
-
 	implementation("com.github.bumptech.glide:glide:4.16.0")
 	implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 	implementation("com.github.bumptech.glide:okhttp3-integration:4.16.0")
 	ksp("com.github.bumptech.glide:ksp:4.16.0")
 	implementation("com.vanniktech:blurhash:0.1.0")
+
+	implementation("app.cash.sqldelight:android-driver:2.0.1")
+	implementation("app.cash.sqldelight:coroutines-extensions:2.0.1")
+	implementation("com.google.code.gson:gson:2.10.1")
+
 }
