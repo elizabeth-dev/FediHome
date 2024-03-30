@@ -47,8 +47,7 @@ fun DashboardRoute(
 			return
 		}
 
-		is DashboardUiState.LoggedIn -> DashboardRoute(
-			windowWidthSizeClass = windowSizeClass.widthSizeClass,
+		is DashboardUiState.LoggedIn -> DashboardRoute(windowWidthSizeClass = windowSizeClass.widthSizeClass,
 			loggedInProfiles = (uiState as DashboardUiState.LoggedIn).loggedInProfiles,
 			activeAccount = (uiState as DashboardUiState.LoggedIn).activeAccount,
 			navToCompose = navToCompose,
@@ -57,11 +56,9 @@ fun DashboardRoute(
 			navToAddAccount = navToLogin,
 			switchActiveProfile = {
 				dashboardViewModel.switchActiveProfile(
-					it,
-					(uiState as DashboardUiState.LoggedIn).activeAccount
+					it, (uiState as DashboardUiState.LoggedIn).activeAccount
 				)
-			}
-		)
+			})
 	}
 
 }
@@ -79,7 +76,8 @@ fun DashboardRoute(
 	switchActiveProfile: (profileId: String) -> Unit,
 ) {
 	var selectedTab by remember { mutableStateOf(HOME.route) }
-	val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+	val scrollBehavior =
+		TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 	var showAccountPicker by remember { mutableStateOf(false) }
 
 	// FIXME: activeAccount might not be cached? cache on startup?
@@ -115,7 +113,11 @@ fun DashboardRoute(
 				navToPost = navToPost,
 				navToProfile = navToProfile,
 			)
-			if (selectedTab == NOTIFICATIONS.route) Text("Notifications screen")
+			if (selectedTab == NOTIFICATIONS.route) NotificationsScreen(
+				navToCompose = navToCompose,
+				navToPost = navToPost,
+				navToProfile = navToProfile
+			)
 			if (selectedTab == SEARCH.route) Text("Search screen")
 
 			AccountPicker(isVisible = showAccountPicker,
@@ -136,15 +138,13 @@ fun DashboardRoute(
 @Composable
 fun DashboardRoutePreview() {
 	FediHomeTheme {
-		DashboardRoute(
-			windowWidthSizeClass = WindowWidthSizeClass.Compact,
+		DashboardRoute(windowWidthSizeClass = WindowWidthSizeClass.Compact,
 			navToCompose = {},
 			navToPost = {},
 			navToProfile = {},
 			loggedInProfiles = listOf(defaultProfile, defaultProfile),
 			switchActiveProfile = {},
 			activeAccount = "foo",
-			navToAddAccount = {}
-		)
+			navToAddAccount = {})
 	}
 }

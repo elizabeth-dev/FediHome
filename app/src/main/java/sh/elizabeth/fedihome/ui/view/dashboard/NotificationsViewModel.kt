@@ -13,84 +13,94 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import sh.elizabeth.fedihome.data.repository.AuthRepository
-import sh.elizabeth.fedihome.data.repository.TimelineRepository
-import sh.elizabeth.fedihome.domain.RefreshTimelineUseCase
+import sh.elizabeth.fedihome.data.repository.NotificationRepository
 import sh.elizabeth.fedihome.domain.VotePollUseCase
-import sh.elizabeth.fedihome.model.Post
+import sh.elizabeth.fedihome.model.Notification
 import javax.inject.Inject
 
-sealed interface HomeUiState {
+sealed interface NotificationsUiState {
 	val isLoading: Boolean
 	val activeAccount: String
 
-	data class NoPosts(
+	data class NoNotifications(
 		override val isLoading: Boolean,
 		override val activeAccount: String,
-	) : HomeUiState
+	) : NotificationsUiState
 
-	data class HasPosts(
-		val posts: List<Post>,
+	data class HasNotifications(
+		val notifications: List<Notification>,
 		override val isLoading: Boolean,
 		override val activeAccount: String,
-	) : HomeUiState
+	) : NotificationsUiState
 }
 
-private data class HomeViewModelState(
+private data class NotificationsViewModelState(
 	val isLoading: Boolean = false,
 ) {
-	fun toUiState(posts: List<Post>?, activeAccount: String = ""): HomeUiState =
-		if (posts.isNullOrEmpty()) {
-			HomeUiState.NoPosts(isLoading = isLoading, activeAccount = activeAccount)
-		} else {
-			HomeUiState.HasPosts(
-				posts = posts,
-				isLoading = isLoading,
-				activeAccount = activeAccount
-			)
-		}
+	fun toUiState(
+        notifications: List<Notification>?, activeAccount: String = "",
+    ): NotificationsUiState = if (notifications.isNullOrEmpty()) {
+		NotificationsUiState.NoNotifications(
+			isLoading = isLoading,
+			activeAccount = activeAccount
+		)
+	} else {
+		NotificationsUiState.HasNotifications(
+			notifications = notifications,
+			isLoading = isLoading,
+			activeAccount = activeAccount
+		)
+	}
 
 }
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-	private val timelineRepository: TimelineRepository,
+class NotificationsViewModel @Inject constructor(
 	authRepository: AuthRepository,
-	private val refreshTimelineUseCase: RefreshTimelineUseCase,
+	private val notificationRepository: NotificationRepository,
 	private val votePollUseCase: VotePollUseCase,
 ) : ViewModel() {
-	private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
+	private val viewModelState =
+		MutableStateFlow(NotificationsViewModelState(isLoading = true))
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private val timeline =
+	private val notifications =
 		authRepository.activeAccount.flatMapLatest {
-			timelineRepository.getTimeline(
+			notificationRepository.getNotificationsFlow(
 				it
 			)
-		}.distinctUntilChanged()
+		}
+			.distinctUntilChanged()
 
 	val uiState = combine(
 		viewModelState,
 		authRepository.activeAccount,
-		timeline
-	) { state, activeAccount, posts ->
-		state.toUiState(posts, activeAccount)
+		notifications,
+	) { state, activeAccount, notifications ->
+		state.toUiState(notifications, activeAccount)
 	}.stateIn(
 		viewModelScope, SharingStarted.Eagerly, viewModelState.value.toUiState(
-			posts = null,
+			notifications = null,
 		)
 	)
 
-	fun refreshTimeline(profileIdentifier: String) {
+	fun refreshNotifications(profileIdentifier: String) {
 		viewModelState.update { it.copy(isLoading = true) }
 		viewModelScope.launch {
-			refreshTimelineUseCase(profileIdentifier)
+			notificationRepository.fetchNotifications(profileIdentifier)
 			viewModelState.update { it.copy(isLoading = false) }
 		}
 	}
 
-	fun votePoll(profileIdentifier: String, postId: String, pollId: String?, choices: List<Int>) {
+	fun votePoll(
+        profileIdentifier: String,
+        postId: String,
+        pollId: String?,
+        choices: List<Int>,
+    ) {
 		viewModelScope.launch {
 			votePollUseCase(profileIdentifier, postId, pollId, choices)
 		}
 	}
+
 }

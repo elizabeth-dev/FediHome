@@ -27,11 +27,12 @@ import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 
 @Composable
 fun SlimPostCard(
-    post: Post,
-    onReply: (String) -> Unit,
-    onVotePoll: (choices: List<Int>) -> Unit,
-    navToPost: (postId: String) -> Unit,
-    navToProfile: (profileId: String) -> Unit,
+	post: Post,
+	onReply: (String) -> Unit,
+	onVotePoll: (choices: List<Int>) -> Unit,
+	navToPost: (postId: String) -> Unit,
+	navToProfile: (profileId: String) -> Unit,
+	showDivider: Boolean = true,
 ) { // TODO: Check if it's better to pass individual props
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -73,8 +74,8 @@ fun SlimPostCard(
 
                 if (post.quote != null) PostPreview(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp),
+	                    .fillMaxWidth()
+	                    .padding(top = 4.dp),
                     post = post.quote,
                     navToPost = navToPost,
                     navToProfile = navToProfile
@@ -112,7 +113,7 @@ fun SlimPostCard(
                 }
 
             }
-            HorizontalDivider(thickness = 1.dp)
+	        if (showDivider) HorizontalDivider(thickness = 1.dp)
         }
     }
 }

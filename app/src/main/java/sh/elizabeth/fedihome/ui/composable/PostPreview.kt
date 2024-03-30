@@ -25,7 +25,7 @@ import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 
 @Composable
 fun PostPreview(
-	modifier: Modifier,
+	modifier: Modifier = Modifier,
 	post: Post,
 	navToPost: (postId: String) -> Unit,
 	navToProfile: (profileId: String) -> Unit,
@@ -36,6 +36,7 @@ fun PostPreview(
 			color = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
 			shape = MaterialTheme.shapes.medium,
 		),
+		// FIXME
 		color = MaterialTheme.colorScheme.primary.copy(
 			alpha = 0.05f
 		),
@@ -63,9 +64,12 @@ fun PostPreview(
 					disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
 					disabledLeadingIconContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
 				),
-//				border = AssistChipDefaults.assistChipBorder(
-//					disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-//				),
+				border = AssistChipDefaults.assistChipBorder(
+					enabled = false,
+					disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(
+						alpha = 0.4f
+					),
+				),
 			)
 		}
 	}

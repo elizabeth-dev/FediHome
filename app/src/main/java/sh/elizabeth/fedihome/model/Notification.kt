@@ -26,3 +26,4 @@ enum class NotificationType {
 	FOLLOW_ACCEPTED,
 	UNKNOWN,
 }
+

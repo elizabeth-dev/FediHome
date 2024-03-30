@@ -39,7 +39,7 @@ fun toUiState(
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
 	private val authRepository: AuthRepository,
-	profileRepository: ProfileRepository,
+	private val profileRepository: ProfileRepository,
 ) : ViewModel() {
 
 	@OptIn(ExperimentalCoroutinesApi::class)
