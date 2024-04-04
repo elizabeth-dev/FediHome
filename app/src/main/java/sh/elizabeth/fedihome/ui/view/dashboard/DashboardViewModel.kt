@@ -44,7 +44,8 @@ class DashboardViewModel @Inject constructor(
 
 	@OptIn(ExperimentalCoroutinesApi::class)
 	val uiState = authRepository.internalData.flatMapLatest { authData ->
-		profileRepository.getMultipleByIdsFlow(authData.accessTokens.keys.toList()).map {
+		profileRepository.getMultipleByIdsFlow(authData.accounts.keys.toList())
+			.map {
 			toUiState(
 				activeAccount = authData.activeAccount, loggedInProfiles = it, isAuthLoading = false
 			)

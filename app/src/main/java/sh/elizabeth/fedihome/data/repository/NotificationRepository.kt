@@ -29,8 +29,8 @@ class NotificationRepository @Inject constructor(
 			val instance = it.split('@')[1]
 			Triple(
 				instance,
-				internalData.serverTypes[instance]!!,
-				internalData.accessTokens[it]!!
+				internalData.instances[instance]?.instanceType!!,
+				internalData.accounts[it]?.accessToken!!
 			)
 		}
 

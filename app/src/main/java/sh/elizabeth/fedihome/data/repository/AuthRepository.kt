@@ -15,17 +15,25 @@ class AuthRepository @Inject constructor(
 ) {
 	val internalData = internalDataLocalDataSource.internalData
 
-	val activeAccount = internalDataLocalDataSource.internalData.map { it.activeAccount }
+	val activeAccount =
+		internalDataLocalDataSource.internalData.map { it.activeAccount }
 
-	val loggedInAccounts = internalDataLocalDataSource.internalData.map { it.accessTokens.keys }
+	val loggedInAccounts =
+		internalDataLocalDataSource.internalData.map { it.accounts.keys }
 
 	suspend fun prepareOAuth(instance: String): String {
 		internalDataLocalDataSource.setLastLoginInstance(instance)
 
-		val instanceType = metaRemoteDataSource.getInstanceType(instance)
-			?: throw IllegalArgumentException("Instance type not supported")
+		val instanceType =
+			metaRemoteDataSource.getInstanceType(instance)
+				?: throw IllegalArgumentException("Instance type not supported")
 
-		internalDataLocalDataSource.addServerType(instance, instanceType)
+		internalDataLocalDataSource.setInstance(
+			instance = instance,
+			newInstanceType = instanceType,
+			newAppId = null,
+			newAppSecret = null
+		)
 
 		return authRemoteDataSource.prepareOAuth(instance, instanceType)
 	}
@@ -37,12 +45,15 @@ class AuthRepository @Inject constructor(
 				"Last login instance not found"
 			)
 
-		val instanceType = settingsData.serverTypes[instance]
-			?: throw IllegalStateException("Instance type not found")
+		val instanceType =
+			settingsData.instances[instance]?.instanceType
+				?: throw IllegalStateException("Instance type not found")
 
-		val (accessToken, profile) = authRemoteDataSource.finishOAuth(instance, instanceType, token)
+		val (accessToken, profile) = authRemoteDataSource.finishOAuth(
+			instance, instanceType, token
+		)
 
-		internalDataLocalDataSource.addAccessToken(profile.id, accessToken)
+		internalDataLocalDataSource.setAccessToken(profile.id, accessToken)
 		internalDataLocalDataSource.setActiveAccount(profile.id)
 
 		return profile

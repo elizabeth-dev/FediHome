@@ -5,23 +5,22 @@ import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
 import com.google.protobuf.InvalidProtocolBufferException
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import sh.elizabeth.fedihome.Account
+import sh.elizabeth.fedihome.AccountPushData
+import sh.elizabeth.fedihome.Instance
 import sh.elizabeth.fedihome.InternalData
 import sh.elizabeth.fedihome.copy
+import sh.elizabeth.fedihome.data.datasource.model.InternalDataAccount
+import sh.elizabeth.fedihome.data.datasource.model.InternalDataAccount_PushData
+import sh.elizabeth.fedihome.data.datasource.model.InternalDataInstance
+import sh.elizabeth.fedihome.data.datasource.model.InternalDataValues
 import sh.elizabeth.fedihome.util.SupportedInstances
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import javax.inject.Inject
-
-data class InternalDataValues(
-	val appIds: Map<String, String>,
-	val appSecrets: Map<String, String>,
-	val lastLoginInstance: String,
-	val accessTokens: Map<String, String>,
-	val serverTypes: Map<String, SupportedInstances>,
-	val activeAccount: String,
-)
 
 class InternalDataSerializer @Inject constructor() : Serializer<InternalData> {
 	override val defaultValue: InternalData = InternalData.getDefaultInstance()
@@ -44,39 +43,28 @@ class InternalDataLocalDataSource @Inject constructor(
 ) {
 	val internalData = internalDataDataStore.data.map {
 		InternalDataValues(
-			appIds = it.appIdsMap,
-			appSecrets = it.appSecretsMap,
 			lastLoginInstance = it.lastLoginInstance,
-			accessTokens = it.accessTokensMap,
 			activeAccount = it.activeAccount,
-			serverTypes = it.serverTypesMap.map { (key, value) ->
-				key to SupportedInstances.valueOf(value)
+			accounts = it.accountsMap.map { (key, value) ->
+				key to InternalDataAccount(
+					accessToken = value.accessToken,
+					pushData = InternalDataAccount_PushData(
+						pushPublicKey = value.pushData.pushPublicKey,
+						pushPrivateKey = value.pushData.pushPrivateKey,
+						pushAuthKey = value.pushData.pushAuthKey,
+						pushAccountId = value.pushData.pushAccountId,
+					)
+				)
 			}.toMap(),
+			instances = it.instancesMap.map { (key, value) ->
+				key to InternalDataInstance(
+					instanceType = SupportedInstances.valueOf(value.instanceType),
+					appId = value.appId,
+					appSecret = value.appSecret,
+				)
+			}.toMap(),
+			fcmDeviceToken = it.fcmDeviceToken,
 		)
-	}
-
-	suspend fun addAppId(instance: String, appId: String) {
-		try {
-			internalDataDataStore.updateData {
-				it.copy {
-					appIds.put(instance, appId)
-				}
-			}
-		} catch (ioException: IOException) {
-			Log.e("InternalDataLocalDataSource", "Failed to update settings", ioException)
-		}
-	}
-
-	suspend fun addAppSecret(instance: String, appSecret: String) {
-		try {
-			internalDataDataStore.updateData {
-				it.copy {
-					appSecrets.put(instance, appSecret)
-				}
-			}
-		} catch (ioException: IOException) {
-			Log.e("InternalDataLocalDataSource", "Failed to update settings", ioException)
-		}
 	}
 
 	suspend fun setLastLoginInstance(instance: String) {
@@ -87,31 +75,11 @@ class InternalDataLocalDataSource @Inject constructor(
 				}
 			}
 		} catch (ioException: IOException) {
-			Log.e("InternalDataLocalDataSource", "Failed to update settings", ioException)
-		}
-	}
-
-	suspend fun addAccessToken(identifier: String, accessToken: String) {
-		try {
-			internalDataDataStore.updateData {
-				it.copy {
-					accessTokens.put(identifier, accessToken)
-				}
-			}
-		} catch (ioException: IOException) {
-			Log.e("InternalDataLocalDataSource", "Failed to update settings", ioException)
-		}
-	}
-
-	suspend fun addServerType(instance: String, type: SupportedInstances) {
-		try {
-			internalDataDataStore.updateData {
-				it.copy {
-					serverTypes.put(instance, type.name)
-				}
-			}
-		} catch (ioException: IOException) {
-			Log.e("InternalDataLocalDataSource", "Failed to update settings", ioException)
+			Log.e(
+				"InternalDataLocalDataSource",
+				"Failed to update settings",
+				ioException
+			)
 		}
 	}
 
@@ -123,7 +91,118 @@ class InternalDataLocalDataSource @Inject constructor(
 				}
 			}
 		} catch (ioException: IOException) {
-			Log.e("InternalDataLocalDataSource", "Failed to update settings", ioException)
+			Log.e(
+				"InternalDataLocalDataSource",
+				"Failed to update settings",
+				ioException
+			)
+		}
+	}
+
+	suspend fun setAccessToken(
+		accountIdentifier: String,
+		newAccessToken: String,
+	) {
+		try {
+			val currentAccount =
+				internalDataDataStore.data.map { it.accountsMap[accountIdentifier] }
+					.first()
+
+			internalDataDataStore.updateData {
+				it.copy {
+					accounts.put(accountIdentifier, Account.newBuilder().apply {
+						accessToken = newAccessToken
+						pushData = currentAccount?.pushData
+					}.build())
+				}
+			}
+		} catch (ioException: IOException) {
+			Log.e(
+				"InternalDataLocalDataSource",
+				"Failed to update settings",
+				ioException
+			)
+		}
+	}
+
+	suspend fun setPushData(
+		accountIdentifier: String,
+		newPublicKey: String,
+		newPrivateKey: String,
+		newAuthKey: String,
+		newPushAccountId: String,
+	) {
+		try {
+			val currentAccount =
+				internalDataDataStore.data.map { it.accountsMap[accountIdentifier] }
+					.first()
+
+			internalDataDataStore.updateData {
+				it.copy {
+					accounts.put(accountIdentifier, Account.newBuilder().apply {
+						accessToken = currentAccount?.accessToken
+						pushData = AccountPushData.newBuilder().apply {
+							pushPublicKey = newPublicKey
+							pushPrivateKey = newPrivateKey
+							pushAuthKey = newAuthKey
+							pushAccountId = newPushAccountId
+						}.build()
+					}.build())
+				}
+			}
+		} catch (ioException: IOException) {
+			Log.e(
+				"InternalDataLocalDataSource",
+				"Failed to update settings",
+				ioException
+			)
+		}
+	}
+
+	suspend fun setInstance(
+		instance: String,
+		newInstanceType: SupportedInstances?,
+		newAppId: String?,
+		newAppSecret: String?,
+	) {
+		try {
+			val currentInstance =
+				internalDataDataStore.data.map { it.instancesMap[instance] }
+					.first()
+
+			internalDataDataStore.updateData {
+				it.copy {
+					instances.put(instance, Instance.newBuilder().apply {
+						instanceType =
+							newInstanceType?.name
+								?: currentInstance?.instanceType
+						appId = newAppId ?: currentInstance?.appId
+						appSecret = newAppSecret ?: currentInstance?.appSecret
+					}.build())
+				}
+			}
+		} catch (ioException: IOException) {
+			Log.e(
+				"InternalDataLocalDataSource",
+				"Failed to update settings",
+				ioException
+			)
+		}
+	}
+
+	suspend fun setFcmDeviceToken(token: String) {
+		try {
+			internalDataDataStore.updateData {
+				it.copy {
+					fcmDeviceToken = token
+				}
+			}
+		} catch (ioException: IOException) {
+			Log.e(
+				"InternalDataLocalDataSource",
+				"Failed to update settings",
+				ioException
+			)
 		}
 	}
 }

@@ -21,13 +21,21 @@ class AuthRemoteDataSource @Inject constructor(
 	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 ) {
 
-	suspend fun prepareOAuth(instance: String, instanceType: SupportedInstances): String {
+	suspend fun prepareOAuth(
+		instance: String,
+		instanceType: SupportedInstances,
+	): String {
 		when (instanceType) {
 			SupportedInstances.FIREFISH, SupportedInstances.SHARKEY -> {
 				val appSecret =
-					internalDataLocalDataSource.internalData.first().appSecrets[instance]
+					internalDataLocalDataSource.internalData.first().instances[instance]?.appSecret
 						?: authFirefishApi.createApp(instance = instance).secret.also { appSecret ->
-							internalDataLocalDataSource.addAppSecret(instance, appSecret)
+							internalDataLocalDataSource.setInstance(
+								instance = instance,
+								newInstanceType = null,
+								newAppSecret = appSecret,
+								newAppId = null
+							)
 						}
 				val session = authFirefishApi.generateSession(
 					instance = instance,
@@ -40,16 +48,25 @@ class AuthRemoteDataSource @Inject constructor(
 			SupportedInstances.GLITCH,
 			SupportedInstances.MASTODON,
 			-> {
-				val cachedApp = internalDataLocalDataSource.internalData.first()
-					.let { it.appIds[instance] to it.appSecrets[instance] }
+				val cachedApp =
+					internalDataLocalDataSource.internalData.first().let {
+						val _instance = it.instances[instance]
+						_instance?.appId to _instance?.appSecret
+					}
 
 				val appData =
 					if (cachedApp.first != null && cachedApp.second != null) cachedApp else authMastodonApi.createApp(
 						instance = instance,
-					).let { it.clientId to it.clientSecret }.also { (clientId, clientSecret) ->
-						internalDataLocalDataSource.addAppId(instance, clientId!!)
-						internalDataLocalDataSource.addAppSecret(instance, clientSecret!!)
-					}
+					)
+						.let { it.clientId to it.clientSecret }
+						.also { (clientId, clientSecret) ->
+							internalDataLocalDataSource.setInstance(
+								instance = instance,
+								newInstanceType = null,
+								newAppId = clientId,
+								newAppSecret = clientSecret
+							)
+						}
 
 				return generateAuthUrl(
 					instance = instance,
@@ -68,19 +85,23 @@ class AuthRemoteDataSource @Inject constructor(
 
 		when (instanceType) {
 			SupportedInstances.FIREFISH -> {
-				val appSecret = internalData.appSecrets[instance]
-					?: throw IllegalStateException("App secret for $instance not found")
+				val appSecret =
+					internalData.instances[instance]?.appSecret
+						?: throw IllegalStateException("App secret for $instance not found")
 
-				val userKey = authFirefishApi.getUserKey(instance, appSecret, token)
+				val userKey =
+					authFirefishApi.getUserKey(instance, appSecret, token)
 
 				return userKey.accessToken to userKey.user.toDomain(instance)
 			}
 
 			SupportedInstances.SHARKEY -> {
-				val appSecret = internalData.appSecrets[instance]
-					?: throw IllegalStateException("App secret for $instance not found")
+				val appSecret =
+					internalData.instances[instance]?.appSecret
+						?: throw IllegalStateException("App secret for $instance not found")
 
-				val userKey = authSharkeyApi.getUserKey(instance, appSecret, token)
+				val userKey =
+					authSharkeyApi.getUserKey(instance, appSecret, token)
 
 				return userKey.accessToken to userKey.user.toDomain(instance)
 			}
@@ -88,17 +109,22 @@ class AuthRemoteDataSource @Inject constructor(
 			SupportedInstances.GLITCH,
 			SupportedInstances.MASTODON,
 			-> {
-				val appId = internalData.appIds[instance]
-					?: throw IllegalStateException("App id for $instance not found")
-				val appSecret = internalData.appSecrets[instance]
-					?: throw IllegalStateException("App secret for $instance not found")
+				val (appId, appSecret) = let {
+					val _instance = internalData.instances[instance]
+					_instance?.appId to _instance?.appSecret
+				}
+
+				if (appId == null || appSecret == null) {
+					throw IllegalStateException("App data for $instance not found")
+				}
 
 				val accessToken = authMastodonApi.getAccessToken(
 					instance, token, appId, appSecret
 				).access_token
 
 				val profile =
-					authMastodonApi.verifyCredentials(instance, accessToken).toDomain(instance)
+					authMastodonApi.verifyCredentials(instance, accessToken)
+						.toDomain(instance)
 
 				return accessToken to profile
 			}

@@ -44,7 +44,8 @@ class ComposeViewModel @Inject constructor(
 	@OptIn(ExperimentalCoroutinesApi::class)
 	val uiState = combine(
 		authRepository.internalData.flatMapLatest { authData ->
-			profileRepository.getMultipleByIdsFlow(authData.accessTokens.keys.toList()).map {
+			profileRepository.getMultipleByIdsFlow(authData.accounts.keys.toList())
+				.map {
 				Pair(authData.activeAccount, it)
 			}
 

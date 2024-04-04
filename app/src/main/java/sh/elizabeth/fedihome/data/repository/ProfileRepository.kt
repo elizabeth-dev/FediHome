@@ -20,15 +20,14 @@ class ProfileRepository @Inject constructor(
 	private val profileRemoteDataSource: ProfileRemoteDataSource,
 	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 ) {
-	private suspend fun getInstanceAndTypeAndToken(activeAccount: String):
-			Triple<String, SupportedInstances, String> =
+	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
 		activeAccount.let {
 			val internalData = internalDataLocalDataSource.internalData.first()
 			val instance = it.split('@')[1]
 			Triple(
 				instance,
-				internalData.serverTypes[instance]!!,
-				internalData.accessTokens[it]!!
+				internalData.instances[instance]?.instanceType!!,
+				internalData.accounts[it]?.accessToken!!
 			)
 		}
 
