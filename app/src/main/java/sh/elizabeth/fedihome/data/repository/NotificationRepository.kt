@@ -23,6 +23,7 @@ class NotificationRepository @Inject constructor(
 	private val profileRepository: ProfileRepository,
 	private val emojiLocalDataSource: EmojiLocalDataSource,
 ) {
+
 	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
 		activeAccount.let {
 			val internalData = internalDataLocalDataSource.internalData.first()
@@ -92,4 +93,5 @@ class NotificationRepository @Inject constructor(
 
 	fun getNotificationsFlow(activeAccount: String) =
 		notificationLocalDataSource.getNotificationsFlow(activeAccount)
+
 }

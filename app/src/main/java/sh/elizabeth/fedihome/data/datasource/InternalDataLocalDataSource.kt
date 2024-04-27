@@ -112,7 +112,9 @@ class InternalDataLocalDataSource @Inject constructor(
 				it.copy {
 					accounts.put(accountIdentifier, Account.newBuilder().apply {
 						accessToken = newAccessToken
-						pushData = currentAccount?.pushData
+						pushData =
+							currentAccount?.pushData
+								?: AccountPushData.getDefaultInstance()
 					}.build())
 				}
 			}
@@ -176,8 +178,9 @@ class InternalDataLocalDataSource @Inject constructor(
 						instanceType =
 							newInstanceType?.name
 								?: currentInstance?.instanceType
-						appId = newAppId ?: currentInstance?.appId
-						appSecret = newAppSecret ?: currentInstance?.appSecret
+						appId = newAppId ?: currentInstance?.appId ?: ""
+						appSecret =
+							newAppSecret ?: currentInstance?.appSecret ?: ""
 					}.build())
 				}
 			}

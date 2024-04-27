@@ -21,11 +21,13 @@ class NotificationRemoteDataSource @Inject constructor(
 		instanceType: SupportedInstances,
 		token: String,
 	): List<Notification> = when (instanceType) {
-		SupportedInstances.SHARKEY -> notificationSharkeyApi.getNotifications(instance, token)
-			.map { it.toDomain(instance, forAccount) }
+		SupportedInstances.SHARKEY -> notificationSharkeyApi.getNotifications(
+			instance, token
+		).map { it.toDomain(instance, forAccount) }
 
-		SupportedInstances.FIREFISH -> notificationFirefishApi.getNotifications(instance, token)
-			.map { it.toDomain(instance, forAccount) }
+		SupportedInstances.FIREFISH -> notificationFirefishApi.getNotifications(
+			instance, token
+		).map { it.toDomain(instance, forAccount) }
 
 		SupportedInstances.MASTODON, SupportedInstances.GLITCH -> notificationMastodonApi.getNotifications(
 			instance, token

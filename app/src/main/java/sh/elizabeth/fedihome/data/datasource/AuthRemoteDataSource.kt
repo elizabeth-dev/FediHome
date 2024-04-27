@@ -55,7 +55,7 @@ class AuthRemoteDataSource @Inject constructor(
 					}
 
 				val appData =
-					if (cachedApp.first != null && cachedApp.second != null) cachedApp else authMastodonApi.createApp(
+					if (!cachedApp.first.isNullOrBlank() && !cachedApp.second.isNullOrBlank()) cachedApp else authMastodonApi.createApp(
 						instance = instance,
 					)
 						.let { it.clientId to it.clientSecret }

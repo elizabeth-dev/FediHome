@@ -12,7 +12,7 @@ data class Media(
 	val remote_url: String? = null,
 	val _meta: String?, // FIXME: object
 	val description: String? = null,
-	val blurhash: String,
+	val blurhash: String? = null,
 )
 
 @Serializable

@@ -8,6 +8,7 @@ plugins {
 	kotlin("plugin.serialization")
 	id("com.google.devtools.ksp")
 	id("app.cash.sqldelight")
+	id("com.google.gms.google-services")
 }
 
 android {
@@ -143,6 +144,8 @@ dependencies {
 
 	implementation("com.google.dagger:hilt-android:2.51.1")
 	ksp("com.google.dagger:hilt-android-compiler:2.51")
+	ksp("com.google.dagger:hilt-compiler:2.51")
+	ksp("androidx.hilt:hilt-compiler:1.2.0")
 	implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 	implementation("androidx.datastore:datastore:1.0.0")
@@ -163,14 +166,26 @@ dependencies {
 	implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 	implementation("io.ktor:ktor-client-auth:$ktorVersion")
 
+	// Glide + BlurHash
 	implementation("com.github.bumptech.glide:glide:4.16.0")
 	implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 	implementation("com.github.bumptech.glide:okhttp3-integration:4.16.0")
 	ksp("com.github.bumptech.glide:ksp:4.16.0")
 	implementation("com.vanniktech:blurhash:0.1.0")
 
+	// SQLDelight
 	implementation("app.cash.sqldelight:android-driver:2.0.1")
 	implementation("app.cash.sqldelight:coroutines-extensions:2.0.1")
 	implementation("com.google.code.gson:gson:2.10.1")
+
+	// Firebase
+	implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+	implementation("com.google.firebase:firebase-analytics")
+	implementation("com.google.firebase:firebase-messaging")
+
+	// Work Manager (used for firebase messaging)
+	val work_version = "2.9.0"
+	implementation("androidx.work:work-runtime-ktx:$work_version")
+	implementation("androidx.hilt:hilt-work:1.2.0")
 
 }
