@@ -68,6 +68,7 @@ object DatabaseModule {
 				AppDatabase.Schema
 			) {
 				override fun onOpen(db: SupportSQLiteDatabase) {
+					super.onOpen(db)
 					db.setForeignKeyConstraintsEnabled(
 						true
 					)

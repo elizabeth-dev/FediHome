@@ -28,7 +28,7 @@ class AuthRemoteDataSource @Inject constructor(
 		when (instanceType) {
 			SupportedInstances.FIREFISH, SupportedInstances.SHARKEY -> {
 				val appSecret =
-					internalDataLocalDataSource.internalData.first().instances[instance]?.appSecret
+					internalDataLocalDataSource.internalData.first().instances[instance]?.appSecret.takeUnless { it.isNullOrBlank() }
 						?: authFirefishApi.createApp(instance = instance).secret.also { appSecret ->
 							internalDataLocalDataSource.setInstance(
 								instance = instance,

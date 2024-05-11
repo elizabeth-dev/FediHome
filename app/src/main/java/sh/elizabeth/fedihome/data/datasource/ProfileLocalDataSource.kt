@@ -16,11 +16,9 @@ import javax.inject.Inject
 
 class ProfileLocalDataSource @Inject constructor(private val appDatabase: AppDatabase) {
 	fun insertOrReplace(vararg profiles: Profile) {
-		appDatabase.profileQueries.transaction {
 			profiles.forEach { profile ->
 				appDatabase.profileQueries.insertOrReplace(profile.toEntity())
 			}
-		}
 	}
 
 	fun insertOrReplaceEmojiCrossRef(

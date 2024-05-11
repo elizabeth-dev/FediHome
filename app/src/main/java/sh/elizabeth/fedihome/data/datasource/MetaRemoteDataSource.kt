@@ -8,6 +8,7 @@ class MetaRemoteDataSource @Inject constructor(
 	private val nodeInfoApi: NodeInfoApi,
 ) {
 	suspend fun getInstanceType(instance: String): SupportedInstances? {
+		return SupportedInstances.SHARKEY
 		val nodeInfoSoftware = nodeInfoApi.getSoftware(instance) ?: return null
 
 		when (nodeInfoSoftware.name) {

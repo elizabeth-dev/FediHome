@@ -19,7 +19,7 @@ fun Post.unwrapQuotes(): List<Post> {
 	val quotes = mutableListOf(this)
 	var currentQuote = quote
 	while (currentQuote != null) {
-		quotes.add(currentQuote)
+		quotes.add(0, currentQuote)
 		currentQuote = currentQuote.quote
 	}
 	return quotes

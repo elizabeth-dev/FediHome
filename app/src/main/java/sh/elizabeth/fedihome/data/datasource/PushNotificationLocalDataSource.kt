@@ -8,15 +8,15 @@ import androidx.work.Data
 import kotlinx.serialization.json.Json
 import sh.elizabeth.fedihome.api.mastodon.model.toDomain
 import sh.elizabeth.fedihome.data.datasource.model.InternalDataAccount
-import sh.elizabeth.fedihome.domain.P256_HEAD
-import sh.elizabeth.fedihome.domain.cipher
-import sh.elizabeth.fedihome.domain.ecdh
-import sh.elizabeth.fedihome.domain.hmacContext
-import sh.elizabeth.fedihome.domain.kf
 import sh.elizabeth.fedihome.model.PushNotification
 import sh.elizabeth.fedihome.model.notify
+import sh.elizabeth.fedihome.util.CryptoConstants.P256_HEAD
+import sh.elizabeth.fedihome.util.CryptoConstants.cipher
+import sh.elizabeth.fedihome.util.CryptoConstants.ecdh
+import sh.elizabeth.fedihome.util.CryptoConstants.hmacContext
+import sh.elizabeth.fedihome.util.CryptoConstants.kf
 import sh.elizabeth.fedihome.util.SupportedInstances
-import sh.elizabeth.fedihome.util.serializePublicKey
+import sh.elizabeth.fedihome.util.publicKeyToEncodedECPoint
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -33,6 +33,18 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import sh.elizabeth.fedihome.api.mastodon.model.PushNotification_Message as MastodonPushNotification_Message
 
+enum class EncryptionVersion {
+	FINAL, DRAFT_04
+}
+
+/*
+* Useful docs for Webpush encryption
+*
+* Mastodon's implementation (RFC8291-draft-04): https://datatracker.ietf.org/doc/html/draft-ietf-webpush-encryption-04
+* Misskey's and co. implementation (RFC8291): https://datatracker.ietf.org/doc/html/rfc8291
+* Embedded parameters in the payload as per final RFC8291: https://datatracker.ietf.org/doc/html/rfc8188#section-2.1
+* ECE example https://webpush-wg.github.io/webpush-encryption/ben-comment/draft-ietf-webpush-encryption.html#rfc.section.5
+*/
 class PushNotificationLocalDataSource @Inject constructor() {
 	fun handleNotification(
 		accountId: String,
@@ -47,7 +59,9 @@ class PushNotificationLocalDataSource @Inject constructor() {
 				accountId, instance, account, messageData
 			)
 
-			else -> TODO()
+			SupportedInstances.SHARKEY, SupportedInstances.FIREFISH -> handleKeyNotification(
+				accountId, instance, account, messageData
+			)
 		}
 
 		createNotificationChannel(
@@ -74,37 +88,107 @@ class PushNotificationLocalDataSource @Inject constructor() {
 		}
 	}
 
-	@OptIn(ExperimentalEncodingApi::class) fun handleMastodonNotification(
+	@OptIn(ExperimentalEncodingApi::class)
+	fun handleKeyNotification(
 		accountId: String,
 		instance: String,
 		account: InternalDataAccount,
 		messageData: Data,
 	): PushNotification {
 		// FIXME: handle missing fields
-		val p = messageData.getString("p") ?: return TODO()
-		val s = messageData.getString("s") ?: return TODO()
-		val k = messageData.getString("k") ?: return TODO()
+		val rawPayload = messageData.getString("p") ?: return TODO()
+		val rawServerKey = account.pushData.pushServerKey ?: return TODO()
 
-		val serverKey = getServerKey(k)
-		val privKey =
-			getPrivateKey(account.pushData.pushPrivateKey!!) // FIXME: handle missing fields
-		val pubKey = getPublicKey(account.pushData.pushPublicKey!!)
-		val authKey = getAuthKey(account.pushData.pushAuthKey!!)
-		val salt = getSalt(s)
+		val payloadBytes =
+			Base64.decode(rawPayload) // TODO: maybe use UrlSafe always
+		val salt = getSaltFromPayload(payloadBytes)
+		val rawContent = getContentFromPayload(payloadBytes)
 
-		val sharedSecret = getSharedSecret(privKey, serverKey)
-		val secondSalt = getSecondSalt(authKey, sharedSecret)
-		val key = deriveKey(
-			salt, secondSalt, getInfo("aesgcm", pubKey, serverKey), 16
+		return handleWebpushNotification(
+			accountId = accountId,
+			instance = instance,
+			account = account,
+			payload = rawContent,
+			salt = salt,
+			rawServerKey = rawServerKey,
+			encryptionVersion = EncryptionVersion.FINAL
 		)
-		val nonce =
-			deriveKey(salt, secondSalt, getInfo("nonce", pubKey, serverKey), 12)
+	}
 
-		val aesKey = SecretKeySpec(key, "AES")
+	@OptIn(ExperimentalEncodingApi::class)
+	fun handleMastodonNotification(
+		accountId: String,
+		instance: String,
+		account: InternalDataAccount,
+		messageData: Data,
+	): PushNotification {
+		// FIXME: handle missing fields
+		val rawPayload = messageData.getString("p") ?: return TODO()
+		val rawSalt = messageData.getString("s") ?: return TODO()
+		val rawServerKey = messageData.getString("k") ?: return TODO()
+
+		return handleWebpushNotification(
+			accountId = accountId,
+			instance = instance,
+			account = account,
+			payload = Base64.decode(rawPayload),
+			salt = getSalt(rawSalt),
+			rawServerKey = rawServerKey,
+			encryptionVersion = EncryptionVersion.DRAFT_04
+		)
+	}
+
+	fun handleWebpushNotification(
+		accountId: String,
+		instance: String,
+		account: InternalDataAccount,
+		payload: ByteArray,
+		salt: ByteArray,
+		rawServerKey: String,
+		encryptionVersion: EncryptionVersion,
+	): PushNotification {
+		val serverKey = getServerKey(rawServerKey)
+		val privateKey =
+			getPrivateKey(account.pushData.pushPrivateKey!!) // FIXME: handle missing fields
+		val publicKey = getPublicKey(account.pushData.pushPublicKey!!)
+		val authSecret = getAuthSecret(account.pushData.pushAuthSecret!!)
+
+		val sharedSecret = getSharedSecret(privateKey, serverKey)
+		val inputKeyringMaterial = getIKM(
+			authKey = authSecret,
+			sharedKey = sharedSecret,
+			clientPublicKey = publicKey,
+			serverPublicKey = serverKey,
+			encryptionVersion = encryptionVersion
+		)
+		val contentEncryptionKey = deriveKey(
+			firstSalt = salt,
+			secondSalt = inputKeyringMaterial,
+			info = getContentEncodingInfo(
+				type = if (encryptionVersion == EncryptionVersion.DRAFT_04) "aesgcm" else "aes128gcm",
+				clientPublicKey = publicKey,
+				serverPublicKey = serverKey,
+				appendContext = encryptionVersion == EncryptionVersion.DRAFT_04
+			),
+			length = 16
+		)
+		val nonce = deriveKey(
+			firstSalt = salt,
+			secondSalt = inputKeyringMaterial,
+			info = getContentEncodingInfo(
+				type = "nonce",
+				clientPublicKey = publicKey,
+				serverPublicKey = serverKey,
+				appendContext = encryptionVersion == EncryptionVersion.DRAFT_04
+			),
+			length = 12
+		)
+
+		val aesKey = SecretKeySpec(contentEncryptionKey, "AES")
 		val iv = GCMParameterSpec(128, nonce)
 
 		cipher.init(Cipher.DECRYPT_MODE, aesKey, iv)
-		val decrypted = cipher.doFinal(Base64.decode(p))
+		val decrypted = cipher.doFinal(payload)
 		val decryptedStr =
 			String(decrypted, 2, decrypted.size - 2, StandardCharsets.UTF_8)
 
@@ -126,7 +210,8 @@ class PushNotificationLocalDataSource @Inject constructor() {
 			kf.generatePublic(X509EncodedKeySpec(output.toByteArray()))
 		}
 
-	@OptIn(ExperimentalEncodingApi::class) private fun getPrivateKey(
+	@OptIn(ExperimentalEncodingApi::class)
+	private fun getPrivateKey(
 		encodedPrivKey: String,
 	): PrivateKey = kf.generatePrivate(
 		PKCS8EncodedKeySpec(
@@ -134,7 +219,8 @@ class PushNotificationLocalDataSource @Inject constructor() {
 		)
 	)
 
-	@OptIn(ExperimentalEncodingApi::class) private fun getPublicKey(
+	@OptIn(ExperimentalEncodingApi::class)
+	private fun getPublicKey(
 		encodedPubKey: String,
 	): PublicKey = kf.generatePublic(
 		X509EncodedKeySpec(
@@ -143,8 +229,9 @@ class PushNotificationLocalDataSource @Inject constructor() {
 	)
 
 	@OptIn(ExperimentalEncodingApi::class)
-	private fun getAuthKey(encodedAuthKey: String): ByteArray =
-		Base64.UrlSafe.decode(encodedAuthKey)
+	private fun getAuthSecret(
+		encodedAuthSecret: String,
+	): ByteArray = Base64.UrlSafe.decode(encodedAuthSecret)
 
 	private fun getSharedSecret(
 		privKey: PrivateKey,
@@ -159,15 +246,40 @@ class PushNotificationLocalDataSource @Inject constructor() {
 	private fun getSalt(encodedSalt: String) =
 		Base64.UrlSafe.decode(encodedSalt)
 
-	private fun getSecondSalt(
+	private fun getIKM(
 		authKey: ByteArray,
 		sharedKey: ByteArray,
+		clientPublicKey: PublicKey,
+		serverPublicKey: PublicKey,
+		encryptionVersion: EncryptionVersion,
 	): ByteArray = deriveKey(
 		authKey,
 		sharedKey,
-		"Content-Encoding: auth${0.toChar()}".toByteArray(),
+		if (encryptionVersion == EncryptionVersion.DRAFT_04) getContentEncodingInfo(
+			type = "auth",
+			clientPublicKey = clientPublicKey,
+			serverPublicKey = serverPublicKey,
+			appendContext = false
+		) else getWebpushInfo(
+			clientPublicKey = clientPublicKey, serverPublicKey = serverPublicKey
+		),
 		32
 	)
+
+	private fun getWebpushInfo(
+		clientPublicKey: PublicKey,
+		serverPublicKey: PublicKey,
+	): ByteArray {
+		val info = ByteArrayOutputStream()
+		try {
+			info.write("WebPush: info".toByteArray(StandardCharsets.UTF_8))
+			info.write(0)
+			info.write(publicKeyToEncodedECPoint(clientPublicKey))
+			info.write(publicKeyToEncodedECPoint(serverPublicKey))
+		} catch (ignore: IOException) {
+		}
+		return info.toByteArray()
+	}
 
 	private fun deriveKey(
 		firstSalt: ByteArray,
@@ -188,26 +300,39 @@ class PushNotificationLocalDataSource @Inject constructor() {
 		)
 	}
 
-	private fun getInfo(
+	private fun getContentEncodingInfo(
 		type: String,
 		clientPublicKey: PublicKey,
 		serverPublicKey: PublicKey,
+		appendContext: Boolean = false,
 	): ByteArray {
 		val info = ByteArrayOutputStream()
 		try {
 			info.write("Content-Encoding: ".toByteArray(StandardCharsets.UTF_8))
 			info.write(type.toByteArray(StandardCharsets.UTF_8))
 			info.write(0)
-			info.write("P-256".toByteArray(StandardCharsets.UTF_8))
-			info.write(0)
-			info.write(0)
-			info.write(65)
-			info.write(serializePublicKey(clientPublicKey))
-			info.write(0)
-			info.write(65)
-			info.write(serializePublicKey(serverPublicKey))
+			if (appendContext) {
+				info.write("P-256".toByteArray(StandardCharsets.UTF_8))
+				info.write(0)
+				info.write(0)
+				info.write(65)
+				info.write(publicKeyToEncodedECPoint(clientPublicKey))
+				info.write(0)
+				info.write(65)
+				info.write(publicKeyToEncodedECPoint(serverPublicKey))
+			}
 		} catch (ignore: IOException) {
 		}
 		return info.toByteArray()
+	}
+
+	private fun getSaltFromPayload(payload: ByteArray): ByteArray =
+		Arrays.copyOfRange(payload, 0, 16)
+
+	private fun getContentFromPayload(payload: ByteArray): ByteArray {
+		val idLen = payload[20].toUInt()
+		return Arrays.copyOfRange(
+			payload, idLen.plus(21u).toInt(), payload.size
+		)
 	}
 }

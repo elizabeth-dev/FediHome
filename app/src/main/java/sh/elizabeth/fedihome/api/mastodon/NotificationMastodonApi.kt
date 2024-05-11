@@ -16,6 +16,7 @@ import sh.elizabeth.fedihome.api.mastodon.model.PushSubscriptionRequest_Data
 import sh.elizabeth.fedihome.api.mastodon.model.PushSubscriptionRequest_Keys
 import sh.elizabeth.fedihome.api.mastodon.model.PushSubscriptionRequest_Policy
 import sh.elizabeth.fedihome.api.mastodon.model.PushSubscriptionRequest_Subscription
+import sh.elizabeth.fedihome.api.mastodon.model.PushSubscriptionResponse
 import javax.inject.Inject
 
 class NotificationMastodonApi @Inject constructor(private val httpClient: HttpClient) {
@@ -34,14 +35,14 @@ class NotificationMastodonApi @Inject constructor(private val httpClient: HttpCl
 		pushAccountId: String,
 		publicKey: String,
 		authKey: String,
-	) {
+	): PushSubscriptionResponse =
 		httpClient.post("https://$instance/api/v1/push/subscription") {
 			bearerAuth(token)
 			contentType(ContentType.Application.Json)
 			setBody(
 				PushSubscriptionRequest(
 					subscription = PushSubscriptionRequest_Subscription(
-						endpoint = "https://i9o44423je.execute-api.eu-west-3.amazonaws.com/default/webpush_fcm_relay/$deviceToken/$pushAccountId",
+						endpoint = "https://api.fedihome.elizabeth.sh/push/fcm/mastodon/$deviceToken/$pushAccountId",
 						keys = PushSubscriptionRequest_Keys(
 							p256dh = publicKey,
 							auth = authKey,
@@ -53,8 +54,7 @@ class NotificationMastodonApi @Inject constructor(private val httpClient: HttpCl
 					),
 				)
 			)
-		}
-	}
+		}.body()
 
 	suspend fun deletePushSubscription(instance: String, token: String) {
 		httpClient.delete("https://$instance/api/v1/push/subscription") {
