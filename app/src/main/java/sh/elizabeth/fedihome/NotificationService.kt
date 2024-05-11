@@ -1,6 +1,7 @@
 package sh.elizabeth.fedihome
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -15,7 +16,6 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import sh.elizabeth.fedihome.data.repository.PushNotificationRepository
-import sh.elizabeth.fedihome.domain.HandlePushMessageUseCase
 
 @HiltWorker class UpdateFcmTokenWorker @AssistedInject constructor(
 	@Assisted appContext: Context,
@@ -40,7 +40,6 @@ import sh.elizabeth.fedihome.domain.HandlePushMessageUseCase
 @HiltWorker class ProcessNotificationWorker @AssistedInject constructor(
 	@Assisted private val appContext: Context,
 	@Assisted private val workerParams: WorkerParameters,
-	private val handlePushMessageUseCase: HandlePushMessageUseCase,
 	private val pushNotificationRepository: PushNotificationRepository,
 ) : CoroutineWorker(appContext, workerParams) {
 	override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
@@ -48,6 +47,7 @@ import sh.elizabeth.fedihome.domain.HandlePushMessageUseCase
 			val pushAccountId =
 				workerParams.inputData.getString("pushAccountId")
 					?: return@withContext Result.failure()
+
 			pushNotificationRepository.handleIncomingNotification(
 				appContext = appContext,
 				pushAccountId = pushAccountId,
@@ -55,6 +55,11 @@ import sh.elizabeth.fedihome.domain.HandlePushMessageUseCase
 			)
 			return@withContext Result.success()
 		} catch (e: Exception) {
+			Log.e(
+				"ProcessNotificationWorker",
+				"Error processing notification",
+				e
+			)
 			return@withContext Result.failure()
 		}
 	}

@@ -3,47 +3,37 @@ package sh.elizabeth.fedihome.api.mastodon.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class PushSubscriptionRequest(
+@Serializable data class PushSubscriptionRequest(
 	val subscription: PushSubscriptionRequest_Subscription,
 	val data: PushSubscriptionRequest_Data,
 )
 
-@Serializable
-data class PushSubscriptionRequest_Subscription(
+@Serializable data class PushSubscriptionRequest_Subscription(
 	val endpoint: String,
 	val keys: PushSubscriptionRequest_Keys,
 )
 
-@Serializable
-data class PushSubscriptionRequest_Keys(
+@Serializable data class PushSubscriptionRequest_Keys(
 	val p256dh: String,
 	val auth: String,
 )
 
-@Serializable
-enum class PushSubscriptionRequest_Policy {
-	@SerialName("all")
-	ALL,
+@Serializable enum class PushSubscriptionRequest_Policy {
+	@SerialName("all") ALL,
 
-	@SerialName("followed")
-	FOLLOWED,
+	@SerialName("followed") FOLLOWED,
 
-	@SerialName("follower")
-	FOLLOWER,
+	@SerialName("follower") FOLLOWER,
 
-	@SerialName("none")
-	NONE,
+	@SerialName("none") NONE,
 }
 
-@Serializable
-data class PushSubscriptionRequest_Data(
+@Serializable data class PushSubscriptionRequest_Data(
 	val alerts: PushSubscriptionRequest_Alerts,
 	val policy: PushSubscriptionRequest_Policy,
 )
 
-@Serializable
-data class PushSubscriptionRequest_Alerts(
+@Serializable data class PushSubscriptionRequest_Alerts(
 	val mention: Boolean = false,
 	val status: Boolean = false,
 	val reblog: Boolean = false,
@@ -70,3 +60,11 @@ data class PushSubscriptionRequest_Alerts(
 		)
 	}
 }
+
+@Serializable data class PushSubscriptionResponse(
+	val id: Int,
+	val endpoint: String,
+	val alerts: PushSubscriptionRequest_Alerts,
+	@SerialName("server_key") val serverKey: String,
+	val policy: PushSubscriptionRequest_Policy,
+)

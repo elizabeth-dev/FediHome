@@ -12,12 +12,10 @@ import javax.inject.Inject
 
 class TimelineLocalDataSource @Inject constructor(private val appDatabase: AppDatabase) {
 	fun insert(profileIdentifier: String, vararg posts: TimelinePost) {
-		appDatabase.timelinePostQueries.transaction {
-			posts.forEach { post ->
-				appDatabase.timelinePostQueries.insert(
-					profileIdentifier, post.postId, post.repostedById
-				)
-			}
+		posts.forEach { post ->
+			appDatabase.timelinePostQueries.insert(
+				profileIdentifier, post.postId, post.repostedById
+			)
 		}
 	}
 

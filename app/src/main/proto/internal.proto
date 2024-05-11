@@ -6,8 +6,10 @@ option java_multiple_files = true;
 message AccountPushData {
   string push_public_key = 1;
   string push_private_key = 2;
-  string push_auth_key = 3;
-  string push_account_id = 4;
+  string push_server_key = 3;
+  string push_auth_secret = 4;
+  string push_account_id = 5;
+  string push_endpoint = 6;
 }
 
 message Account {

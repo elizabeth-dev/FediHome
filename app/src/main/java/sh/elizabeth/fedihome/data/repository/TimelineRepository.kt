@@ -1,12 +1,10 @@
 package sh.elizabeth.fedihome.data.repository
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import sh.elizabeth.fedihome.PostEmojiCrossRef
 import sh.elizabeth.fedihome.ProfileEmojiCrossRef
+import sh.elizabeth.fedihome.data.database.AppDatabase
 import sh.elizabeth.fedihome.data.datasource.EmojiLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.TimelineLocalDataSource
@@ -25,6 +23,7 @@ class TimelineRepository @Inject constructor(
 	private val emojiLocalDataSource: EmojiLocalDataSource,
 	private val timelineRemoteDataSource: TimelineRemoteDataSource,
 	private val internalDataLocalDataSource: InternalDataLocalDataSource,
+	private val appDatabase: AppDatabase,
 ) {
 	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
 		activeAccount.let {
@@ -71,32 +70,22 @@ class TimelineRepository @Inject constructor(
 		}
 
 
-		coroutineScope {
-			val emojiRef =
-				async { emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray()) }
+		appDatabase.transaction {
+			emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray())
 
 			profileRepository.insertOrReplace(*profiles.toTypedArray())
 			postRepository.insertOrReplace(*unWrappedPosts.toTypedArray())
 
-			val timelineRef = async {
-				timelineLocalDataSource.insert(profileIdentifier,
-					*posts.map {
-						TimelinePost(
-							postId = it.id,
-							repostedById = it.repostedBy?.id
-						)
-					}.reversed().toTypedArray()
-				)
-			}
+			timelineLocalDataSource.insert(
+				profileIdentifier, *posts.map {
+					TimelinePost(
+						postId = it.id, repostedById = it.repostedBy?.id
+					)
+				}.reversed().toTypedArray()
+			)
 
-			emojiRef.await()
-
-			val postEmojiRef =
-				async { postRepository.insertOrReplaceEmojiCrossRef(*postEmojiCrossRefs.toTypedArray()) }
-			val profileEmojiRef =
-				async { profileRepository.insertOrReplaceEmojiCrossRef(*profileEmojiCrossRefs.toTypedArray()) }
-
-			awaitAll(timelineRef, postEmojiRef, profileEmojiRef)
+			postRepository.insertOrReplaceEmojiCrossRef(*postEmojiCrossRefs.toTypedArray())
+			profileRepository.insertOrReplaceEmojiCrossRef(*profileEmojiCrossRefs.toTypedArray())
 		}
 	}
 }

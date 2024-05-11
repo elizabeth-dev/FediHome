@@ -5,8 +5,10 @@ import sh.elizabeth.fedihome.util.SupportedInstances
 data class InternalDataAccount_PushData(
 	val pushPublicKey: String?,
 	val pushPrivateKey: String?,
-	val pushAuthKey: String?,
+	val pushServerKey: String?,
+	val pushAuthSecret: String?,
 	val pushAccountId: String?,
+	val pushEndpoint: String?,
 )
 
 data class InternalDataAccount(

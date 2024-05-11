@@ -76,7 +76,8 @@ data class UserDetailedNotMe(
 	// TODO: should be Page
 	val pinnedPage: String? = null,
 	val publicReactions: Boolean,
-	val ffVisibility: FollowsFollowersVisibility,
+	val followingVisibility: FollowsFollowersVisibility,
+	val followersVisibility: FollowsFollowersVisibility,
 	val twoFactorEnabled: Boolean,
 	val usePasswordLessLogin: Boolean,
 	val securityKeys: Boolean,

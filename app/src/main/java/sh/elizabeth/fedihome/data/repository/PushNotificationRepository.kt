@@ -6,17 +6,7 @@ import kotlinx.coroutines.flow.first
 import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.PushNotificationLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.PushNotificationRemoteDataSource
-import sh.elizabeth.fedihome.util.serializePublicKey
-import java.security.KeyPairGenerator
-import java.security.SecureRandom
-import java.security.spec.ECGenParameterSpec
 import javax.inject.Inject
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
-
-val keyPairGenerator: KeyPairGenerator = KeyPairGenerator.getInstance("EC")
-
-val rngGenerator: SecureRandom = SecureRandom()
 
 class PushNotificationRepository @Inject constructor(
 	private val pushNotificationRemoteDataSource: PushNotificationRemoteDataSource,
@@ -24,22 +14,21 @@ class PushNotificationRepository @Inject constructor(
 	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 	private val internalDataRepository: InternalDataRepository,
 ) {
-	init {
-		keyPairGenerator.initialize(ECGenParameterSpec("prime256v1"))
-	}
 
 	suspend fun updatePushTokenAll(deviceToken: String) {
-		val accounts =
-			internalDataLocalDataSource.internalData.first().accounts.keys
+		val accounts = internalDataLocalDataSource.internalData.first().accounts
 
 		for (account in accounts) {
-			updatePushToken(account, deviceToken)
+			updatePushToken(
+				account.key, deviceToken, account.value.pushData.pushEndpoint
+			)
 		}
 	}
 
-	@OptIn(ExperimentalEncodingApi::class) suspend fun updatePushToken(
+	suspend fun updatePushToken(
 		accountIdentifier: String,
 		deviceToken: String,
+		oldEndpoint: String? = null,
 	) {
 		internalDataLocalDataSource.setFcmDeviceToken(deviceToken)
 
@@ -47,40 +36,27 @@ class PushNotificationRepository @Inject constructor(
 			accountIdentifier
 		)
 
-		// Generate cryptographic stuff
-		val keyPair = keyPairGenerator.generateKeyPair()
-		val encodedPublicKey = Base64.UrlSafe.encode(
-			serializePublicKey(keyPair.public)
-		) // FIXME: no padding
+		if (!oldEndpoint.isNullOrBlank()) pushNotificationRemoteDataSource.deletePushSubscription(
+			instance, instanceType, accessToken, oldEndpoint
+		)
 
-		val authKey = ByteArray(16)
-		rngGenerator.nextBytes(authKey)
+		val pushData =
+			pushNotificationRemoteDataSource.registerPushSubscription(
+				instance,
+				instanceType,
+				accessToken,
+				deviceToken,
+			)
 
-		val pushAccountId = ByteArray(16)
-		rngGenerator.nextBytes(pushAccountId)
-
-		// Start registering
 		internalDataLocalDataSource.setPushData(
 			accountIdentifier = accountIdentifier,
-			newPublicKey = Base64.UrlSafe.encode(keyPair.public.encoded),
-			newPrivateKey = Base64.UrlSafe.encode(keyPair.private.encoded),
-			newAuthKey = Base64.UrlSafe.encode(authKey),
-			newPushAccountId = Base64.UrlSafe.encode(pushAccountId)
+			newPublicKey = pushData.publicKey,
+			newPrivateKey = pushData.privateKey,
+			newServerKey = pushData.serverKey,
+			newAuthSecret = pushData.authSecret,
+			newPushAccountId = pushData.pushAccountId,
+			newPushEndpoint = pushData.endpoint,
 		)
-
-		pushNotificationRemoteDataSource.deletePushSubscription(
-			instance, instanceType, accessToken
-		)
-		pushNotificationRemoteDataSource.registerPushSubscription(
-			instance,
-			instanceType,
-			accessToken,
-			deviceToken,
-			Base64.UrlSafe.encode(pushAccountId),
-			encodedPublicKey,
-			Base64.UrlSafe.encode(authKey)
-		)
-
 	}
 
 	suspend fun handleIncomingNotification(

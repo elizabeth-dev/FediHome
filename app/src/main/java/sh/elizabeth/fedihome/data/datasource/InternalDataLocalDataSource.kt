@@ -51,8 +51,10 @@ class InternalDataLocalDataSource @Inject constructor(
 					pushData = InternalDataAccount_PushData(
 						pushPublicKey = value.pushData.pushPublicKey,
 						pushPrivateKey = value.pushData.pushPrivateKey,
-						pushAuthKey = value.pushData.pushAuthKey,
+						pushServerKey = value.pushData.pushServerKey,
+						pushAuthSecret = value.pushData.pushAuthSecret,
 						pushAccountId = value.pushData.pushAccountId,
+						pushEndpoint = value.pushData.pushEndpoint,
 					)
 				)
 			}.toMap(),
@@ -131,8 +133,10 @@ class InternalDataLocalDataSource @Inject constructor(
 		accountIdentifier: String,
 		newPublicKey: String,
 		newPrivateKey: String,
-		newAuthKey: String,
+		newServerKey: String?,
+		newAuthSecret: String?,
 		newPushAccountId: String,
+		newPushEndpoint: String,
 	) {
 		try {
 			val currentAccount =
@@ -146,8 +150,10 @@ class InternalDataLocalDataSource @Inject constructor(
 						pushData = AccountPushData.newBuilder().apply {
 							pushPublicKey = newPublicKey
 							pushPrivateKey = newPrivateKey
-							pushAuthKey = newAuthKey
+							pushServerKey = newServerKey
+							pushAuthSecret = newAuthSecret
 							pushAccountId = newPushAccountId
+							pushEndpoint = newPushEndpoint
 						}.build()
 					}.build())
 				}

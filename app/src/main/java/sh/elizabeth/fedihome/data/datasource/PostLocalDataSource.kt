@@ -17,11 +17,9 @@ import javax.inject.Inject
 
 class PostLocalDataSource @Inject constructor(private val appDatabase: AppDatabase) {
 	fun insertOrReplace(vararg posts: Post) {
-		appDatabase.postQueries.transaction {
 			posts.forEach { post ->
 				appDatabase.postQueries.insertOrReplace(post.toEntity())
 			}
-		}
 	}
 
 	fun insertOrReplaceEmojiCrossRef(vararg refs: PostEmojiCrossRef) =
