@@ -24,7 +24,7 @@ class AuthMastodonApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun createApp(
 		instance: String,
 		name: String = APP_NAME,
-		callbackUrl: String = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}",
+		callbackUrl: String = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_OAUTH_ROUTE}",
 		scopes: List<String>? = MASTODON_APP_PERMISSION,
 		website: String? = null,
 	): CreateAppResponse = httpClient.post("https://$instance/api/v1/apps") {
@@ -44,7 +44,7 @@ class AuthMastodonApi @Inject constructor(private val httpClient: HttpClient) {
 		code: String,
 		clientId: String,
 		clientSecret: String,
-		callbackUrl: String = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}",
+		callbackUrl: String = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_OAUTH_ROUTE}",
 		scopes: List<String>? = MASTODON_APP_PERMISSION,
 	): AccessTokenResponse = httpClient.post("https://$instance/oauth/token") {
 		contentType(ContentType.Application.Json)

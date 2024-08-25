@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.dashboard
+package sh.elizabeth.fedihome.ui.routes.dashboard.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.login
+package sh.elizabeth.fedihome.ui.routes.login.oauth
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
@@ -40,8 +40,8 @@ val padding = 16.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
-	uiState: LoginUiState,
+fun LoginOAuthScreen(
+	uiState: LoginOAuthUiState,
 	navToDashboard: () -> Unit,
 	onLogin: (String) -> Unit,
 	navBack: () -> Unit,
@@ -116,7 +116,8 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
 	FediHomeTheme {
-		LoginScreen(uiState = LoginUiState(
+		LoginOAuthScreen(
+			uiState = LoginOAuthUiState(
 			isLoading = false,
 			errorMessage = "Login failed",
 			canNavBack = true
@@ -129,7 +130,8 @@ fun LoginScreenPreview() {
 @Composable
 fun LoginScreenLoadingPreview() {
 	FediHomeTheme {
-		LoginScreen(uiState = LoginUiState(
+		LoginOAuthScreen(
+			uiState = LoginOAuthUiState(
 			isLoading = true,
 			errorMessage = "Login failed"
 		), navToDashboard = {}, onLogin = {}, navBack = {})

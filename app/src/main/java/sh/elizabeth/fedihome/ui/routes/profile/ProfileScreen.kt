@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.profile
+package sh.elizabeth.fedihome.ui.routes.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,17 +41,17 @@ fun ProfileScreen(
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding()
-            .statusBarsPadding()
-            .displayCutoutPadding()
-            .pullRefresh(pullRefreshState)
+	        .fillMaxSize()
+	        .navigationBarsPadding()
+	        .statusBarsPadding()
+	        .displayCutoutPadding()
+	        .pullRefresh(pullRefreshState)
     ) {
         when (uiState) {
             is ProfileUiState.NoProfile -> if (!uiState.isLoading) Column(
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
+	            Modifier
+		            .fillMaxSize()
+		            .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

@@ -134,7 +134,7 @@ class AuthRemoteDataSource @Inject constructor(
 	private fun generateAuthUrl(
 		instance: String,
 		clientId: String,
-		callbackUrl: String = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}",
+		callbackUrl: String = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_OAUTH_ROUTE}",
 		scopes: List<String> = MASTODON_APP_PERMISSION,
 	): String =
 		"https://$instance/oauth/authorize?client_id=$clientId&redirect_uri=$callbackUrl&response_type=code&scope=${

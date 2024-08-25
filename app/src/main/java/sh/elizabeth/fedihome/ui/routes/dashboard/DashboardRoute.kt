@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.dashboard
+package sh.elizabeth.fedihome.ui.routes.dashboard
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row
@@ -24,10 +24,12 @@ import sh.elizabeth.fedihome.mock.defaultProfile
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.ui.composable.AccountPicker
 import sh.elizabeth.fedihome.ui.composable.PostFAB
+import sh.elizabeth.fedihome.ui.routes.dashboard.DashboardDestinations.HOME
+import sh.elizabeth.fedihome.ui.routes.dashboard.DashboardDestinations.NOTIFICATIONS
+import sh.elizabeth.fedihome.ui.routes.dashboard.DashboardDestinations.SEARCH
+import sh.elizabeth.fedihome.ui.routes.dashboard.screens.HomeScreen
+import sh.elizabeth.fedihome.ui.routes.dashboard.screens.NotificationsScreen
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
-import sh.elizabeth.fedihome.ui.view.dashboard.DashboardDestinations.HOME
-import sh.elizabeth.fedihome.ui.view.dashboard.DashboardDestinations.NOTIFICATIONS
-import sh.elizabeth.fedihome.ui.view.dashboard.DashboardDestinations.SEARCH
 
 @Composable
 fun DashboardRoute(

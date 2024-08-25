@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.post
+package sh.elizabeth.fedihome.ui.routes.post
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,17 +38,17 @@ fun PostScreen(
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(contentPadding)
-            .pullRefresh(pullRefreshState)
+	        .fillMaxSize()
+	        .padding(contentPadding)
+	        .pullRefresh(pullRefreshState)
     ) {
         HorizontalDivider(modifier = Modifier.zIndex(1f), thickness = 1.dp)
 
         when (uiState) {
             is PostUiState.NoPost -> if (!uiState.isLoading) Column(
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
+	            Modifier
+		            .fillMaxSize()
+		            .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -56,9 +56,9 @@ fun PostScreen(
             }
 
             is PostUiState.HasPost -> Column(
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+	            Modifier
+		            .fillMaxSize()
+		            .verticalScroll(rememberScrollState())
             ) {
                 Surface {
                     SlimPostCard(post = uiState.post, onReply = onReply, onVotePoll = {

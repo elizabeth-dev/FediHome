@@ -25,7 +25,7 @@ class AuthFirefishApi @Inject constructor(private val httpClient: HttpClient) {
 		name: String = APP_NAME,
 		description: String = APP_DESCRIPTION,
 		permission: List<String> = FIREFISH_APP_PERMISSION,
-		callbackUrl: String = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}",
+		callbackUrl: String = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_OAUTH_ROUTE}",
 	): CreateAppResponse = httpClient.post("https://$instance/api/app/create") {
 		contentType(ContentType.Application.Json)
 		setBody(

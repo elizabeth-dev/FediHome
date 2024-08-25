@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.post
+package sh.elizabeth.fedihome.ui.routes.profile
 
 import android.content.res.Configuration
 import androidx.compose.material.icons.Icons
@@ -9,97 +9,108 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.fedihome.mock.defaultPost
+import sh.elizabeth.fedihome.mock.defaultProfile
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 
 @Composable
-fun PostRoute(
-	postViewModel: PostViewModel = hiltViewModel(),
+fun ProfileRoute(
+	profileViewModel: ProfileViewModel = hiltViewModel(),
 	navBack: () -> Unit,
-	navToCompose: (replyId: String) -> Unit,
+	navToCompose: (postId: String) -> Unit,
+	navToPost: (postId: String) -> Unit,
 	navToProfile: (profileId: String) -> Unit,
 ) {
-	val uiState by postViewModel.uiState.collectAsStateWithLifecycle()
+	val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
 
-	PostRoute(
+	ProfileRoute(
 		uiState = uiState,
 		navBack = navBack,
-		onPostRefresh = postViewModel::refreshPost,
+		onRefresh = profileViewModel::refreshProfile,
 		onReply = navToCompose,
-		onVotePoll = postViewModel::votePoll,
-		navToProfile = navToProfile,
+		onVotePoll = profileViewModel::votePoll,
+		navToPost = navToPost,
+		navToProfile = navToProfile
 	)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostRoute(
-	uiState: PostUiState,
+fun ProfileRoute(
+	uiState: ProfileUiState,
 	navBack: () -> Unit,
-	onPostRefresh: (activeAccount: String, postId: String) -> Unit,
+	onRefresh: (activeAccount: String, postId: String) -> Unit,
 	onReply: (String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	navToProfile: (profileId: String) -> Unit,
+	navToPost: (String) -> Unit,
+	navToProfile: (String) -> Unit,
 ) {
-	LaunchedEffect(key1 = uiState.activeAccount, key2 = uiState.postId) {
-		if (uiState.activeAccount.isNotBlank()) onPostRefresh(
+	LaunchedEffect(key1 = uiState.profileId, key2 = uiState.activeAccount) {
+		if (uiState.activeAccount.isNotBlank()) onRefresh(
 			uiState.activeAccount,
-			uiState.postId
+			uiState.profileId
 		)
+
 	}
 
 	Scaffold(topBar = {
-		TopAppBar(title = {
-			Text(
-				text = "Post",
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
-			)
-		}, navigationIcon = {
-			IconButton(
-				onClick = navBack
-			) {
-				Icon(
-					Icons.AutoMirrored.Outlined.ArrowBack,
-					contentDescription = "Back"
+		TopAppBar(
+			title = {
+				Text(
+					text = "",
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis
 				)
-			}
-		})
+			},
+			navigationIcon = {
+				IconButton(
+					onClick = navBack
+				) {
+					Icon(
+						Icons.AutoMirrored.Outlined.ArrowBack,
+						contentDescription = "Back"
+					)
+				}
+			},
+			colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+		)
 	}) { contentPadding ->
-		PostScreen(
+		ProfileScreen(
 			uiState = uiState,
-			onPostRefresh = onPostRefresh,
+			onRefresh = onRefresh,
 			contentPadding = contentPadding,
 			onReply = onReply,
 			onVotePoll = onVotePoll,
+			navToPost = navToPost,
 			navToProfile = navToProfile
 		)
-
 	}
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Preview(showBackground = true)
 @Composable
-fun PostRoutePreview() {
+fun ProfileRoutePreview() {
 	FediHomeTheme {
-		PostRoute(uiState = PostUiState.HasPost(
-			postId = "foo",
-			post = defaultPost,
-			activeAccount = "foo",
-			isLoading = false
+		ProfileRoute(uiState = ProfileUiState.HasProfile(
+			profileId = "foo", profile = defaultProfile, posts = listOf(
+				defaultPost
+			), activeAccount = "foo", isLoading = false
 		),
 			navBack = {},
-			onPostRefresh = { _, _ -> },
+			onRefresh = { _, _ -> },
 			onReply = {},
 			onVotePoll = { _, _, _, _ -> },
+			navToPost = {},
 			navToProfile = {})
 	}
 }

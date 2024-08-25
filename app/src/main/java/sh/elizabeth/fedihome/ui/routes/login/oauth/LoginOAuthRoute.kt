@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.login
+package sh.elizabeth.fedihome.ui.routes.login.oauth
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -6,19 +6,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun LoginRoute(
-	loginViewModel: LoginViewModel = hiltViewModel(),
+fun LoginOAuthRoute(
+	loginOAuthViewModel: LoginOAuthViewModel = hiltViewModel(),
 	navToDashboard: () -> Unit,
 	navBack: () -> Unit,
 ) {
-	loginViewModel.initialize()
+	loginOAuthViewModel.initialize()
 
-	val uiState by loginViewModel.uiState.collectAsStateWithLifecycle()
+	val uiState by loginOAuthViewModel.uiState.collectAsStateWithLifecycle()
 
-	LoginScreen(
+	LoginOAuthScreen(
 		uiState = uiState,
 		navToDashboard = navToDashboard,
-		onLogin = loginViewModel::getLoginUrl,
+		onLogin = loginOAuthViewModel::getLoginUrl,
 		navBack = navBack,
 	)
 }

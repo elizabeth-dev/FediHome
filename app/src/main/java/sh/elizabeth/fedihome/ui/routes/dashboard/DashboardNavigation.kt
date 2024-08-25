@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.dashboard
+package sh.elizabeth.fedihome.ui.routes.dashboard
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Spacer

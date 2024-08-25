@@ -5,7 +5,8 @@ import androidx.navigation.NavHostController
 
 object MainDestinations {
 	const val DASHBOARD_ROUTE = "dashboard"
-	const val LOGIN_ROUTE = "login"
+	const val LOGIN_OAUTH_ROUTE = "login/oauth"
+	const val LOGIN_NOTIFICATIONS_ROUTE = "login/notifications"
 	const val COMPOSE_ROUTE = "compose"
 	const val POST_ROUTE = "post/{postId}"
 	const val PROFILE_ROUTE = "profile/{profileId}"
@@ -23,8 +24,8 @@ class MainNavigationActions(private val navController: NavHostController) {
 		}
 	}
 
-	fun navigateToLogin() {
-		navController.navigate(MainDestinations.LOGIN_ROUTE) {
+	fun navigateToLoginOAuth() {
+		navController.navigate(MainDestinations.LOGIN_OAUTH_ROUTE) {
 			popUpTo(navController.graph.findStartDestination().id) {
 				saveState = true
 			}

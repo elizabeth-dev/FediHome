@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.dashboard
+package sh.elizabeth.fedihome.ui.routes.dashboard.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

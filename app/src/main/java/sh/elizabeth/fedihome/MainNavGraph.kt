@@ -10,11 +10,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import sh.elizabeth.fedihome.ui.view.compose.ComposeRoute
-import sh.elizabeth.fedihome.ui.view.dashboard.DashboardRoute
-import sh.elizabeth.fedihome.ui.view.login.LoginRoute
-import sh.elizabeth.fedihome.ui.view.post.PostRoute
-import sh.elizabeth.fedihome.ui.view.profile.ProfileRoute
+import sh.elizabeth.fedihome.ui.routes.compose.ComposeRoute
+import sh.elizabeth.fedihome.ui.routes.dashboard.DashboardRoute
+import sh.elizabeth.fedihome.ui.routes.login.oauth.LoginOAuthRoute
+import sh.elizabeth.fedihome.ui.routes.post.PostRoute
+import sh.elizabeth.fedihome.ui.routes.profile.ProfileRoute
 import sh.elizabeth.fedihome.util.APP_DEEPLINK_URI
 
 const val TOKEN_PARAM = "token"
@@ -32,7 +32,7 @@ fun MainNavGraph(
 		composable(MainDestinations.DASHBOARD_ROUTE) {
 			DashboardRoute(
 				windowSizeClass = windowSizeClass,
-				navToLogin = navActions::navigateToLogin,
+				navToLogin = navActions::navigateToLoginOAuth,
 				navToCompose = navActions::navigateToCompose,
 				navToPost = navActions::navigateToPost,
 				navToProfile = navActions::navigateToProfile,
@@ -40,14 +40,16 @@ fun MainNavGraph(
 		}
 
 		composable(
-			route = MainDestinations.LOGIN_ROUTE, deepLinks = listOf(navDeepLink {
+			route = MainDestinations.LOGIN_OAUTH_ROUTE,
+			deepLinks = listOf(navDeepLink {
 				uriPattern =
-					"$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}?token={$TOKEN_PARAM}"
+					"$APP_DEEPLINK_URI/${MainDestinations.LOGIN_OAUTH_ROUTE}?token={$TOKEN_PARAM}"
 			}, navDeepLink {
-				uriPattern = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_ROUTE}?code={$TOKEN_PARAM}"
+				uriPattern =
+					"$APP_DEEPLINK_URI/${MainDestinations.LOGIN_OAUTH_ROUTE}?code={$TOKEN_PARAM}"
 			})
 		) {
-			LoginRoute(
+			LoginOAuthRoute(
 				navToDashboard = navActions::navigateToDashboard,
 				navBack = navActions::navigateUp
 			)

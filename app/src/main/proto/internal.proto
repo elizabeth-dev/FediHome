@@ -3,6 +3,21 @@ syntax = "proto3";
 option java_package = "sh.elizabeth.fedihome";
 option java_multiple_files = true;
 
+message InternalData {
+  string last_login_instance = 1;
+  string active_account = 2;
+  map<string, Account> accounts = 3;
+  map<string, Instance> instances = 4;
+  string fcm_device_token = 5;
+  map<string, AccountSettings> accountSettings = 6;
+
+}
+
+message Account {
+  string access_token = 1;
+  AccountPushData push_data = 2;
+}
+
 message AccountPushData {
   string push_public_key = 1;
   string push_private_key = 2;
@@ -12,21 +27,13 @@ message AccountPushData {
   string push_endpoint = 6;
 }
 
-message Account {
-  string access_token = 1;
-  AccountPushData push_data = 2;
-}
-
 message Instance {
   string instance_type = 1;
   string app_id = 2;
   string app_secret = 3;
 }
 
-message InternalData {
-  string last_login_instance = 1;
-  string active_account = 2;
-  map<string, Account> accounts = 3;
-  map<string, Instance> instances = 4;
-  string fcm_device_token = 5;
+message AccountSettings {
+  bool notificationsEnabled = 1;
+  map<string, bool> notificationTypes = 2;
 }

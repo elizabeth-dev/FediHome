@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.login
+package sh.elizabeth.fedihome.ui.routes.login.oauth
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.SavedStateHandle
@@ -15,7 +15,7 @@ import sh.elizabeth.fedihome.data.repository.AuthRepository
 import sh.elizabeth.fedihome.domain.FinishOAuthUseCase
 import javax.inject.Inject
 
-data class LoginUiState(
+data class LoginOAuthUiState(
 	val isLoading: Boolean = false,
 	val oauthUrl: String? = null,
 	val errorMessage: String? = null,
@@ -24,13 +24,14 @@ data class LoginUiState(
 )
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
+class LoginOAuthViewModel @Inject constructor(
 	private val savedStateHandle: SavedStateHandle,
 	private val authRepository: AuthRepository,
 	private val finishOAuthUseCase: FinishOAuthUseCase,
 ) : ViewModel() {
 
-	private val _uiState = MutableStateFlow(LoginUiState(isLoading = false))
+	private val _uiState =
+		MutableStateFlow(LoginOAuthUiState(isLoading = false))
 	val uiState = _uiState.asStateFlow()
 
 	private var initializeCalled = false

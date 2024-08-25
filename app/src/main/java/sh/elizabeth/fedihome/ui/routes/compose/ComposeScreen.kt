@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.compose
+package sh.elizabeth.fedihome.ui.routes.compose
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -77,17 +77,17 @@ fun ComposeScreen(
     }
 
     Surface(
-        Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .imePadding()
+	    Modifier
+		    .fillMaxSize()
+		    .statusBarsPadding()
+		    .navigationBarsPadding()
+		    .imePadding()
     ) {
         Column {
             Surface(
                 modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .fillMaxWidth(), tonalElevation = 6.dp
+	                .padding(bottom = 8.dp)
+	                .fillMaxWidth(), tonalElevation = 6.dp
             ) {
                 Row(
                     Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
@@ -126,8 +126,8 @@ fun ComposeScreen(
             AnimatedVisibility(visible = isCWVisible) {
                 TextField(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(cwFocus),
+	                    .fillMaxWidth()
+	                    .focusRequester(cwFocus),
                     value = contentWarning,
                     onValueChange = { setContentWarning(it) },
                     placeholder = { Text("Content warning") },
@@ -144,9 +144,9 @@ fun ComposeScreen(
 
             TextField(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .focusRequester(postFocus),
+	                .fillMaxWidth()
+	                .weight(1f)
+	                .focusRequester(postFocus),
                 value = postText,
                 onValueChange = { setPostText(it) },
                 placeholder = { Text("Type what's on your mind") },

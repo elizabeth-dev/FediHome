@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.dashboard
+package sh.elizabeth.fedihome.ui.routes.dashboard.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,7 +40,10 @@ private data class HomeViewModelState(
 ) {
 	fun toUiState(posts: List<Post>?, activeAccount: String = ""): HomeUiState =
 		if (posts.isNullOrEmpty()) {
-			HomeUiState.NoPosts(isLoading = isLoading, activeAccount = activeAccount)
+			HomeUiState.NoPosts(
+				isLoading = isLoading,
+				activeAccount = activeAccount
+			)
 		} else {
 			HomeUiState.HasPosts(
 				posts = posts,

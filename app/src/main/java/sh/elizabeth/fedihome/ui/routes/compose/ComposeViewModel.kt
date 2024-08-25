@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.compose
+package sh.elizabeth.fedihome.ui.routes.compose
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

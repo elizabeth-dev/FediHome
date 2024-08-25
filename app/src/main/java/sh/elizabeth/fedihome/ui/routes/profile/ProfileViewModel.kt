@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.ui.view.profile
+package sh.elizabeth.fedihome.ui.routes.profile
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
