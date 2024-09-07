@@ -1,7 +1,6 @@
 package sh.elizabeth.fedihome.ui.routes.dashboard.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,16 +9,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import sh.elizabeth.fedihome.ui.composable.NotificationCard
 
 @Composable
@@ -52,27 +55,26 @@ fun NotificationsScreen(
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 ) {
 	val pullRefreshState = rememberPullToRefreshState()
+	var isRefreshing by remember { mutableStateOf(false) }
 
-	if (pullRefreshState.isRefreshing) {
-		LaunchedEffect(key1 = uiState.activeAccount) {
-			if (uiState.activeAccount.isNotBlank()) {
-				onRefresh(uiState.activeAccount)
-			}
+	val coroutineScope = rememberCoroutineScope()
+	val launchOnRefresh: () -> Unit = {
+		isRefreshing = true
+		coroutineScope.launch {
+			if (uiState.activeAccount.isNotBlank()) onRefresh(uiState.activeAccount)
+			isRefreshing = false
 		}
 	}
 
-	if (!uiState.isLoading) {
-		pullRefreshState.endRefresh()
-	}
-
 	LaunchedEffect(key1 = uiState.activeAccount) {
-		pullRefreshState.startRefresh()
+		launchOnRefresh()
 	}
 
-	Box(
-		modifier = Modifier
-			.fillMaxSize()
-			.nestedScroll(pullRefreshState.nestedScrollConnection)
+	PullToRefreshBox(
+		modifier = Modifier.fillMaxSize(),
+		state = pullRefreshState,
+		isRefreshing = isRefreshing,
+		onRefresh = launchOnRefresh
 	) {
 		when (uiState) {
 			is NotificationsUiState.NoNotifications -> if (!uiState.isLoading) Column(
@@ -104,11 +106,5 @@ fun NotificationsScreen(
 				}
 			}
 		}
-
-		PullToRefreshContainer(
-			state = pullRefreshState, modifier = Modifier.align(
-				Alignment.TopCenter
-			)
-		)
 	}
 }

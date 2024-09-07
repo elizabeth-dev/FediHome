@@ -3,16 +3,12 @@ package sh.elizabeth.fedihome.ui.routes.compose
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import sh.elizabeth.fedihome.MainDestinations
 import sh.elizabeth.fedihome.data.repository.AuthRepository
 import sh.elizabeth.fedihome.data.repository.PostRepository
 import sh.elizabeth.fedihome.data.repository.ProfileRepository
@@ -30,7 +26,6 @@ data class ComposeUiState(
 	val replyTo: Post? = null,
 )
 
-@Suppress("unused")
 @HiltViewModel
 class ComposeViewModel @Inject constructor(
 	private val createPostUseCase: CreatePostUseCase,
@@ -52,12 +47,14 @@ class ComposeViewModel @Inject constructor(
 		},
 		_uiState
 	) { profilesData, uiState ->
-		val isReply = savedStateHandle.contains("replyTo")
+		val replyTo =
+			savedStateHandle.toRoute<MainDestinations.COMPOSE>().replyTo
+
 		uiState.copy(
 			activeAccount = profilesData.first,
 			loggedInProfiles = profilesData.second,
-			isReply = isReply,
-			replyTo = if (isReply) postRepository.getPost(savedStateHandle["replyTo"]!!) else null
+			isReply = !replyTo.isNullOrBlank(),
+			replyTo = replyTo?.let { postRepository.getPost(it) },
 		)
 	}.stateIn(viewModelScope, SharingStarted.Eagerly, _uiState.value)
 

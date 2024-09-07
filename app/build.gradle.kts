@@ -13,14 +13,14 @@ plugins {
 
 android {
 	namespace = "sh.elizabeth.fedihome"
-	compileSdk = 34
+	compileSdk = 35
 	buildToolsVersion = "34.0.0"
 	ndkVersion = "26.1.10909125"
 
 	defaultConfig {
 		applicationId = "sh.elizabeth.fedihome"
 		minSdk = 24
-		targetSdk = 34
+		targetSdk = 35
 		versionCode = 1
 		versionName = "1.0"
 
@@ -42,11 +42,11 @@ android {
 	compileOptions {
 		isCoreLibraryDesugaringEnabled = true
 
-		sourceCompatibility = JavaVersion.VERSION_1_8
-		targetCompatibility = JavaVersion.VERSION_1_8
+		sourceCompatibility = JavaVersion.VERSION_11
+		targetCompatibility = JavaVersion.VERSION_11
 	}
 	kotlinOptions {
-		jvmTarget = "1.8"
+		jvmTarget = "11"
 	}
 	buildFeatures {
 		compose = true
@@ -119,9 +119,9 @@ sqldelight {
 
 dependencies {
 	implementation("androidx.core:core-ktx:1.13.1")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-	implementation("androidx.activity:activity-compose:1.9.0")
-	implementation(platform("androidx.compose:compose-bom:2024.05.00"))
+	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
+	implementation("androidx.activity:activity-compose:1.9.2")
+	implementation(platform("androidx.compose:compose-bom:2024.09.00"))
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
@@ -131,34 +131,34 @@ dependencies {
 	implementation("androidx.compose.material3:material3-window-size-class")
 	testImplementation("junit:junit:4.13.2")
 	testImplementation("junit:junit:4.13.2")
-	androidTestImplementation("androidx.test.ext:junit:1.1.5")
-	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-	androidTestImplementation(platform("androidx.compose:compose-bom:2024.05.00"))
+	androidTestImplementation("androidx.test.ext:junit:1.2.1")
+	androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+	androidTestImplementation(platform("androidx.compose:compose-bom:2024.09.00"))
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 	debugImplementation("androidx.compose.ui:ui-tooling")
 	debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-	implementation("androidx.navigation:navigation-compose:2.7.7")
-	implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
-	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+	implementation("androidx.navigation:navigation-compose:2.8.0")
+	implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.5")
+	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.5")
 	implementation("androidx.compose.material3:material3-window-size-class")
 
 	implementation("com.google.dagger:hilt-android:2.51.1")
-	ksp("com.google.dagger:hilt-android-compiler:2.51.1")
+	ksp("com.google.dagger:hilt-android-compiler:2.51")
 	ksp("androidx.hilt:hilt-compiler:1.2.0")
 	implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 	implementation("androidx.datastore:datastore:1.1.1")
-	implementation("com.google.protobuf:protobuf-kotlin-lite:4.26.1")
+	implementation("com.google.protobuf:protobuf-kotlin-lite:4.27.2")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
 	implementation("androidx.browser:browser:1.8.0")
 
 	// Needed for:
 	// java.time when targeting API Level <26
-	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
 
-	val ktorVersion = "2.3.11"
+	val ktorVersion = "2.3.12"
 	implementation("io.ktor:ktor-client-core:$ktorVersion")
 	implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
@@ -179,12 +179,12 @@ dependencies {
 	implementation("com.google.code.gson:gson:2.10.1")
 
 	// Firebase
-	implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+	implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
 	implementation("com.google.firebase:firebase-analytics")
 	implementation("com.google.firebase:firebase-messaging")
 
 	// Work Manager (used for firebase messaging)
-	val work_version = "2.9.0"
+	val work_version = "2.9.1"
 	implementation("androidx.work:work-runtime-ktx:$work_version")
 	implementation("androidx.hilt:hilt-work:1.2.0")
 

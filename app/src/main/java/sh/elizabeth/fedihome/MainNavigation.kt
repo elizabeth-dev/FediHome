@@ -2,20 +2,26 @@ package sh.elizabeth.fedihome
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import kotlinx.serialization.Serializable
 
 object MainDestinations {
-	const val DASHBOARD_ROUTE = "dashboard"
-	const val LOGIN_OAUTH_ROUTE = "login/oauth"
-	const val LOGIN_NOTIFICATIONS_ROUTE = "login/notifications"
-	const val COMPOSE_ROUTE = "compose"
-	const val POST_ROUTE = "post/{postId}"
-	const val PROFILE_ROUTE = "profile/{profileId}"
-
+	@Serializable
+	object DASHBOARD
+	@Serializable
+	object LOGIN_OAUTH
+	@Serializable
+	object LOGIN_NOTIFICATIONS
+	@Serializable
+	data class COMPOSE(val replyTo: String? = null)
+	@Serializable
+	data class POST(val postId: String)
+	@Serializable
+	data class PROFILE(val profileId: String)
 }
 
 class MainNavigationActions(private val navController: NavHostController) {
 	fun navigateToDashboard() {
-		navController.navigate(MainDestinations.DASHBOARD_ROUTE) {
+		navController.navigate(MainDestinations.DASHBOARD) {
 			popUpTo(navController.graph.findStartDestination().id) {
 				saveState = false // This is needed for first login flow
 			}
@@ -25,7 +31,7 @@ class MainNavigationActions(private val navController: NavHostController) {
 	}
 
 	fun navigateToLoginOAuth() {
-		navController.navigate(MainDestinations.LOGIN_OAUTH_ROUTE) {
+		navController.navigate(MainDestinations.LOGIN_OAUTH) {
 			popUpTo(navController.graph.findStartDestination().id) {
 				saveState = true
 			}
@@ -35,9 +41,7 @@ class MainNavigationActions(private val navController: NavHostController) {
 	}
 
 	fun navigateToCompose(replyTo: String? = null) {
-		navController.navigate(
-			if (replyTo.isNullOrBlank()) MainDestinations.COMPOSE_ROUTE else "${MainDestinations.COMPOSE_ROUTE}?replyTo=$replyTo"
-		) {
+		navController.navigate(MainDestinations.COMPOSE(replyTo)) {
 			launchSingleTop = true
 			restoreState = true
 		}
@@ -45,7 +49,7 @@ class MainNavigationActions(private val navController: NavHostController) {
 
 	fun navigateToPost(postId: String) {
 		navController.navigate(
-			MainDestinations.POST_ROUTE.replace("{postId}", postId)
+			MainDestinations.POST(postId)
 		) {
 			launchSingleTop = false
 			restoreState = true
@@ -54,7 +58,7 @@ class MainNavigationActions(private val navController: NavHostController) {
 
 	fun navigateToProfile(profileId: String) {
 		navController.navigate(
-			MainDestinations.PROFILE_ROUTE.replace("{profileId}", profileId)
+			MainDestinations.PROFILE(profileId)
 		) {
 			launchSingleTop = false
 			restoreState = true

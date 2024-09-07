@@ -3,13 +3,11 @@ package sh.elizabeth.fedihome.ui.routes.post
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import sh.elizabeth.fedihome.MainDestinations
 import sh.elizabeth.fedihome.data.repository.AuthRepository
 import sh.elizabeth.fedihome.data.repository.PostRepository
 import sh.elizabeth.fedihome.domain.VotePollUseCase
@@ -55,8 +53,8 @@ class PostViewModel @Inject constructor(
 	authRepository: AuthRepository,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-	private val postId = savedStateHandle.get<String>("postId")
-		?: throw IllegalArgumentException("Post ID must be provided")
+	private val postId =
+		savedStateHandle.toRoute<MainDestinations.POST>().postId
 
 	private val viewModelState =
 		MutableStateFlow(PostViewModelState(isLoading = true, postId = postId))

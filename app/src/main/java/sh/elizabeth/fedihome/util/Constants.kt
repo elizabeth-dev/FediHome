@@ -41,6 +41,7 @@ val MASTODON_APP_PERMISSION = listOf(
 )
 
 const val APP_DEEPLINK_URI = "app://sh.elizabeth.fedihome"
+const val APP_LOGIN_OAUTH_PATH = "/login/oauth"
 
 enum class SupportedInstances {
 	@SerialName("sharkey")

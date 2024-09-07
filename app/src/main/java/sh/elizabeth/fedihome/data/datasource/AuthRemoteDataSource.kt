@@ -1,7 +1,6 @@
 package sh.elizabeth.fedihome.data.datasource
 
 import kotlinx.coroutines.flow.first
-import sh.elizabeth.fedihome.MainDestinations
 import sh.elizabeth.fedihome.api.firefish.AuthFirefishApi
 import sh.elizabeth.fedihome.api.firefish.model.toDomain
 import sh.elizabeth.fedihome.api.mastodon.AuthMastodonApi
@@ -10,6 +9,7 @@ import sh.elizabeth.fedihome.api.sharkey.AuthSharkeyApi
 import sh.elizabeth.fedihome.api.sharkey.model.toDomain
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.util.APP_DEEPLINK_URI
+import sh.elizabeth.fedihome.util.APP_LOGIN_OAUTH_PATH
 import sh.elizabeth.fedihome.util.MASTODON_APP_PERMISSION
 import sh.elizabeth.fedihome.util.SupportedInstances
 import javax.inject.Inject
@@ -47,7 +47,7 @@ class AuthRemoteDataSource @Inject constructor(
 
 			SupportedInstances.GLITCH,
 			SupportedInstances.MASTODON,
-			-> {
+				-> {
 				val cachedApp =
 					internalDataLocalDataSource.internalData.first().let {
 						val _instance = it.instances[instance]
@@ -108,7 +108,7 @@ class AuthRemoteDataSource @Inject constructor(
 
 			SupportedInstances.GLITCH,
 			SupportedInstances.MASTODON,
-			-> {
+				-> {
 				val (appId, appSecret) = let {
 					val _instance = internalData.instances[instance]
 					_instance?.appId to _instance?.appSecret
@@ -134,7 +134,7 @@ class AuthRemoteDataSource @Inject constructor(
 	private fun generateAuthUrl(
 		instance: String,
 		clientId: String,
-		callbackUrl: String = "$APP_DEEPLINK_URI/${MainDestinations.LOGIN_OAUTH_ROUTE}",
+		callbackUrl: String = "$APP_DEEPLINK_URI$APP_LOGIN_OAUTH_PATH",
 		scopes: List<String> = MASTODON_APP_PERMISSION,
 	): String =
 		"https://$instance/oauth/authorize?client_id=$clientId&redirect_uri=$callbackUrl&response_type=code&scope=${

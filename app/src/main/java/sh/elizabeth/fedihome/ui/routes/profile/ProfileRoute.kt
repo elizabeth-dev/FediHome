@@ -3,13 +3,7 @@ package sh.elizabeth.fedihome.ui.routes.profile
 import android.content.res.Configuration
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,6 +19,7 @@ import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 @Composable
 fun ProfileRoute(
 	profileViewModel: ProfileViewModel = hiltViewModel(),
+
 	navBack: () -> Unit,
 	navToCompose: (postId: String) -> Unit,
 	navToPost: (postId: String) -> Unit,
