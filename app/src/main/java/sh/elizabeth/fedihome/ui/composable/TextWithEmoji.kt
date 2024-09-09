@@ -1,5 +1,6 @@
 package sh.elizabeth.fedihome.ui.composable
 
+import android.text.Html
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -16,13 +17,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import coil.compose.AsyncImage
 import sh.elizabeth.fedihome.model.Emoji
 
-val emojiRegex = Regex(":([\\w]+):")
+val emojiRegex = Regex(":(\\w+):")
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun TextWithEmoji(
 	text: String,
@@ -39,6 +38,9 @@ fun TextWithEmoji(
 	val _emojiSize = with(LocalDensity.current) {
 		emojiSize.toDp()
 	}
+
+	Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
+
 
 	Text(
 		text = buildAnnotatedString {
@@ -63,19 +65,20 @@ fun TextWithEmoji(
 		style = style,
 		color = color,
 		inlineContent = emojis.map { (key, emoji) ->
-			Pair(key, InlineTextContent(
+			key to InlineTextContent(
 				placeholder = Placeholder(
 					width = emojiSize,
 					height = emojiSize,
 					placeholderVerticalAlign = PlaceholderVerticalAlign.Center
 				),
 			) {
-				GlideImage(
+				AsyncImage(
 					model = emoji.url,
 					contentDescription = key,
-					modifier = Modifier.size(_emojiSize),
+					modifier = Modifier
+						.size(_emojiSize)
 				)
-			})
+			}
 		}.toMap(),
 	)
 }

@@ -9,6 +9,7 @@ plugins {
 	id("com.google.devtools.ksp")
 	id("app.cash.sqldelight")
 	id("com.google.gms.google-services")
+	id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -50,9 +51,6 @@ android {
 	}
 	buildFeatures {
 		compose = true
-	}
-	composeOptions {
-		kotlinCompilerExtensionVersion = "1.5.7"
 	}
 	packaging {
 		resources {
@@ -143,13 +141,13 @@ dependencies {
 	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.5")
 	implementation("androidx.compose.material3:material3-window-size-class")
 
-	implementation("com.google.dagger:hilt-android:2.51.1")
-	ksp("com.google.dagger:hilt-android-compiler:2.51")
+	implementation("com.google.dagger:hilt-android:2.52")
+	ksp("com.google.dagger:hilt-android-compiler:2.52")
 	ksp("androidx.hilt:hilt-compiler:1.2.0")
 	implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
 	implementation("androidx.datastore:datastore:1.1.1")
-	implementation("com.google.protobuf:protobuf-kotlin-lite:4.27.2")
+	implementation("com.google.protobuf:protobuf-kotlin-lite:4.28.0")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
 	implementation("androidx.browser:browser:1.8.0")
@@ -166,17 +164,20 @@ dependencies {
 	implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 	implementation("io.ktor:ktor-client-auth:$ktorVersion")
 
-	// Glide + BlurHash
-	implementation("com.github.bumptech.glide:glide:4.16.0")
-	implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
-	implementation("com.github.bumptech.glide:okhttp3-integration:4.16.0")
-	ksp("com.github.bumptech.glide:ksp:4.16.0")
+	// Coil + BlurHash
+	implementation(platform("io.coil-kt:coil-bom:2.7.0"))
+	implementation("io.coil-kt:coil")
+	implementation("io.coil-kt:coil-compose")
+	implementation("io.coil-kt:coil-gif")
+	implementation("io.coil-kt:coil-svg")
+	testImplementation("io.coil-kt:coil-test")
+	androidTestImplementation("io.coil-kt:coil-test:2.7.0")
 	implementation("com.vanniktech:blurhash:0.3.0")
 
 	// SQLDelight
 	implementation("app.cash.sqldelight:android-driver:2.0.2")
 	implementation("app.cash.sqldelight:coroutines-extensions:2.0.2")
-	implementation("com.google.code.gson:gson:2.10.1")
+	implementation("com.google.code.gson:gson:2.11.0")
 
 	// Firebase
 	implementation(platform("com.google.firebase:firebase-bom:33.2.0"))

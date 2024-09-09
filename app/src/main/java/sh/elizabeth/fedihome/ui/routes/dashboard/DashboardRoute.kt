@@ -1,6 +1,7 @@
 package sh.elizabeth.fedihome.ui.routes.dashboard
 
 import android.content.res.Configuration
+import android.text.Html
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding

@@ -3,12 +3,12 @@
   <component name="AndroidTestResultsUserPreferences">
     <option name="androidTestResultsTableState">
       <map>
-        <entry key="-1499334731">
+        <entry key="154617659">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
                 <map>
-                  <entry key="Dev_API_34" value="120" />
+                  <entry key="Dev_API_35_16K" value="120" />
                   <entry key="Duration" value="90" />
                   <entry key="Tests" value="360" />
                 </map>
@@ -16,12 +16,12 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
-        <entry key="2016946644">
+        <entry key="1185800427">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
                 <map>
-                  <entry key="Dev_API_34" value="120" />
+                  <entry key="Dev_API_35_16K" value="120" />
                   <entry key="Duration" value="90" />
                   <entry key="Tests" value="360" />
                 </map>

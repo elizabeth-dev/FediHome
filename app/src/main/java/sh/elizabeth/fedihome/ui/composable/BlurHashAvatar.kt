@@ -1,7 +1,9 @@
 package sh.elizabeth.fedihome.ui.composable
 
+// import getValue and setValue from androidx.compose.runtime
 import android.graphics.Bitmap
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -9,23 +11,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toDrawable
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.vanniktech.blurhash.BlurHash
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun BlurHashAvatar(modifier: Modifier = Modifier, imageUrl: String?, imageBlur: String?, imageSize: Dp = 48.dp, roundingRadius: Int = 16) {
+fun BlurHashAvatar(
+	modifier: Modifier = Modifier,
+	imageUrl: String?,
+	imageBlur: String?,
+	imageSize: Dp = 48.dp,
+	roundingRadius: Float = 16f,
+) {
 	val resources = LocalContext.current.resources
 	val imageSizeInPx =
 		resources.displayMetrics.densityDpi.div(160f).times(imageSize.value).roundToInt()
@@ -41,14 +47,18 @@ fun BlurHashAvatar(modifier: Modifier = Modifier, imageUrl: String?, imageBlur: 
 		}
 	}
 
-	GlideImage(
+	AsyncImage(
 		model = imageUrl,
 		contentDescription = null,
-		modifier = modifier.size(imageSize)
-	) {
-		it.let { _it ->
-			if (imageBlurHash != null) _it.placeholder(imageBlurHash?.toDrawable(resources = resources))
-			else _it
-		}.transform(CenterCrop(), RoundedCorners(roundingRadius))
-	}
+		modifier = modifier
+			.size(imageSize)
+			.clip(RoundedCornerShape(roundingRadius)),
+		contentScale = ContentScale.Crop,
+		placeholder = imageBlurHash?.let {
+			rememberAsyncImagePainter(
+				model = it, contentScale =
+				ContentScale.Crop
+			)
+		}
+	)
 }
