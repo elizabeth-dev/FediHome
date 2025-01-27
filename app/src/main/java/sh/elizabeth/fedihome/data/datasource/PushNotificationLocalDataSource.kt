@@ -59,7 +59,7 @@ class PushNotificationLocalDataSource @Inject constructor() {
 				accountId, instance, account, messageData
 			)
 
-			SupportedInstances.SHARKEY, SupportedInstances.FIREFISH -> handleKeyNotification(
+			SupportedInstances.SHARKEY, SupportedInstances.ICESHRIMP -> handleKeyNotification(
 				accountId, instance, account, messageData
 			)
 		}

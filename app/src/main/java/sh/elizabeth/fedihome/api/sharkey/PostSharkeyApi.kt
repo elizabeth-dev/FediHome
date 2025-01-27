@@ -7,8 +7,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import sh.elizabeth.fedihome.api.firefish.model.GetPostsByProfile
-import sh.elizabeth.fedihome.api.firefish.model.SelectPostRequest
+import sh.elizabeth.fedihome.api.iceshrimp.model.GetPostsByProfile
+import sh.elizabeth.fedihome.api.iceshrimp.model.SelectPostRequest
 import sh.elizabeth.fedihome.api.sharkey.model.CreatePostRequest
 import sh.elizabeth.fedihome.api.sharkey.model.CreatePostResponse
 import sh.elizabeth.fedihome.api.sharkey.model.Post
@@ -51,7 +51,7 @@ class PostSharkeyApi @Inject constructor(private val httpClient: HttpClient) {
 fun PostDraft.toCreatePost() = CreatePostRequest(
 	text = text,
 	cw = cw,
-	visibility = visibility.toFirefish(),
+	visibility = visibility.toIceshrimp(),
 	visibleUserIds = visibleUserIds,
 	localOnly = localOnly,
 	replyId = replyId,
@@ -59,7 +59,7 @@ fun PostDraft.toCreatePost() = CreatePostRequest(
 	channelId = channelId,
 )
 
-fun DomainPostVisibility.toFirefish(): PostVisibility = when (this) {
+fun DomainPostVisibility.toIceshrimp(): PostVisibility = when (this) {
 	DomainPostVisibility.PUBLIC -> PostVisibility.PUBLIC
 	DomainPostVisibility.UNLISTED -> PostVisibility.HOME
 	DomainPostVisibility.FOLLOWERS -> PostVisibility.FOLLOWERS

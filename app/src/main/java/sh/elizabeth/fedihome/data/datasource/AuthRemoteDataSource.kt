@@ -1,8 +1,8 @@
 package sh.elizabeth.fedihome.data.datasource
 
 import kotlinx.coroutines.flow.first
-import sh.elizabeth.fedihome.api.firefish.AuthFirefishApi
-import sh.elizabeth.fedihome.api.firefish.model.toDomain
+import sh.elizabeth.fedihome.api.iceshrimp.AuthIceshrimpApi
+import sh.elizabeth.fedihome.api.iceshrimp.model.toDomain
 import sh.elizabeth.fedihome.api.mastodon.AuthMastodonApi
 import sh.elizabeth.fedihome.api.mastodon.model.toDomain
 import sh.elizabeth.fedihome.api.sharkey.AuthSharkeyApi
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 class AuthRemoteDataSource @Inject constructor(
     private val authMastodonApi: AuthMastodonApi,
-    private val authFirefishApi: AuthFirefishApi,
+    private val authIceshrimpApi: AuthIceshrimpApi,
     private val authSharkeyApi: AuthSharkeyApi,
     private val internalDataLocalDataSource: InternalDataLocalDataSource,
 ) {
@@ -29,9 +29,9 @@ class AuthRemoteDataSource @Inject constructor(
             ?: throw IllegalStateException("Instance data is missing")
 
         when (instanceType) {
-            SupportedInstances.FIREFISH, SupportedInstances.SHARKEY -> {
+            SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> {
                 val appSecret = instanceData.appSecret.takeUnless { it.isNullOrBlank() }
-                    ?: authFirefishApi.createApp(endpoint = instanceData.delegatedEndpoint).secret.also { appSecret ->
+                    ?: authIceshrimpApi.createApp(endpoint = instanceData.delegatedEndpoint).secret.also { appSecret ->
                         internalDataLocalDataSource.setInstance(
                             instance = instance,
                             newDelegatedEndpoint = null,
@@ -40,7 +40,7 @@ class AuthRemoteDataSource @Inject constructor(
                             newAppId = null
                         )
                     }
-                val session = authFirefishApi.generateSession(
+                val session = authIceshrimpApi.generateSession(
                     endpoint = instanceData.delegatedEndpoint,
                     appSecret = appSecret,
                 )
@@ -81,11 +81,11 @@ class AuthRemoteDataSource @Inject constructor(
             ?: throw IllegalStateException("Instance data is missing")
 
         when (instanceType) {
-            SupportedInstances.FIREFISH -> {
+            SupportedInstances.ICESHRIMP -> {
                 val appSecret = instanceData.appSecret
                     ?: throw IllegalStateException("App secret for $instance not found")
 
-                val userKey = authFirefishApi.getUserKey(
+                val userKey = authIceshrimpApi.getUserKey(
                     endpoint = instanceData.delegatedEndpoint, appSecret = appSecret, token = token
                 )
 

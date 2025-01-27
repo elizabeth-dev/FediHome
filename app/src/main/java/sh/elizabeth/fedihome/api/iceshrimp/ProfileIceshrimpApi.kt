@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.api.firefish
+package sh.elizabeth.fedihome.api.iceshrimp
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -7,11 +7,11 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import sh.elizabeth.fedihome.api.firefish.model.SelectUserRequest
-import sh.elizabeth.fedihome.api.firefish.model.UserDetailedNotMe
+import sh.elizabeth.fedihome.api.iceshrimp.model.SelectUserRequest
+import sh.elizabeth.fedihome.api.iceshrimp.model.UserDetailedNotMe
 import javax.inject.Inject
 
-class ProfileFirefishApi @Inject constructor(private val httpClient: HttpClient) {
+class ProfileIceshrimpApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun fetchProfile(
 		endpoint: String,
 		token: String,

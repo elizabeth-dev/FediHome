@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 const val APP_NAME = "Test Fedi Client"
 const val APP_DESCRIPTION = "Test Fedi Client by @elizabeth@tech.lgbt"
 
-val FIREFISH_APP_PERMISSION = listOf(
+val ICESHRIMP_APP_PERMISSION = listOf(
 	"write:user-groups",
 	"read:user-groups",
 	"read:page-likes",
@@ -47,8 +47,8 @@ enum class SupportedInstances {
 	@SerialName("sharkey")
 	SHARKEY,
 
-	@SerialName("firefish")
-	FIREFISH,
+	@SerialName("iceshrimp")
+	ICESHRIMP,
 
 	@SerialName("mastodon")
 	MASTODON,

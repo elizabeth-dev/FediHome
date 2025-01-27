@@ -1,7 +1,7 @@
 package sh.elizabeth.fedihome.data.datasource
 
-import sh.elizabeth.fedihome.api.firefish.TimelineFirefishApi
-import sh.elizabeth.fedihome.api.firefish.model.toDomain
+import sh.elizabeth.fedihome.api.iceshrimp.TimelineIceshrimpApi
+import sh.elizabeth.fedihome.api.iceshrimp.model.toDomain
 import sh.elizabeth.fedihome.api.mastodon.TimelineMastodonApi
 import sh.elizabeth.fedihome.api.mastodon.model.toDomain
 import sh.elizabeth.fedihome.api.sharkey.TimelineSharkeyApi
@@ -11,7 +11,7 @@ import sh.elizabeth.fedihome.util.SupportedInstances
 import javax.inject.Inject
 
 class TimelineRemoteDataSource @Inject constructor(
-	private val timelineFirefishApi: TimelineFirefishApi,
+	private val timelineIceshrimpApi: TimelineIceshrimpApi,
 	private val timelineSharkeyApi: TimelineSharkeyApi,
 	private val timelineMastodonApi: TimelineMastodonApi,
 ) {
@@ -21,7 +21,7 @@ class TimelineRemoteDataSource @Inject constructor(
 		instanceType: SupportedInstances,
 		token: String,
 	): List<Post> = when (instanceType) {
-		SupportedInstances.FIREFISH -> timelineFirefishApi.getHome(
+		SupportedInstances.ICESHRIMP -> timelineIceshrimpApi.getHome(
 			endpoint = endpoint, token = token
 		).map { it.toDomain(instance) }
 

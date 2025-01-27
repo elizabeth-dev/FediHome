@@ -3,8 +3,8 @@ package sh.elizabeth.fedihome.data.datasource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import sh.elizabeth.fedihome.api.firefish.PostFirefishApi
-import sh.elizabeth.fedihome.api.firefish.model.toDomain
+import sh.elizabeth.fedihome.api.iceshrimp.PostIceshrimpApi
+import sh.elizabeth.fedihome.api.iceshrimp.model.toDomain
 import sh.elizabeth.fedihome.api.mastodon.PostMastodonApi
 import sh.elizabeth.fedihome.api.mastodon.model.toDomain
 import sh.elizabeth.fedihome.api.sharkey.PostSharkeyApi
@@ -15,7 +15,7 @@ import sh.elizabeth.fedihome.util.SupportedInstances
 import javax.inject.Inject
 
 class PostRemoteDataSource @Inject constructor(
-	private val postFirefishApi: PostFirefishApi,
+	private val postIceshrimpApi: PostIceshrimpApi,
 	private val postSharkeyApi: PostSharkeyApi,
 	private val postMastodonApi: PostMastodonApi,
 ) {
@@ -26,7 +26,7 @@ class PostRemoteDataSource @Inject constructor(
 		token: String,
 		newPost: PostDraft,
 	): Post = when (instanceType) {
-		SupportedInstances.FIREFISH -> postFirefishApi.createPost(
+		SupportedInstances.ICESHRIMP -> postIceshrimpApi.createPost(
 			endpoint = endpoint, token = token, newPost = newPost
 		).createdNote.toDomain(instance)
 
@@ -48,7 +48,7 @@ class PostRemoteDataSource @Inject constructor(
 		token: String,
 		postId: String,
 	): Post = when (instanceType) {
-		SupportedInstances.FIREFISH -> postFirefishApi.fetchPost(
+		SupportedInstances.ICESHRIMP -> postIceshrimpApi.fetchPost(
 			endpoint = endpoint, token = token, postId = postId
 		).toDomain(instance)
 
@@ -69,7 +69,7 @@ class PostRemoteDataSource @Inject constructor(
 		token: String,
 		profileId: String,
 	): List<Post> = when (instanceType) {
-		SupportedInstances.FIREFISH -> postFirefishApi.fetchPostsByProfile(
+		SupportedInstances.ICESHRIMP -> postIceshrimpApi.fetchPostsByProfile(
 			endpoint = endpoint, token = token, profileId = profileId
 		).map { it.toDomain(instance) }
 
@@ -91,10 +91,10 @@ class PostRemoteDataSource @Inject constructor(
 		pollId: String,
 		choices: List<Int>,
 	) = when (instanceType) {
-		SupportedInstances.FIREFISH, SupportedInstances.SHARKEY -> coroutineScope {
+		SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> coroutineScope {
 			val voteCoroutines = choices.map {
 				async {
-					postFirefishApi.votePoll(
+					postIceshrimpApi.votePoll(
 						endpoint = endpoint, token = token, postId = pollId, choice = it
 					)
 				}

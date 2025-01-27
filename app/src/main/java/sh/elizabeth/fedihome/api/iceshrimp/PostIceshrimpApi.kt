@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.api.firefish
+package sh.elizabeth.fedihome.api.iceshrimp
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -7,18 +7,18 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import sh.elizabeth.fedihome.api.firefish.model.CreatePostRequest
-import sh.elizabeth.fedihome.api.firefish.model.CreatePostResponse
-import sh.elizabeth.fedihome.api.firefish.model.GetPostsByProfile
-import sh.elizabeth.fedihome.api.firefish.model.PollVoteRequest
-import sh.elizabeth.fedihome.api.firefish.model.Post
-import sh.elizabeth.fedihome.api.firefish.model.PostVisibility
-import sh.elizabeth.fedihome.api.firefish.model.SelectPostRequest
+import sh.elizabeth.fedihome.api.iceshrimp.model.CreatePostRequest
+import sh.elizabeth.fedihome.api.iceshrimp.model.CreatePostResponse
+import sh.elizabeth.fedihome.api.iceshrimp.model.GetPostsByProfile
+import sh.elizabeth.fedihome.api.iceshrimp.model.PollVoteRequest
+import sh.elizabeth.fedihome.api.iceshrimp.model.Post
+import sh.elizabeth.fedihome.api.iceshrimp.model.PostVisibility
+import sh.elizabeth.fedihome.api.iceshrimp.model.SelectPostRequest
 import sh.elizabeth.fedihome.model.PostDraft
 import javax.inject.Inject
 import sh.elizabeth.fedihome.model.PostVisibility as DomainPostVisibility
 
-class PostFirefishApi @Inject constructor(private val httpClient: HttpClient) {
+class PostIceshrimpApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun createPost(
 		endpoint: String,
 		token: String,
@@ -60,7 +60,7 @@ class PostFirefishApi @Inject constructor(private val httpClient: HttpClient) {
 fun PostDraft.toCreatePost() = CreatePostRequest(
 	text = text,
 	cw = cw,
-	visibility = visibility.toFirefish(),
+	visibility = visibility.toIceshrimp(),
 	visibleUserIds = visibleUserIds,
 	localOnly = localOnly,
 	replyId = replyId,
@@ -68,7 +68,7 @@ fun PostDraft.toCreatePost() = CreatePostRequest(
 	channelId = channelId,
 )
 
-fun DomainPostVisibility.toFirefish(): PostVisibility = when (this) {
+fun DomainPostVisibility.toIceshrimp(): PostVisibility = when (this) {
 	DomainPostVisibility.PUBLIC -> PostVisibility.PUBLIC
 	DomainPostVisibility.UNLISTED -> PostVisibility.HOME
 	DomainPostVisibility.FOLLOWERS -> PostVisibility.FOLLOWERS

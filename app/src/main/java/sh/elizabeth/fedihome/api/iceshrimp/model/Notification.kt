@@ -1,4 +1,4 @@
-package sh.elizabeth.fedihome.api.firefish.model
+package sh.elizabeth.fedihome.api.iceshrimp.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

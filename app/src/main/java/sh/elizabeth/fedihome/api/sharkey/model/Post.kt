@@ -2,7 +2,7 @@ package sh.elizabeth.fedihome.api.sharkey.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import sh.elizabeth.fedihome.api.firefish.model.File
+import sh.elizabeth.fedihome.api.iceshrimp.model.File
 import sh.elizabeth.fedihome.util.InstantAsString
 
 @Serializable

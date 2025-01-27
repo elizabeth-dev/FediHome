@@ -49,7 +49,7 @@ val notificationTypesByInstanceType = mapOf(
 		NotificationType.EDIT
 	),
 	SupportedInstances.SHARKEY to arrayOf(),
-	SupportedInstances.FIREFISH to arrayOf()
+	SupportedInstances.ICESHRIMP to arrayOf()
 )
 
 val notificationTypesLabels = mapOf(

@@ -7,7 +7,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import sh.elizabeth.fedihome.api.firefish.model.GetHomeRequest
+import sh.elizabeth.fedihome.api.iceshrimp.model.GetHomeRequest
 import sh.elizabeth.fedihome.api.sharkey.model.Post
 import javax.inject.Inject
 

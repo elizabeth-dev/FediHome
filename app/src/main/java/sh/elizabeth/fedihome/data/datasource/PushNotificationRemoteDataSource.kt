@@ -1,6 +1,6 @@
 package sh.elizabeth.fedihome.data.datasource
 
-import sh.elizabeth.fedihome.api.firefish.NotificationFirefishApi
+import sh.elizabeth.fedihome.api.iceshrimp.NotificationIceshrimpApi
 import sh.elizabeth.fedihome.api.mastodon.NotificationMastodonApi
 import sh.elizabeth.fedihome.api.sharkey.NotificationSharkeyApi
 import sh.elizabeth.fedihome.util.SupportedInstances
@@ -28,7 +28,7 @@ interface RegisterPushResult {
 
 class PushNotificationRemoteDataSource @Inject constructor(
 	private val notificationSharkeyApi: NotificationSharkeyApi,
-	private val notificationFirefishApi: NotificationFirefishApi,
+	private val notificationIceshrimpApi: NotificationIceshrimpApi,
 	private val notificationMastodonApi: NotificationMastodonApi,
 ) {
 	init {
@@ -51,7 +51,7 @@ class PushNotificationRemoteDataSource @Inject constructor(
 		val pushAccountId = generatePushAccountId()
 
 		when (instanceType) {
-			SupportedInstances.FIREFISH, SupportedInstances.SHARKEY -> {
+			SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> {
 				val registerResult =
 					notificationSharkeyApi.createPushSubscription(
 						instance = instance,
@@ -118,7 +118,7 @@ class PushNotificationRemoteDataSource @Inject constructor(
 		token: String,
 		oldEndpoint: String,
 	) = when (instanceType) {
-		SupportedInstances.FIREFISH, SupportedInstances.SHARKEY -> notificationSharkeyApi.deletePushSubscription(
+		SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> notificationSharkeyApi.deletePushSubscription(
 			instance, token, oldEndpoint
 		)
 

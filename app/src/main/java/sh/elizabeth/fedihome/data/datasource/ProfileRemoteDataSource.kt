@@ -1,7 +1,7 @@
 package sh.elizabeth.fedihome.data.datasource
 
-import sh.elizabeth.fedihome.api.firefish.ProfileFirefishApi
-import sh.elizabeth.fedihome.api.firefish.model.toDomain
+import sh.elizabeth.fedihome.api.iceshrimp.ProfileIceshrimpApi
+import sh.elizabeth.fedihome.api.iceshrimp.model.toDomain
 import sh.elizabeth.fedihome.api.mastodon.ProfileMastodonApi
 import sh.elizabeth.fedihome.api.mastodon.model.toDomain
 import sh.elizabeth.fedihome.api.sharkey.ProfileSharkeyApi
@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 class ProfileRemoteDataSource @Inject constructor(
 	private val profileMastodonApi: ProfileMastodonApi,
-	private val profileFirefishApi: ProfileFirefishApi,
+	private val profileIceshrimpApi: ProfileIceshrimpApi,
 	private val profileSharkeyApi: ProfileSharkeyApi,
 ) {
 	suspend fun fetchProfile(
@@ -22,7 +22,7 @@ class ProfileRemoteDataSource @Inject constructor(
 		token: String,
 		profileId: String,
 	): Profile = when (instanceType) {
-		SupportedInstances.FIREFISH -> profileFirefishApi.fetchProfile(
+		SupportedInstances.ICESHRIMP -> profileIceshrimpApi.fetchProfile(
 			endpoint = endpoint, token = token, profileId = profileId
 		).toDomain(instance)
 
