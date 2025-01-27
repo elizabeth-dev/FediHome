@@ -11,7 +11,7 @@ import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.ProfileLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.ProfileRemoteDataSource
 import sh.elizabeth.fedihome.model.Profile
-import sh.elizabeth.fedihome.util.SupportedInstances
+import sh.elizabeth.fedihome.util.InstanceEndpointTypeToken
 import javax.inject.Inject
 
 class ProfileRepository @Inject constructor(
@@ -20,12 +20,13 @@ class ProfileRepository @Inject constructor(
 	private val profileRemoteDataSource: ProfileRemoteDataSource,
 	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 ) {
-	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
+	private suspend fun getInstanceAndEndpointAndTypeAndToken(activeAccount: String): InstanceEndpointTypeToken =
 		activeAccount.let {
 			val internalData = internalDataLocalDataSource.internalData.first()
 			val instance = it.split('@')[1]
-			Triple(
+			InstanceEndpointTypeToken(
 				instance,
+				internalData.instances[instance]?.delegatedEndpoint!!,
 				internalData.instances[instance]?.instanceType!!,
 				internalData.accounts[it]?.accessToken!!
 			)
@@ -42,19 +43,20 @@ class ProfileRepository @Inject constructor(
 	fun getMultipleByIdsFlow(fullUsernames: List<String>): Flow<List<Profile>> =
 		profileLocalDataSource.getMultipleById(fullUsernames)
 
-	fun getProfileFlow(profileId: String) =
-		profileLocalDataSource.getById(profileId)
+	fun getProfileFlow(profileId: String) = profileLocalDataSource.getById(profileId)
 
 	suspend fun fetchProfile(
 		activeAccount: String,
 		profileId: String,
 	) {
-		val (instance, instanceType, token) = getInstanceAndTypeAndToken(
-			activeAccount
-		)
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
 		val profileRes = profileRemoteDataSource.fetchProfile(
-			instance, instanceType, token, profileId.split('@').first()
+			instance = instanceData.instance,
+			endpoint = instanceData.endpoint,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			profileId = profileId.split('@').first()
 		)
 		val emojiRefs = profileRes.emojis.values.map {
 			ProfileEmojiCrossRef(
@@ -65,8 +67,7 @@ class ProfileRepository @Inject constructor(
 		coroutineScope {
 			val emojiRef =
 				async { emojiLocalDataSource.insertOrReplace(*profileRes.emojis.values.toTypedArray()) }
-			val profileRef =
-				async { profileLocalDataSource.insertOrReplace(profileRes) }
+			val profileRef = async { profileLocalDataSource.insertOrReplace(profileRes) }
 
 			awaitAll(emojiRef, profileRef)
 

@@ -16,10 +16,10 @@ import javax.inject.Inject
 
 class NotificationSharkeyApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun getNotifications(
-		instance: String,
+		endpoint: String,
 		token: String,
 	): List<Notification> =
-		httpClient.post("https://$instance/api/i/notifiications") {
+		httpClient.post("https://$endpoint/api/i/notifiications") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
 			setBody(GetNotificationsRequest())

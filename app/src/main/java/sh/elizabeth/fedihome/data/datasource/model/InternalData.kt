@@ -28,6 +28,7 @@ data class InternalDataInstance(
 	val instanceType: SupportedInstances,
 	val appId: String?,
 	val appSecret: String?,
+	val delegatedEndpoint: String,
 )
 
 data class InternalDataAccountSettings(

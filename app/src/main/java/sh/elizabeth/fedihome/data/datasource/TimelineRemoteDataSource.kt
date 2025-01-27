@@ -17,17 +17,20 @@ class TimelineRemoteDataSource @Inject constructor(
 ) {
 	suspend fun getHome(
 		instance: String,
+		endpoint: String,
 		instanceType: SupportedInstances,
 		token: String,
 	): List<Post> = when (instanceType) {
-		SupportedInstances.FIREFISH -> timelineFirefishApi.getHome(instance, token)
-			.map { it.toDomain(instance) }
+		SupportedInstances.FIREFISH -> timelineFirefishApi.getHome(
+			endpoint = endpoint, token = token
+		).map { it.toDomain(instance) }
 
-		SupportedInstances.SHARKEY -> timelineSharkeyApi.getHome(instance, token)
+		SupportedInstances.SHARKEY -> timelineSharkeyApi.getHome(endpoint = endpoint, token = token)
 			.map { it.toDomain(instance) }
 
 		SupportedInstances.GLITCH,
 		SupportedInstances.MASTODON,
-		-> timelineMastodonApi.getHome(instance, token).map { it.toDomain(instance) }
+			-> timelineMastodonApi.getHome(endpoint = endpoint, token = token)
+			.map { it.toDomain(instance) }
 	}
 }

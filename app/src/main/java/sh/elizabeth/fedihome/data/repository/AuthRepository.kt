@@ -24,12 +24,13 @@ class AuthRepository @Inject constructor(
 	suspend fun prepareOAuth(instance: String): String {
 		internalDataLocalDataSource.setLastLoginInstance(instance)
 
-		val instanceType =
-			metaRemoteDataSource.getInstanceType(instance)
+		val (delegatedEndpoint, instanceType) =
+			metaRemoteDataSource.getInstanceData(instance)
 				?: throw IllegalArgumentException("Instance type not supported")
 
 		internalDataLocalDataSource.setInstance(
 			instance = instance,
+			newDelegatedEndpoint = delegatedEndpoint,
 			newInstanceType = instanceType,
 			newAppId = null,
 			newAppSecret = null

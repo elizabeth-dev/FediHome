@@ -23,7 +23,7 @@ android {
 		minSdk = 24
 		targetSdk = 35
 		versionCode = 1
-		versionName = "1.0"
+		versionName = "0.0.1"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables {
@@ -116,10 +116,10 @@ sqldelight {
 }
 
 dependencies {
-	implementation("androidx.core:core-ktx:1.13.1")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
-	implementation("androidx.activity:activity-compose:1.9.2")
-	implementation(platform("androidx.compose:compose-bom:2024.09.00"))
+	implementation("androidx.core:core-ktx:1.15.0")
+	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+	implementation("androidx.activity:activity-compose:1.10.0")
+	implementation(platform("androidx.compose:compose-bom:2025.01.00"))
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
@@ -131,14 +131,14 @@ dependencies {
 	testImplementation("junit:junit:4.13.2")
 	androidTestImplementation("androidx.test.ext:junit:1.2.1")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-	androidTestImplementation(platform("androidx.compose:compose-bom:2024.09.00"))
+	androidTestImplementation(platform("androidx.compose:compose-bom:2025.01.00"))
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 	debugImplementation("androidx.compose.ui:ui-tooling")
 	debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-	implementation("androidx.navigation:navigation-compose:2.8.0")
-	implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.5")
-	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.5")
+	implementation("androidx.navigation:navigation-compose:2.8.5")
+	implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
 	implementation("androidx.compose.material3:material3-window-size-class")
 
 	implementation("com.google.dagger:hilt-android:2.52")
@@ -146,7 +146,7 @@ dependencies {
 	ksp("androidx.hilt:hilt-compiler:1.2.0")
 	implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-	implementation("androidx.datastore:datastore:1.1.1")
+	implementation("androidx.datastore:datastore:1.1.2")
 	implementation("com.google.protobuf:protobuf-kotlin-lite:4.28.0")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
@@ -154,7 +154,7 @@ dependencies {
 
 	// Needed for:
 	// java.time when targeting API Level <26
-	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
+	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
 	val ktorVersion = "2.3.12"
 	implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -180,12 +180,12 @@ dependencies {
 	implementation("com.google.code.gson:gson:2.11.0")
 
 	// Firebase
-	implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
+	implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
 	implementation("com.google.firebase:firebase-analytics")
 	implementation("com.google.firebase:firebase-messaging")
 
 	// Work Manager (used for firebase messaging)
-	val work_version = "2.9.1"
+	val work_version = "2.10.0"
 	implementation("androidx.work:work-runtime-ktx:$work_version")
 	implementation("androidx.hilt:hilt-work:1.2.0")
 

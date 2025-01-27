@@ -8,6 +8,6 @@ import sh.elizabeth.fedihome.api.mastodon.model.Profile
 import javax.inject.Inject
 
 class ProfileMastodonApi @Inject constructor(private val httpClient: HttpClient) {
-	suspend fun fetchProfile(instance: String, token: String, profileId: String): Profile =
-		httpClient.get("https://$instance/api/v1/accounts/$profileId") { bearerAuth(token) }.body()
+	suspend fun fetchProfile(endpoint: String, token: String, profileId: String): Profile =
+		httpClient.get("https://$endpoint/api/v1/accounts/$profileId") { bearerAuth(token) }.body()
 }

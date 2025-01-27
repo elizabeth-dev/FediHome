@@ -17,18 +17,23 @@ class ProfileRemoteDataSource @Inject constructor(
 ) {
 	suspend fun fetchProfile(
 		instance: String,
+		endpoint: String,
 		instanceType: SupportedInstances,
 		token: String,
 		profileId: String,
 	): Profile = when (instanceType) {
-		SupportedInstances.FIREFISH -> profileFirefishApi.fetchProfile(instance, token, profileId)
-			.toDomain(instance)
+		SupportedInstances.FIREFISH -> profileFirefishApi.fetchProfile(
+			endpoint = endpoint, token = token, profileId = profileId
+		).toDomain(instance)
 
-		SupportedInstances.SHARKEY -> profileSharkeyApi.fetchProfile(instance, token, profileId)
-			.toDomain(instance)
+		SupportedInstances.SHARKEY -> profileSharkeyApi.fetchProfile(
+			endpoint = endpoint, token = token, profileId = profileId
+		).toDomain(instance)
 
 		SupportedInstances.GLITCH,
 		SupportedInstances.MASTODON,
-		-> profileMastodonApi.fetchProfile(instance, token, profileId).toDomain(instance)
+			-> profileMastodonApi.fetchProfile(
+			endpoint = endpoint, token = token, profileId = profileId
+		).toDomain(instance)
 	}
 }

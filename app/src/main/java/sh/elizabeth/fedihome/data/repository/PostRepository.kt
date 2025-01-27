@@ -14,7 +14,7 @@ import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.PostDraft
 import sh.elizabeth.fedihome.model.unwrapProfiles
 import sh.elizabeth.fedihome.model.unwrapQuotes
-import sh.elizabeth.fedihome.util.SupportedInstances
+import sh.elizabeth.fedihome.util.InstanceEndpointTypeToken
 import javax.inject.Inject
 
 class PostRepository @Inject constructor(
@@ -24,12 +24,13 @@ class PostRepository @Inject constructor(
 	private val postRemoteDataSource: PostRemoteDataSource,
 	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 ) {
-	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
+	private suspend fun getInstanceAndEndpointAndTypeAndToken(activeAccount: String): InstanceEndpointTypeToken =
 		activeAccount.let {
 			val internalData = internalDataLocalDataSource.internalData.first()
 			val instance = it.split('@')[1]
-			Triple(
+			InstanceEndpointTypeToken(
 				instance,
+				internalData.instances[instance]?.delegatedEndpoint!!,
 				internalData.instances[instance]?.instanceType!!,
 				internalData.accounts[it]?.accessToken!!
 			)
@@ -44,40 +45,40 @@ class PostRepository @Inject constructor(
 	}
 
 	suspend fun createPost(activeAccount: String, newPost: PostDraft) {
-		val (instance, instanceType, token) = getInstanceAndTypeAndToken(
-			activeAccount
-		)
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
 		val postRes = postRemoteDataSource.createPost(
-			instance, instanceType, token, newPost
+			instance = instanceData.instance,
+			endpoint = instanceData.endpoint,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			newPost = newPost
 		)
 		insertOrReplace(postRes)
 	}
 
-	fun getPost(postId: String): Post? =
-		postLocalDataSource.getPostSingle(postId)
+	fun getPost(postId: String): Post? = postLocalDataSource.getPostSingle(postId)
 
 	fun getPostFlow(postId: String) = postLocalDataSource.getPost(postId)
 
-	fun getPostsByProfileFlow(profileId: String) =
-		postLocalDataSource.getPostsByProfile(profileId)
+	fun getPostsByProfileFlow(profileId: String) = postLocalDataSource.getPostsByProfile(profileId)
 
 	suspend fun fetchPost(
 		activeAccount: String,
 		postId: String,
 	) {
-		val (instance, instanceType, token) = getInstanceAndTypeAndToken(
-			activeAccount
-		)
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
 		val posts = postRemoteDataSource.fetchPost(
-			instance, instanceType, token, postId.split('@').first()
+			instance = instanceData.instance,
+			endpoint = instanceData.endpoint,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			postId = postId.split('@').first()
 		).unwrapQuotes()
 		val profiles = posts.flatMap { it.unwrapProfiles() }.toSet()
 		val emojis =
-			posts.flatMap { it.emojis.values }
-				.plus(profiles.flatMap { it.emojis.values })
-				.toSet()
+			posts.flatMap { it.emojis.values }.plus(profiles.flatMap { it.emojis.values }).toSet()
 		val postEmojiCrossRefs = posts.flatMap { post ->
 			post.emojis.values.map { emoji ->
 				PostEmojiCrossRef(
@@ -94,8 +95,7 @@ class PostRepository @Inject constructor(
 		}
 
 		coroutineScope {
-			val emojiRef =
-				async { emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray()) }
+			val emojiRef = async { emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray()) }
 
 			profileRepository.insertOrReplace(*profiles.toTypedArray())
 			postLocalDataSource.insertOrReplace(*posts.toTypedArray())
@@ -115,18 +115,18 @@ class PostRepository @Inject constructor(
 		activeAccount: String,
 		profileId: String,
 	) {
-		val (instance, instanceType, token) = getInstanceAndTypeAndToken(
-			activeAccount
-		)
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
 		val posts = postRemoteDataSource.fetchPostsByProfile(
-			instance, instanceType, token, profileId.split('@').first()
+			instance = instanceData.instance,
+			endpoint = instanceData.endpoint,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			profileId = profileId.split('@').first()
 		).flatMap { it.unwrapQuotes() }
 		val profiles = posts.flatMap { it.unwrapProfiles() }.toSet()
 		val emojis =
-			posts.flatMap { it.emojis.values }
-				.plus(profiles.flatMap { it.emojis.values })
-				.toSet()
+			posts.flatMap { it.emojis.values }.plus(profiles.flatMap { it.emojis.values }).toSet()
 		val postEmojiCrossRefs = posts.flatMap { post ->
 			post.emojis.values.map { emoji ->
 				PostEmojiCrossRef(
@@ -166,12 +166,14 @@ class PostRepository @Inject constructor(
 		postId: String,
 		choices: List<Int>,
 	) {
-		val (instance, instanceType, token) = getInstanceAndTypeAndToken(
-			activeAccount
-		)
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
 		postRemoteDataSource.votePoll(
-			instance, instanceType, token, postId.split('@').first(), choices
+			instanceData.endpoint,
+			instanceData.instanceType,
+			instanceData.token,
+			postId.split('@').first(),
+			choices
 		)
 	}
 

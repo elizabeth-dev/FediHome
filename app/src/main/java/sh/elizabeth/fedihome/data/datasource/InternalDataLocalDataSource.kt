@@ -63,6 +63,7 @@ class InternalDataLocalDataSource @Inject constructor(
 					instanceType = SupportedInstances.valueOf(value.instanceType),
 					appId = value.appId,
 					appSecret = value.appSecret,
+					delegatedEndpoint = value.delegatedEndpoint
 				)
 			}.toMap(),
 			fcmDeviceToken = it.fcmDeviceToken,
@@ -169,6 +170,7 @@ class InternalDataLocalDataSource @Inject constructor(
 
 	suspend fun setInstance(
 		instance: String,
+		newDelegatedEndpoint: String?,
 		newInstanceType: SupportedInstances?,
 		newAppId: String?,
 		newAppSecret: String?,
@@ -184,6 +186,7 @@ class InternalDataLocalDataSource @Inject constructor(
 						instanceType =
 							newInstanceType?.name
 								?: currentInstance?.instanceType
+						delegatedEndpoint = newDelegatedEndpoint ?: currentInstance?.delegatedEndpoint
 						appId = newAppId ?: currentInstance?.appId ?: ""
 						appSecret =
 							newAppSecret ?: currentInstance?.appSecret ?: ""

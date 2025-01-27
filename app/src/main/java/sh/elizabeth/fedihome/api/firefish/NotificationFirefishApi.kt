@@ -12,8 +12,8 @@ import sh.elizabeth.fedihome.api.sharkey.model.GetNotificationsRequest
 import javax.inject.Inject
 
 class NotificationFirefishApi @Inject constructor(private val httpClient: HttpClient) {
-	suspend fun getNotifications(instance: String, token: String): List<Notification> =
-		httpClient.post("https://$instance/api/i/notifiications") {
+	suspend fun getNotifications(endpoint: String, token: String): List<Notification> =
+		httpClient.post("https://$endpoint/api/i/notifiications") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
 			setBody(GetNotificationsRequest())

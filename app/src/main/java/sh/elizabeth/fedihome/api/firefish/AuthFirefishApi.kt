@@ -21,12 +21,12 @@ import javax.inject.Inject
 
 class AuthFirefishApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun createApp(
-		instance: String,
+		endpoint: String,
 		name: String = APP_NAME,
 		description: String = APP_DESCRIPTION,
 		permission: List<String> = FIREFISH_APP_PERMISSION,
 		callbackUrl: String = "$APP_DEEPLINK_URI$APP_LOGIN_OAUTH_PATH",
-	): CreateAppResponse = httpClient.post("https://$instance/api/app/create") {
+	): CreateAppResponse = httpClient.post("https://$endpoint/api/app/create") {
 		contentType(ContentType.Application.Json)
 		setBody(
 			CreateAppRequest(
@@ -39,23 +39,23 @@ class AuthFirefishApi @Inject constructor(private val httpClient: HttpClient) {
 	}.body()
 
 	suspend fun generateSession(
-		instance: String,
+		endpoint: String,
 		appSecret: String,
 	): GenerateSessionResponse =
 		httpClient.post(
-			"https://$instance/api/auth/session/generate"
+			"https://$endpoint/api/auth/session/generate"
 		) {
 			contentType(ContentType.Application.Json)
 			setBody(GenerateSessionRequest(appSecret = appSecret))
 		}.body()
 
 	suspend fun getUserKey(
-		instance: String,
+		endpoint: String,
 		appSecret: String,
 		token: String,
 	): UserKeyResponse =
 		httpClient.post(
-			"https://$instance/api/auth/session/userkey"
+			"https://$endpoint/api/auth/session/userkey"
 		) {
 			contentType(ContentType.Application.Json)
 			setBody(UserKeyRequest(appSecret = appSecret, token = token))

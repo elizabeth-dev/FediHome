@@ -12,6 +12,7 @@ import sh.elizabeth.fedihome.data.datasource.NotificationLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.NotificationRemoteDataSource
 import sh.elizabeth.fedihome.model.unwrapProfiles
 import sh.elizabeth.fedihome.model.unwrapQuotes
+import sh.elizabeth.fedihome.util.InstanceEndpointTypeToken
 import sh.elizabeth.fedihome.util.SupportedInstances
 import javax.inject.Inject
 
@@ -24,24 +25,29 @@ class NotificationRepository @Inject constructor(
 	private val emojiLocalDataSource: EmojiLocalDataSource,
 ) {
 
-	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
+	private suspend fun getInstanceAndEndpointAndTypeAndToken(activeAccount: String): InstanceEndpointTypeToken =
 		activeAccount.let {
 			val internalData = internalDataLocalDataSource.internalData.first()
 			val instance = it.split('@')[1]
-			Triple(
+			InstanceEndpointTypeToken(
 				instance,
+				internalData.instances[instance]?.delegatedEndpoint!!,
 				internalData.instances[instance]?.instanceType!!,
 				internalData.accounts[it]?.accessToken!!
 			)
 		}
 
 	suspend fun fetchNotifications(activeAccount: String) {
-		val (instance, instanceType, token) = getInstanceAndTypeAndToken(
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(
 			activeAccount
 		)
 
 		val notificationRes = notificationRemoteDataSource.getNotifications(
-			activeAccount, instance, instanceType, token
+            forAccount = activeAccount,
+            instance = instanceData.instance,
+            endpoint = instanceData.endpoint,
+            instanceType = instanceData.instanceType,
+            token = instanceData.token
 		)
 
 		val posts = notificationRes.mapNotNull { it.post }.flatMap {

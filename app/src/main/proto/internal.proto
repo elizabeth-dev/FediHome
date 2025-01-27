@@ -31,6 +31,7 @@ message Instance {
   string instance_type = 1;
   string app_id = 2;
   string app_secret = 3;
+  string delegatedEndpoint = 4;
 }
 
 message AccountSettings {

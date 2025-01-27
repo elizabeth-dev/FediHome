@@ -13,7 +13,7 @@ import sh.elizabeth.fedihome.data.datasource.TimelineRemoteDataSource
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.unwrapProfiles
 import sh.elizabeth.fedihome.model.unwrapQuotes
-import sh.elizabeth.fedihome.util.SupportedInstances
+import sh.elizabeth.fedihome.util.InstanceEndpointTypeToken
 import javax.inject.Inject
 
 class TimelineRepository @Inject constructor(
@@ -25,12 +25,13 @@ class TimelineRepository @Inject constructor(
 	private val internalDataLocalDataSource: InternalDataLocalDataSource,
 	private val appDatabase: AppDatabase,
 ) {
-	private suspend fun getInstanceAndTypeAndToken(activeAccount: String): Triple<String, SupportedInstances, String> =
+	private suspend fun getInstanceAndEndpointAndTypeAndToken(activeAccount: String): InstanceEndpointTypeToken =
 		activeAccount.let {
 			val internalData = internalDataLocalDataSource.internalData.first()
 			val instance = it.split('@')[1]
-			Triple(
+			InstanceEndpointTypeToken(
 				instance,
+				internalData.instances[instance]?.delegatedEndpoint!!,
 				internalData.instances[instance]?.instanceType!!,
 				internalData.accounts[it]?.accessToken!!
 			)
@@ -43,17 +44,18 @@ class TimelineRepository @Inject constructor(
 		activeAccount: String,
 		profileIdentifier: String,
 	) {
-		val (instance, instanceType, token) = getInstanceAndTypeAndToken(
-			activeAccount
-		)
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
-		val posts =
-			timelineRemoteDataSource.getHome(instance, instanceType, token)
+		val posts = timelineRemoteDataSource.getHome(
+			instance = instanceData.instance,
+			endpoint = instanceData.endpoint,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token
+		)
 		val unWrappedPosts = posts.flatMap { it.unwrapQuotes() }
 		val profiles = unWrappedPosts.flatMap { it.unwrapProfiles() }.toSet()
 		val emojis =
-			unWrappedPosts.flatMap { it.emojis.values }
-				.plus(profiles.flatMap { it.emojis.values })
+			unWrappedPosts.flatMap { it.emojis.values }.plus(profiles.flatMap { it.emojis.values })
 				.toSet()
 
 		val postEmojiCrossRefs = unWrappedPosts.flatMap { post ->

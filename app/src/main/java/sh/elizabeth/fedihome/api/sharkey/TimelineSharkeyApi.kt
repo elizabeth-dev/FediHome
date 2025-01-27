@@ -12,8 +12,8 @@ import sh.elizabeth.fedihome.api.sharkey.model.Post
 import javax.inject.Inject
 
 class TimelineSharkeyApi @Inject constructor(private val httpClient: HttpClient) {
-	suspend fun getHome(instance: String, token: String): List<Post> =
-		httpClient.post("https://$instance/api/notes/timeline") {
+	suspend fun getHome(endpoint: String, token: String): List<Post> =
+		httpClient.post("https://$endpoint/api/notes/timeline") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
 			setBody(GetHomeRequest(limit = 11))

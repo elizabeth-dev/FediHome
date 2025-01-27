@@ -19,29 +19,29 @@ import sh.elizabeth.fedihome.model.PostVisibility as DomainPostVisibility
 
 class PostSharkeyApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun createPost(
-		instance: String,
+		endpoint: String,
 		token: String,
 		newPost: PostDraft,
 	): CreatePostResponse =
-		httpClient.post("https://$instance/api/notes/create") {
+		httpClient.post("https://$endpoint/api/notes/create") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
 			setBody(newPost.toCreatePost())
 		}.body()
 
-	suspend fun fetchPost(instance: String, token: String, postId: String): Post =
-		httpClient.post("https://$instance/api/notes/show") {
+	suspend fun fetchPost(endpoint: String, token: String, postId: String): Post =
+		httpClient.post("https://$endpoint/api/notes/show") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
 			setBody(SelectPostRequest(noteId = postId.split('@').first()))
 		}.body()
 
 	suspend fun fetchPostsByProfile(
-		instance: String,
+		endpoint: String,
 		token: String,
 		profileId: String,
 	): List<Post> =
-		httpClient.post("https://$instance/api/users/notes") {
+		httpClient.post("https://$endpoint/api/users/notes") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
 			setBody(GetPostsByProfile(userId = profileId.split('@').first()))

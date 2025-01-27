@@ -8,6 +8,6 @@ import sh.elizabeth.fedihome.api.mastodon.model.Post
 import javax.inject.Inject
 
 class TimelineMastodonApi @Inject constructor(private val httpClient: HttpClient) {
-	suspend fun getHome(instance: String, token: String): List<Post> =
-		httpClient.get("https://$instance/api/v1/timelines/home") { bearerAuth(token) }.body()
+	suspend fun getHome(endpoint: String, token: String): List<Post> =
+		httpClient.get("https://$endpoint/api/v1/timelines/home") { bearerAuth(token) }.body()
 }

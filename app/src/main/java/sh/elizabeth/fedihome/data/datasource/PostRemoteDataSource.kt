@@ -21,63 +21,71 @@ class PostRemoteDataSource @Inject constructor(
 ) {
 	suspend fun createPost(
 		instance: String,
+		endpoint: String,
 		instanceType: SupportedInstances,
 		token: String,
 		newPost: PostDraft,
-): Post = when (instanceType) {
+	): Post = when (instanceType) {
 		SupportedInstances.FIREFISH -> postFirefishApi.createPost(
-			instance, token, newPost
+			endpoint = endpoint, token = token, newPost = newPost
 		).createdNote.toDomain(instance)
 
 		SupportedInstances.SHARKEY -> postSharkeyApi.createPost(
-			instance, token, newPost
+			endpoint = endpoint, token = token, newPost = newPost
 		).createdNote.toDomain(instance)
 
 		SupportedInstances.GLITCH,
 		SupportedInstances.MASTODON,
-		-> postMastodonApi.createPost(instance, token, newPost).toDomain(instance)
+			-> postMastodonApi.createPost(endpoint = endpoint, token = token, newPost = newPost)
+			.toDomain(instance)
 
 	}
 
 	suspend fun fetchPost(
 		instance: String,
+		endpoint: String,
 		instanceType: SupportedInstances,
 		token: String,
 		postId: String,
 	): Post = when (instanceType) {
-		SupportedInstances.FIREFISH -> postFirefishApi.fetchPost(instance, token, postId)
-			.toDomain(instance)
+		SupportedInstances.FIREFISH -> postFirefishApi.fetchPost(
+			endpoint = endpoint, token = token, postId = postId
+		).toDomain(instance)
 
-		SupportedInstances.SHARKEY -> postSharkeyApi.fetchPost(instance, token, postId)
-			.toDomain(instance)
+		SupportedInstances.SHARKEY -> postSharkeyApi.fetchPost(
+			endpoint = endpoint, token = token, postId = postId
+		).toDomain(instance)
 
 		SupportedInstances.GLITCH,
 		SupportedInstances.MASTODON,
-		-> postMastodonApi.fetchPost(instance, token, postId).toDomain(instance)
+			-> postMastodonApi.fetchPost(endpoint = endpoint, token = token, postId = postId)
+			.toDomain(instance)
 	}
 
 	suspend fun fetchPostsByProfile(
 		instance: String,
+		endpoint: String,
 		instanceType: SupportedInstances,
 		token: String,
 		profileId: String,
 	): List<Post> = when (instanceType) {
 		SupportedInstances.FIREFISH -> postFirefishApi.fetchPostsByProfile(
-			instance, token, profileId
+			endpoint = endpoint, token = token, profileId = profileId
 		).map { it.toDomain(instance) }
 
 		SupportedInstances.SHARKEY -> postSharkeyApi.fetchPostsByProfile(
-			instance, token, profileId
+			endpoint = endpoint, token = token, profileId = profileId
 		).map { it.toDomain(instance) }
 
 		SupportedInstances.GLITCH,
 		SupportedInstances.MASTODON,
-		-> postMastodonApi.fetchPostsByProfile(instance, token, profileId)
-			.map { it.toDomain(instance) }
+			-> postMastodonApi.fetchPostsByProfile(
+			endpoint = endpoint, token = token, profileId = profileId
+		).map { it.toDomain(instance) }
 	}
 
 	suspend fun votePoll(
-		instance: String,
+		endpoint: String,
 		instanceType: SupportedInstances,
 		token: String,
 		pollId: String,
@@ -85,7 +93,11 @@ class PostRemoteDataSource @Inject constructor(
 	) = when (instanceType) {
 		SupportedInstances.FIREFISH, SupportedInstances.SHARKEY -> coroutineScope {
 			val voteCoroutines = choices.map {
-				async { postFirefishApi.votePoll(instance, token, pollId, it) }
+				async {
+					postFirefishApi.votePoll(
+						endpoint = endpoint, token = token, postId = pollId, choice = it
+					)
+				}
 			}
 
 			voteCoroutines.awaitAll()
@@ -94,6 +106,8 @@ class PostRemoteDataSource @Inject constructor(
 
 		SupportedInstances.GLITCH,
 		SupportedInstances.MASTODON,
-		-> postMastodonApi.votePoll(instance, token, pollId, choices)
+			-> postMastodonApi.votePoll(
+			endpoint = endpoint, token = token, pollId = pollId, choices = choices
+		)
 	}
 }

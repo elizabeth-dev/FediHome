@@ -11,9 +11,9 @@ import sh.elizabeth.fedihome.api.sharkey.model.UserKeyResponse
 import javax.inject.Inject
 
 class AuthSharkeyApi @Inject constructor(private val httpClient: HttpClient) {
-	suspend fun getUserKey(instance: String, appSecret: String, token: String): UserKeyResponse =
+	suspend fun getUserKey(endpoint: String, appSecret: String, token: String): UserKeyResponse =
 		httpClient.post(
-			"https://$instance/api/auth/session/userkey"
+			"https://$endpoint/api/auth/session/userkey"
 		) {
 			contentType(ContentType.Application.Json)
 			setBody(UserKeyRequest(appSecret = appSecret, token = token))

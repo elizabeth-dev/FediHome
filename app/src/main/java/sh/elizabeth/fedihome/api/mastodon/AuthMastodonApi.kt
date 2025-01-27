@@ -22,12 +22,12 @@ import javax.inject.Inject
 
 class AuthMastodonApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun createApp(
-		instance: String,
+		endpoint: String,
 		name: String = APP_NAME,
 		callbackUrl: String = "$APP_DEEPLINK_URI$APP_LOGIN_OAUTH_PATH",
 		scopes: List<String>? = MASTODON_APP_PERMISSION,
 		website: String? = null,
-	): CreateAppResponse = httpClient.post("https://$instance/api/v1/apps") {
+	): CreateAppResponse = httpClient.post("https://$endpoint/api/v1/apps") {
 		contentType(ContentType.Application.Json)
 		setBody(
 			CreateAppRequest(
@@ -40,13 +40,13 @@ class AuthMastodonApi @Inject constructor(private val httpClient: HttpClient) {
 	}.body()
 
 	suspend fun getAccessToken(
-		instance: String,
+		endpoint: String,
 		code: String,
 		clientId: String,
 		clientSecret: String,
 		callbackUrl: String = "$APP_DEEPLINK_URI$APP_LOGIN_OAUTH_PATH",
 		scopes: List<String>? = MASTODON_APP_PERMISSION,
-	): AccessTokenResponse = httpClient.post("https://$instance/oauth/token") {
+	): AccessTokenResponse = httpClient.post("https://$endpoint/oauth/token") {
 		contentType(ContentType.Application.Json)
 		setBody(
 			AccessTokenRequest(
@@ -60,10 +60,10 @@ class AuthMastodonApi @Inject constructor(private val httpClient: HttpClient) {
 	}.body()
 
 	suspend fun verifyCredentials(
-		instance: String,
+		endpoint: String,
 		accessToken: String?,
 	): Profile =
-		httpClient.get("https://$instance/api/v1/accounts/verify_credentials") {
+		httpClient.get("https://$endpoint/api/v1/accounts/verify_credentials") {
 			if (accessToken != null) header(
 				HttpHeaders.Authorization,
 				"Bearer $accessToken"

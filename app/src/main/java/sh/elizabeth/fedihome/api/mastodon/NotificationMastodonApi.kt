@@ -21,10 +21,10 @@ import javax.inject.Inject
 
 class NotificationMastodonApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun getNotifications(
-		instance: String,
+		endpoint: String,
 		token: String,
 	): List<Notification> =
-		httpClient.get("https://$instance/api/v1/notifications") {
+		httpClient.get("https://$endpoint/api/v1/notifications") {
 			bearerAuth(token)
 		}.body()
 

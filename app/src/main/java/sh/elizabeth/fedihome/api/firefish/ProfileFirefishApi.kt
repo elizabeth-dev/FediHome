@@ -13,10 +13,10 @@ import javax.inject.Inject
 
 class ProfileFirefishApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun fetchProfile(
-		instance: String,
+		endpoint: String,
 		token: String,
 		profileId: String,
-	): UserDetailedNotMe = httpClient.post("https://$instance/api/users/show") {
+	): UserDetailedNotMe = httpClient.post("https://$endpoint/api/users/show") {
 		contentType(ContentType.Application.Json)
 		bearerAuth(token)
 		setBody(SelectUserRequest(profileId.split('@').first()))
