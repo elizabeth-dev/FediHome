@@ -1,28 +1,26 @@
 package sh.elizabeth.fedihome.ui.routes.dashboard.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import sh.elizabeth.fedihome.ui.composable.NotificationCard
 
 @Composable
@@ -44,7 +42,7 @@ fun NotificationsScreen(
 	)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun NotificationsScreen(
 	uiState: NotificationsUiState,
@@ -54,27 +52,17 @@ fun NotificationsScreen(
 	onReply: (String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 ) {
-	val pullRefreshState = rememberPullToRefreshState()
-	var isRefreshing by remember { mutableStateOf(false) }
-
-	val coroutineScope = rememberCoroutineScope()
-	val launchOnRefresh: () -> Unit = {
-		isRefreshing = true
-		coroutineScope.launch {
-			if (uiState.activeAccount.isNotBlank()) onRefresh(uiState.activeAccount)
-			isRefreshing = false
-		}
-	}
+	val pullRefreshState =
+		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
 
 	LaunchedEffect(key1 = uiState.activeAccount) {
-		launchOnRefresh()
+		if (uiState.activeAccount.isNotBlank()) onRefresh(uiState.activeAccount)
 	}
 
-	PullToRefreshBox(
-		modifier = Modifier.fillMaxSize(),
-		state = pullRefreshState,
-		isRefreshing = isRefreshing,
-		onRefresh = launchOnRefresh
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.pullRefresh(pullRefreshState, true)
 	) {
 		when (uiState) {
 			is NotificationsUiState.NoNotifications -> if (!uiState.isLoading) Column(
@@ -90,7 +78,8 @@ fun NotificationsScreen(
 			is NotificationsUiState.HasNotifications -> {
 				LazyColumn(Modifier.fillMaxSize()) {
 					items(uiState.notifications) { notification ->
-						NotificationCard(notification = notification,
+						NotificationCard(
+							notification = notification,
 							navToProfile = navToProfile,
 							navToPost = navToPost,
 							onReply = onReply,
@@ -106,5 +95,9 @@ fun NotificationsScreen(
 				}
 			}
 		}
+
+		PullRefreshIndicator(
+			uiState.isLoading, pullRefreshState, Modifier.align(Alignment.TopCenter)
+		)
 	}
 }
