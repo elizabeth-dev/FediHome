@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class NotificationIceshrimpApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun getNotifications(endpoint: String, token: String): List<Notification> =
-		httpClient.post("https://$endpoint/api/i/notifiications") {
+		httpClient.post("https://$endpoint/api/i/notifications") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
 			setBody(GetNotificationsRequest())

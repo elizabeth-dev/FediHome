@@ -57,7 +57,7 @@ class TextWithEmojiTest {
 		val text = "Hello, world!"
 		composeTestRule.setContent {
 			FediHomeTheme {
-				TextWithEmoji(text = text, modifier = Modifier.testTag(TAG))
+				EnrichedText(text = text, modifier = Modifier.testTag(TAG))
 			}
 		}
 
@@ -69,7 +69,7 @@ class TextWithEmojiTest {
 		val text = "Hello, :world:!"
 		composeTestRule.setContent {
 			FediHomeTheme {
-				TextWithEmoji(
+				EnrichedText(
 					text = text, modifier = Modifier.testTag(TAG), emojis = mapOf(
 						"world" to Emoji(
 							fullEmojiId = "world@foo.bar",
@@ -97,7 +97,7 @@ class TextWithEmojiTest {
 		val text = "Hello, :world:!"
 		composeTestRule.setContent {
 			FediHomeTheme {
-				TextWithEmoji(
+				EnrichedText(
 					text = text, modifier = Modifier.testTag(TAG), emojis = mapOf()
 				)
 			}
@@ -118,7 +118,7 @@ class TextWithEmojiTest {
 		val text = "Hello, :world: :earth:!"
 		composeTestRule.setContent {
 			FediHomeTheme {
-				TextWithEmoji(
+				EnrichedText(
 					text = text, modifier = Modifier.testTag(TAG), emojis = mapOf(
 						"world" to Emoji(
 							fullEmojiId = "world@foo.bar",

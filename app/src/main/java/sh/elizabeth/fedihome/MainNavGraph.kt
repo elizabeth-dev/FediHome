@@ -34,7 +34,7 @@ fun MainNavGraph(
 				navToLogin = navActions::navigateToLoginOAuth,
 				navToCompose = navActions::navigateToCompose,
 				navToPost = navActions::navigateToPost,
-				navToProfile = navActions::navigateToProfile,
+				navToProfile = navActions::navigateToProfileByTag,
 			)
 		}
 
@@ -61,7 +61,7 @@ fun MainNavGraph(
 			PostRoute(
 				navBack = navActions::navigateUp,
 				navToCompose = navActions::navigateToCompose,
-				navToProfile = navActions::navigateToProfile
+				navToProfile = navActions::navigateToProfileByTag
 			)
 		}
 
@@ -70,7 +70,7 @@ fun MainNavGraph(
 				navBack = navActions::navigateUp,
 				navToCompose = navActions::navigateToCompose,
 				navToPost = navActions::navigateToPost,
-				navToProfile = navActions::navigateToProfile,
+				navToProfile = navActions::navigateToProfileByTag,
 			)
 		}
 	}

@@ -49,12 +49,13 @@ fun SlimProfileSummary(
 					.align(Alignment.CenterVertically)
 					.padding(start = 8.dp)
 			) {
-				TextWithEmoji(
+				EnrichedText(
 					profile.name ?: "",
 					emojis = profile.emojis,
 					style = MaterialTheme.typography.titleMedium,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+					overflow = TextOverflow.Ellipsis,
+					allowClickable = false,
 				)
 				Text(
 					"@${profile.username}",

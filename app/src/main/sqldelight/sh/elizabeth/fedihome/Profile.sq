@@ -38,6 +38,9 @@ INSERT OR REPLACE INTO ProfileEmojiCrossRef VALUES ?;
 getProfileById:
 SELECT * FROM ProfileEntity WHERE profileId = ?;
 
+getProfileByTag:
+SELECT * FROM ProfileEntity WHERE username = ?;
+
 getMultipleProfilesByIds:
 SELECT * FROM ProfileEntity WHERE profileId IN ?;
 

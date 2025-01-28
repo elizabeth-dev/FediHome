@@ -54,7 +54,7 @@ fun SlimPostCard(
                 )
 
                 SlimProfileSummary(profile = post.author,
-                    onClick = { navToProfile(post.author.id) })
+                    onClick = { navToProfile(post.author.username) })
 
                 if (!post.cw.isNullOrBlank()) {
                     Text(
@@ -63,19 +63,21 @@ fun SlimPostCard(
                     HorizontalDivider()
                 }
 
-                if (!post.text.isNullOrBlank()) TextWithEmoji(
+                if (!post.text.isNullOrBlank()) EnrichedText(
                     post.text,
                     emojis = post.emojis,
                     style = MaterialTheme.typography.bodyLarge, // TODO: Maybe use a smaller font size like bodyMedium
-                    modifier = Modifier
+                    modifier = Modifier,
+                    navToProfileTag = navToProfile,
+                    instance = post.author.instance
                 )
 
                 if (post.poll != null) PollDisplay(poll = post.poll) { onVotePoll(it) }
 
                 if (post.quote != null) PostPreview(
                     modifier = Modifier
-	                    .fillMaxWidth()
-	                    .padding(top = 4.dp),
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
                     post = post.quote,
                     navToPost = navToPost,
                     navToProfile = navToProfile

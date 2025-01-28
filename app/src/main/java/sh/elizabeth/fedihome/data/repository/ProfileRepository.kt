@@ -45,6 +45,8 @@ class ProfileRepository @Inject constructor(
 
 	fun getProfileFlow(profileId: String) = profileLocalDataSource.getById(profileId)
 
+	fun getProfileByTagFlow(profileTag: String) = profileLocalDataSource.getByTag(profileTag)
+
 	suspend fun fetchProfile(
 		activeAccount: String,
 		profileId: String,
@@ -57,6 +59,36 @@ class ProfileRepository @Inject constructor(
 			instanceType = instanceData.instanceType,
 			token = instanceData.token,
 			profileId = profileId.split('@').first()
+		)
+		val emojiRefs = profileRes.emojis.values.map {
+			ProfileEmojiCrossRef(
+				profileId = profileRes.id, emojiId = it.fullEmojiId
+			)
+		}
+
+		coroutineScope {
+			val emojiRef =
+				async { emojiLocalDataSource.insertOrReplace(*profileRes.emojis.values.toTypedArray()) }
+			val profileRef = async { profileLocalDataSource.insertOrReplace(profileRes) }
+
+			awaitAll(emojiRef, profileRef)
+
+			profileLocalDataSource.insertOrReplaceEmojiCrossRef(*emojiRefs.toTypedArray())
+		}
+	}
+
+	suspend fun fetchProfileByTag(
+		activeAccount: String,
+		profileTag: String,
+	) {
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
+
+		val profileRes = profileRemoteDataSource.fetchProfileByTag(
+			instance = instanceData.instance,
+			endpoint = instanceData.endpoint,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			profileTag = profileTag
 		)
 		val emojiRefs = profileRes.emojis.values.map {
 			ProfileEmojiCrossRef(

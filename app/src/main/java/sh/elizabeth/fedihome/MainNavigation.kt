@@ -7,16 +7,21 @@ import kotlinx.serialization.Serializable
 object MainDestinations {
 	@Serializable
 	object DASHBOARD
+
 	@Serializable
 	object LOGIN_OAUTH
+
 	@Serializable
 	object LOGIN_NOTIFICATIONS
+
 	@Serializable
 	data class COMPOSE(val replyTo: String? = null)
+
 	@Serializable
 	data class POST(val postId: String)
+
 	@Serializable
-	data class PROFILE(val profileId: String)
+	data class PROFILE(val profileTag: String)
 }
 
 class MainNavigationActions(private val navController: NavHostController) {
@@ -56,9 +61,9 @@ class MainNavigationActions(private val navController: NavHostController) {
 		}
 	}
 
-	fun navigateToProfile(profileId: String) {
+	fun navigateToProfileByTag(profileTag: String) {
 		navController.navigate(
-			MainDestinations.PROFILE(profileId)
+			MainDestinations.PROFILE(profileTag = profileTag)
 		) {
 			launchSingleTop = false
 			restoreState = true

@@ -126,11 +126,12 @@ fun ProfilePreview(modifier: Modifier = Modifier, profile: Profile) {
 					verticalArrangement = Arrangement.spacedBy(12.dp),
 				) {
 					Column {
-						TextWithEmoji(
+						EnrichedText(
 							text = profile.name ?: "",
 							emojis = profile.emojis,
 							emojiSize = 30.sp,
-							style = MaterialTheme.typography.headlineSmall
+							style = MaterialTheme.typography.headlineSmall,
+							allowClickable = false
 						)
 						Text(
 							"@${profile.username}", style = MaterialTheme.typography.bodyLarge.copy(
@@ -140,7 +141,7 @@ fun ProfilePreview(modifier: Modifier = Modifier, profile: Profile) {
 							)
 						)
 					}
-					if (!profile.description.isNullOrBlank()) TextWithEmoji(
+					if (!profile.description.isNullOrBlank()) EnrichedText(
 						text = profile.description,
 						emojis = profile.emojis,
 						style = MaterialTheme.typography.bodyLarge,

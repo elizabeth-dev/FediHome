@@ -7,6 +7,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import sh.elizabeth.fedihome.api.iceshrimp.model.SelectUserByTagRequest
 import sh.elizabeth.fedihome.api.iceshrimp.model.SelectUserRequest
 import sh.elizabeth.fedihome.api.iceshrimp.model.UserDetailedNotMe
 import javax.inject.Inject
@@ -21,4 +22,19 @@ class ProfileIceshrimpApi @Inject constructor(private val httpClient: HttpClient
 		bearerAuth(token)
 		setBody(SelectUserRequest(profileId.split('@').first()))
 	}.body()
+
+	suspend fun fetchProfileByTag(
+		endpoint: String,
+		token: String,
+		profileTag: String,
+	): UserDetailedNotMe =
+		httpClient.post("https://$endpoint/api/users/search-by-username-and-host") {
+			contentType(ContentType.Application.Json)
+			bearerAuth(token)
+			setBody(
+				SelectUserByTagRequest(
+					username = profileTag.split('@').first(), host = profileTag.split('@').last()
+				)
+			)
+		}.body()
 }

@@ -48,12 +48,16 @@ fun PostPreview(
 			Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-			SlimProfileSummary(profile = post.author, onClick = { navToProfile(post.author.id) })
-			if (!post.text.isNullOrBlank()) TextWithEmoji(
+			SlimProfileSummary(
+				profile = post.author,
+				onClick = { navToProfile(post.author.username) })
+			if (!post.text.isNullOrBlank()) EnrichedText(
 				text = post.text,
 				emojis = post.emojis,
 				emojiSize = 21.sp,
 				style = MaterialTheme.typography.bodyMedium,
+				navToProfileTag = navToProfile,
+				instance = post.author.instance
 			)
 			if (post.poll != null) AssistChip(
 				onClick = {},

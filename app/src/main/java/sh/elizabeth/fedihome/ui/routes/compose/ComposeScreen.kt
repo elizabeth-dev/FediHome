@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.Reply
@@ -20,14 +18,17 @@ import androidx.compose.material.icons.outlined.Poll
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,156 +50,157 @@ import sh.elizabeth.fedihome.ui.composable.SlimProfileSummary
 import sh.elizabeth.fedihome.ui.composable.TopDisclaimer
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposeScreen(
-    uiState: ComposeUiState,
-    onSendPost: (String, String?) -> Unit,
-    onClose: () -> Unit,
-    onSwitchActiveProfile: (profileId: String) -> Unit,
+	uiState: ComposeUiState,
+	onSendPost: (String, String?) -> Unit,
+	onClose: () -> Unit,
+	onSwitchActiveProfile: (profileId: String) -> Unit,
 ) {
-    val (postText, setPostText) = remember { mutableStateOf("") }
-    val (contentWarning, setContentWarning) = remember { mutableStateOf("") }
-    val (isCWVisible, setCWVisible) = remember { mutableStateOf(false) }
+	val (postText, setPostText) = remember { mutableStateOf("") }
+	val (contentWarning, setContentWarning) = remember { mutableStateOf("") }
+	val (isCWVisible, setCWVisible) = remember { mutableStateOf(false) }
 
-    val postFocus = remember { FocusRequester() }
-    val cwFocus = remember { FocusRequester() }
+	val postFocus = remember { FocusRequester() }
+	val cwFocus = remember { FocusRequester() }
 
-    var showAccountPicker by remember { mutableStateOf(false) }
+	var showAccountPicker by remember { mutableStateOf(false) }
 
-    // FIXME: activeAccount might not be cached?
-    val activeProfile = uiState.loggedInProfiles.find { it.id == uiState.activeAccount }
+	// FIXME: activeAccount might not be cached?
+	val activeProfile = uiState.loggedInProfiles.find { it.id == uiState.activeAccount }
 
-    LaunchedEffect(Unit) {
-        postFocus.requestFocus()
-    }
+	LaunchedEffect(Unit) {
+		postFocus.requestFocus()
+	}
 
-    LaunchedEffect(isCWVisible) {
-        if (isCWVisible) cwFocus.requestFocus()
-    }
+	LaunchedEffect(isCWVisible) {
+		if (isCWVisible) cwFocus.requestFocus()
+	}
 
-    Surface(
-	    Modifier
-		    .fillMaxSize()
-		    .statusBarsPadding()
-		    .navigationBarsPadding()
-		    .imePadding()
-    ) {
-        Column {
-            Surface(
-                modifier = Modifier
-	                .padding(bottom = 8.dp)
-	                .fillMaxWidth(), tonalElevation = 6.dp
-            ) {
-                Row(
-                    Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    IconButton(onClick = onClose) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Close")
-                    }
+	Scaffold(topBar = {
+		Surface(
+			modifier = Modifier
+				.windowInsetsPadding(TopAppBarDefaults.windowInsets)
+				.fillMaxWidth(),
+		) {
+			Row(
+				Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
+				horizontalArrangement = Arrangement.End
+			) {
+				IconButton(onClick = onClose) {
+					Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Close")
+				}
 
-                    Spacer(modifier = Modifier.weight(1f))
+				Spacer(modifier = Modifier.weight(1f))
 
-                    Button(onClick = {
-                        onSendPost(
-                            postText, if (isCWVisible) contentWarning else null
-                        )
-                    }) {
-                        Text("Send")
-                    }
-                }
-                HorizontalDivider(thickness = Dp.Hairline)
-            }
+				Button(onClick = {
+					onSendPost(
+						postText, if (isCWVisible) contentWarning else null
+					)
+				}) {
+					Text("Send")
+				}
+			}
+		}
 
-            if (uiState.replyTo != null) TopDisclaimer(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                icon = Icons.AutoMirrored.Outlined.Reply,
-                iconDescription = "Reply",
-                text = "Replying to ${uiState.replyTo.author.name}"
-            )
+	}) { contentPadding ->
+		Column(
+			Modifier
+				.fillMaxSize()
+				.padding(contentPadding)
+		) {
+			if (uiState.replyTo != null) TopDisclaimer(
+				modifier = Modifier.padding(horizontal = 16.dp),
+				icon = Icons.AutoMirrored.Outlined.Reply,
+				iconDescription = "Reply",
+				text = "Replying to ${uiState.replyTo.author.name}"
+			)
 
-            if (activeProfile != null) SlimProfileSummary(
-                profile = activeProfile,
-                onClick = { if (uiState.loggedInProfiles.size > 1) showAccountPicker = true },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+			if (activeProfile != null) SlimProfileSummary(
+				profile = activeProfile,
+				onClick = { if (uiState.loggedInProfiles.size > 1) showAccountPicker = true },
+				modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+			)
 
-            AnimatedVisibility(visible = isCWVisible) {
-                TextField(
-                    modifier = Modifier
-	                    .fillMaxWidth()
-	                    .focusRequester(cwFocus),
-                    value = contentWarning,
-                    onValueChange = { setContentWarning(it) },
-                    placeholder = { Text("Content warning") },
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                    ),
-                    shape = RectangleShape
-                )
-            }
-            if (isCWVisible) HorizontalDivider(thickness = 1.dp)
+			AnimatedVisibility(visible = isCWVisible) {
+				TextField(
+					modifier = Modifier
+						.fillMaxWidth()
+						.focusRequester(cwFocus),
+					value = contentWarning,
+					onValueChange = { setContentWarning(it) },
+					placeholder = { Text("Content warning") },
+					colors = TextFieldDefaults.colors(
+						focusedContainerColor = MaterialTheme.colorScheme.surface,
+						unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+						focusedIndicatorColor = Color.Transparent,
+						unfocusedIndicatorColor = Color.Transparent,
+					),
+					shape = RectangleShape
+				)
+			}
+			if (isCWVisible) HorizontalDivider(thickness = 1.dp)
 
-            TextField(
-                modifier = Modifier
-	                .fillMaxWidth()
-	                .weight(1f)
-	                .focusRequester(postFocus),
-                value = postText,
-                onValueChange = { setPostText(it) },
-                placeholder = { Text("Type what's on your mind") },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                )
-            )
+			TextField(
+				modifier = Modifier
+					.fillMaxWidth()
+					.weight(1f)
+					.focusRequester(postFocus),
+				value = postText,
+				onValueChange = { setPostText(it) },
+				placeholder = { Text("Type what's on your mind") },
+				colors = TextFieldDefaults.colors(
+					focusedContainerColor = MaterialTheme.colorScheme.surface,
+					unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+					focusedIndicatorColor = Color.Transparent,
+					unfocusedIndicatorColor = Color.Transparent,
+				)
+			)
 
-            HorizontalDivider(thickness = Dp.Hairline)
-            Surface(modifier = Modifier.fillMaxWidth(), tonalElevation = 6.dp) {
-                Row(
-                    Modifier.padding(4.dp),
-                ) {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Outlined.Image, contentDescription = "Add media")
-                    }
-                    IconButton(onClick = { setCWVisible(!isCWVisible) }) {
-                        Icon(
-                            if (isCWVisible) Icons.Rounded.Warning else Icons.Rounded.WarningAmber,
-                            contentDescription = "Add content warning"
-                        )
-                    }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Outlined.Poll, contentDescription = "Add poll")
-                    }
-                }
-            }
+			HorizontalDivider(thickness = Dp.Hairline)
+			Surface(modifier = Modifier.fillMaxWidth(), tonalElevation = 6.dp) {
+				Row(
+					Modifier.padding(4.dp),
+				) {
+					IconButton(onClick = { /*TODO*/ }) {
+						Icon(Icons.Outlined.Image, contentDescription = "Add media")
+					}
+					IconButton(onClick = { setCWVisible(!isCWVisible) }) {
+						Icon(
+							if (isCWVisible) Icons.Rounded.Warning else Icons.Rounded.WarningAmber,
+							contentDescription = "Add content warning"
+						)
+					}
+					IconButton(onClick = { /*TODO*/ }) {
+						Icon(Icons.Outlined.Poll, contentDescription = "Add poll")
+					}
+				}
+			}
 
-            AccountPicker(isVisible = showAccountPicker,
-                profiles = uiState.loggedInProfiles,
-                activeProfileId = uiState.activeAccount,
-                canAddProfile = false,
-                onSwitch = onSwitchActiveProfile,
-                onAddProfile = {},
-                onDismiss = { showAccountPicker = false })
-        }
-    }
+			AccountPicker(
+				isVisible = showAccountPicker,
+				profiles = uiState.loggedInProfiles,
+				activeProfileId = uiState.activeAccount,
+				canAddProfile = false,
+				onSwitch = onSwitchActiveProfile,
+				onAddProfile = {},
+				onDismiss = { showAccountPicker = false })
+		}
+	}
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Preview
 @Composable
 fun ComposeScreenPreview() {
-    FediHomeTheme {
-        ComposeScreen(uiState = ComposeUiState(
-            activeAccount = defaultProfile.id,
-            loggedInProfiles = listOf(defaultProfile),
-            isReply = true,
-            replyTo = defaultPost
-        ), onSendPost = { _, _ -> }, onClose = {}, onSwitchActiveProfile = {})
-    }
+	FediHomeTheme {
+		ComposeScreen(
+			uiState = ComposeUiState(
+				activeAccount = defaultProfile.id,
+				loggedInProfiles = listOf(defaultProfile),
+				isReply = true,
+				replyTo = defaultPost
+			), onSendPost = { _, _ -> }, onClose = {}, onSwitchActiveProfile = {})
+	}
 }

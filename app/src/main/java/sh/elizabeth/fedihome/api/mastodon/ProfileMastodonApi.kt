@@ -10,4 +10,11 @@ import javax.inject.Inject
 class ProfileMastodonApi @Inject constructor(private val httpClient: HttpClient) {
 	suspend fun fetchProfile(endpoint: String, token: String, profileId: String): Profile =
 		httpClient.get("https://$endpoint/api/v1/accounts/$profileId") { bearerAuth(token) }.body()
+
+	suspend fun fetchProfileByTag(endpoint: String, token: String, profileTag: String): Profile =
+		httpClient.get("https://$endpoint/api/v1/accounts/lookup?acct=$profileTag") {
+			bearerAuth(
+				token
+			)
+		}.body()
 }

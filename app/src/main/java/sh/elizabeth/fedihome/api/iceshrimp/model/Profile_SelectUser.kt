@@ -6,3 +6,13 @@ import kotlinx.serialization.Serializable
 data class SelectUserRequest(
 	val userId: String,
 )
+
+@Serializable
+data class SelectUserByTagRequest(
+	val username: String,
+	val host: String,
+	val limit: Int = 1,
+	// Unneeded, missing in Sharkey
+//	val maxDaysSinceActive: Int? = null,
+	val detail: Boolean = true,
+)

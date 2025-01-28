@@ -41,6 +41,19 @@ class ProfileLocalDataSource @Inject constructor(private val appDatabase: AppDat
 				it.toDomain(profileEmojis)
 			}
 
+	fun getByTag(profileTag: String): Flow<Profile?> =
+		appDatabase.profileQueries.getProfileByTag(profileTag).asFlow()
+			.mapToOneOrNull(Dispatchers.IO)
+			.map {
+				if (it == null) return@map null
+
+				// TODO: see if we can incorporate emojis in main query
+				val profileEmojis =
+					appDatabase.profileQueries.getEmojisForProfiles(listOf(it.profileId))
+						.executeAsList()
+				it.toDomain(profileEmojis)
+			}
+
 	fun getMultipleById(profileIds: List<String>): Flow<List<Profile>> =
 		appDatabase.profileQueries.getMultipleProfilesByIds(profileIds).asFlow()
 			.mapToList(Dispatchers.IO).map {

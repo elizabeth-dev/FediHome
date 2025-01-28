@@ -36,4 +36,26 @@ class ProfileRemoteDataSource @Inject constructor(
 			endpoint = endpoint, token = token, profileId = profileId
 		).toDomain(instance)
 	}
+
+	suspend fun fetchProfileByTag(
+		instance: String,
+		endpoint: String,
+		instanceType: SupportedInstances,
+		token: String,
+		profileTag: String,
+	): Profile = when (instanceType) {
+		SupportedInstances.ICESHRIMP -> profileIceshrimpApi.fetchProfileByTag(
+			endpoint = endpoint, token = token, profileTag = profileTag
+		).toDomain(instance)
+
+		SupportedInstances.SHARKEY -> profileSharkeyApi.fetchProfileByTag(
+			endpoint = endpoint, token = token, profileTag = profileTag
+		).toDomain(instance)
+
+		SupportedInstances.GLITCH,
+		SupportedInstances.MASTODON,
+			-> profileMastodonApi.fetchProfileByTag(
+			endpoint = endpoint, token = token, profileTag = profileTag
+		).toDomain(instance)
+	}
 }

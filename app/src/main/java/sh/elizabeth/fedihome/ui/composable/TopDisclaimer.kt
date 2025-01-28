@@ -42,12 +42,13 @@ fun TopDisclaimer(
 				contentDescription = iconDescription,
 				modifier = Modifier.size(20.dp)
 			)
-			TextWithEmoji(
+			EnrichedText(
 				text = text,
 				emojis = emojis,
 				emojiSize = 21.sp,
 				style = MaterialTheme.typography.bodyMedium,
-				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+				allowClickable = false
 			)
 		}
 	}
