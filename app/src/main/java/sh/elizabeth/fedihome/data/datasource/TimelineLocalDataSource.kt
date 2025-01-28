@@ -20,11 +20,17 @@ class TimelineLocalDataSource @Inject constructor(private val appDatabase: AppDa
 	}
 
 	fun getTimelinePosts(profileIdentifier: String): Flow<List<Post>> =
-		appDatabase.timelinePostQueries.getTimelinePosts(profileIdentifier)
-			.asFlow()
-			.mapToList(Dispatchers.IO)
-			.map { posts ->
-				posts.map { it.toPostDomain() }
+		appDatabase.timelinePostQueries.getTimelinePosts(profileIdentifier).asFlow()
+			.mapToList(Dispatchers.IO).map {
+				val postIds = it.flatMap { listOf(it.postId, it.postId_) }
+				val profileIds = it.flatMap { listOf(it.profileId, it.profileId_) }
+
+				// TODO: see if we can incorporate emojis in main query
+				val postEmojis = appDatabase.postQueries.getEmojisForPosts(postIds).executeAsList()
+				val profileEmojis =
+					appDatabase.profileQueries.getEmojisForProfiles(profileIds).executeAsList()
+
+				it.map { it.toPostDomain(postEmojis.plus(profileEmojis)) }
 			}
 }
 

@@ -48,3 +48,11 @@ LEFT JOIN ProfileEntity AS QuoteProfile ON Quote.authorId = QuoteProfile.profile
 
 WHERE PostEntity.authorId = ?
 ORDER BY PostEntity.createdAt DESC;
+
+getEmojisForPosts:
+SELECT EmojiEntity.* FROM PostEmojiCrossRef
+
+JOIN EmojiEntity ON PostEmojiCrossRef.emojiId = EmojiEntity.emojiId
+
+WHERE PostEmojiCrossRef.postId IN ?;
+

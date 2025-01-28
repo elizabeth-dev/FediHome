@@ -15,7 +15,7 @@ plugins {
 android {
 	namespace = "sh.elizabeth.fedihome"
 	compileSdk = 35
-	buildToolsVersion = "34.0.0"
+	buildToolsVersion = "35.0.0"
 	ndkVersion = "26.1.10909125"
 
 	defaultConfig {
@@ -175,8 +175,8 @@ dependencies {
 	implementation("com.vanniktech:blurhash:0.3.0")
 
 	// SQLDelight
-	implementation("app.cash.sqldelight:android-driver:2.0.2")
-	implementation("app.cash.sqldelight:coroutines-extensions:2.0.2")
+	implementation("app.cash.sqldelight:android-driver:2.0.1")
+	implementation("app.cash.sqldelight:coroutines-extensions:2.0.1")
 	implementation("com.google.code.gson:gson:2.11.0")
 
 	// Firebase

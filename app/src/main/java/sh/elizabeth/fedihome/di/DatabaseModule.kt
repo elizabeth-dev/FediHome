@@ -33,22 +33,20 @@ val pollEntityAdapter = object : ColumnAdapter<PollEntity, String> {
 	}
 }
 
-val profileFieldEntityListAdapter =
-	object : ColumnAdapter<List<ProfileFieldEntity>, String> {
-		override fun decode(databaseValue: String): List<ProfileFieldEntity> {
-			val type = object : TypeToken<List<ProfileFieldEntity>>() {}.type
-			return Gson().fromJson(databaseValue, type)
-		}
-
-		override fun encode(value: List<ProfileFieldEntity>): String {
-			val type = object : TypeToken<List<ProfileFieldEntity>>() {}.type
-			return Gson().toJson(value, type)
-		}
+val profileFieldEntityListAdapter = object : ColumnAdapter<List<ProfileFieldEntity>, String> {
+	override fun decode(databaseValue: String): List<ProfileFieldEntity> {
+		val type = object : TypeToken<List<ProfileFieldEntity>>() {}.type
+		return Gson().fromJson(databaseValue, type)
 	}
 
+	override fun encode(value: List<ProfileFieldEntity>): String {
+		val type = object : TypeToken<List<ProfileFieldEntity>>() {}.type
+		return Gson().toJson(value, type)
+	}
+}
+
 val instantAdapter = object : ColumnAdapter<Instant, Long> {
-	override fun decode(databaseValue: Long): Instant =
-		Instant.ofEpochMilli(databaseValue)
+	override fun decode(databaseValue: Long): Instant = Instant.ofEpochMilli(databaseValue)
 
 	override fun encode(value: Instant): Long = value.toEpochMilli()
 }
@@ -61,7 +59,8 @@ object DatabaseModule {
 	fun provideAppDatabase(
 		@ApplicationContext context: Context,
 	): AppDatabase = AppDatabase(
-		driver = AndroidSqliteDriver(schema = AppDatabase.Schema,
+		driver = AndroidSqliteDriver(
+			schema = AppDatabase.Schema,
 			context = context,
 			name = "app-database",
 			callback = object : AndroidSqliteDriver.Callback(
@@ -82,8 +81,7 @@ object DatabaseModule {
 			createdAtAdapter = instantAdapter,
 			updatedAtAdapter = instantAdapter
 		), ProfileEntityAdapter = ProfileEntity.Adapter(
-			fieldsAdapter = profileFieldEntityListAdapter,
-			createdAtAdapter = instantAdapter
-		)
+			fieldsAdapter = profileFieldEntityListAdapter, createdAtAdapter = instantAdapter
+		),
 	)
 }

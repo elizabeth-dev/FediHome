@@ -1,6 +1,5 @@
 package sh.elizabeth.fedihome.ui.composable
 
-import android.text.Html
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -38,9 +37,6 @@ fun TextWithEmoji(
 	val _emojiSize = with(LocalDensity.current) {
 		emojiSize.toDp()
 	}
-
-	Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
-
 
 	Text(
 		text = buildAnnotatedString {

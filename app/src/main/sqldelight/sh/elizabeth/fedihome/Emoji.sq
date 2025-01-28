@@ -1,8 +1,8 @@
 CREATE TABLE EmojiEntity (
-    emojiId TEXT PRIMARY KEY,
-    instance TEXT,
-    shortcode TEXT,
-    url TEXT
+    emojiId TEXT PRIMARY KEY NOT NULL ,
+    instance TEXT NOT NULL,
+    shortcode TEXT NOT NULL,
+    url TEXT NOT NULL
 );
 
 insertOrReplace:

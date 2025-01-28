@@ -16,9 +16,9 @@ import javax.inject.Inject
 
 class ProfileLocalDataSource @Inject constructor(private val appDatabase: AppDatabase) {
 	fun insertOrReplace(vararg profiles: Profile) {
-			profiles.forEach { profile ->
-				appDatabase.profileQueries.insertOrReplace(profile.toEntity())
-			}
+		profiles.forEach { profile ->
+			appDatabase.profileQueries.insertOrReplace(profile.toEntity())
+		}
 	}
 
 	fun insertOrReplaceEmojiCrossRef(
@@ -30,16 +30,26 @@ class ProfileLocalDataSource @Inject constructor(private val appDatabase: AppDat
 	}
 
 	fun getById(profileId: String): Flow<Profile?> =
-		appDatabase.profileQueries.getProfileById(profileId)
-			.asFlow()
-			.mapToOneOrNull(Dispatchers.IO)
-			.map { it?.toDomain() }
+		appDatabase.profileQueries.getProfileById(profileId).asFlow().mapToOneOrNull(Dispatchers.IO)
+			.map {
+				if (it == null) return@map null
+
+				// TODO: see if we can incorporate emojis in main query
+				val profileEmojis =
+					appDatabase.profileQueries.getEmojisForProfiles(listOf(it.profileId))
+						.executeAsList()
+				it.toDomain(profileEmojis)
+			}
 
 	fun getMultipleById(profileIds: List<String>): Flow<List<Profile>> =
-		appDatabase.profileQueries.getMultipleProfilesByIds(profileIds)
-			.asFlow()
-			.mapToList(Dispatchers.IO)
-			.map { profiles -> profiles.map { it.toDomain() } }
+		appDatabase.profileQueries.getMultipleProfilesByIds(profileIds).asFlow()
+			.mapToList(Dispatchers.IO).map {
+				// TODO: see if we can incorporate emojis in main query
+				val profileEmojis =
+					appDatabase.profileQueries.getEmojisForProfiles(it.map { it.profileId })
+						.executeAsList()
+				it.map { it.toDomain(profileEmojis) }
+			}
 }
 
 fun Profile.toEntity() = ProfileEntity(

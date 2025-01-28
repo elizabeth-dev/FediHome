@@ -20,8 +20,8 @@ CREATE TABLE ProfileEntity (
 );
 
 CREATE TABLE ProfileEmojiCrossRef (
-	profileId TEXT NOT NULL,
-	emojiId TEXT NOT NULL,
+	profileId TEXT,
+	emojiId TEXT,
 	PRIMARY KEY(profileId, emojiId),
 	FOREIGN KEY(profileId) REFERENCES ProfileEntity(profileId),
 	FOREIGN KEY(emojiId) REFERENCES EmojiEntity(emojiId)
@@ -40,3 +40,10 @@ SELECT * FROM ProfileEntity WHERE profileId = ?;
 
 getMultipleProfilesByIds:
 SELECT * FROM ProfileEntity WHERE profileId IN ?;
+
+getEmojisForProfiles:
+SELECT EmojiEntity.* FROM ProfileEmojiCrossRef
+
+JOIN EmojiEntity ON ProfileEmojiCrossRef.emojiId = EmojiEntity.emojiId
+
+WHERE ProfileEmojiCrossRef.profileId IN ?;
