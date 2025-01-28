@@ -37,8 +37,7 @@ fun ProfileScreen(
 	navToProfile: (String) -> Unit,
 ) {
 	val pullRefreshState = rememberPullRefreshState(
-		uiState.isLoading,
-		{
+		uiState.isLoading, {
 			onRefresh(
 				uiState.activeAccount,
 				uiState.profileTag,
@@ -68,7 +67,7 @@ fun ProfileScreen(
 			is ProfileUiState.HasProfile -> LazyColumn(Modifier.fillMaxSize()) {
 
 				item {
-					ProfileHeader(profile = uiState.profile)
+					ProfileHeader(profile = uiState.profile, navToProfile = navToProfile)
 					HorizontalDivider(thickness = 1.dp)
 				}
 

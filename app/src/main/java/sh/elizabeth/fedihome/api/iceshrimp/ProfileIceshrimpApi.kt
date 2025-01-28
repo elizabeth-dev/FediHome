@@ -27,7 +27,7 @@ class ProfileIceshrimpApi @Inject constructor(private val httpClient: HttpClient
 		endpoint: String,
 		token: String,
 		profileTag: String,
-	): UserDetailedNotMe =
+	): List<UserDetailedNotMe> =
 		httpClient.post("https://$endpoint/api/users/search-by-username-and-host") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
@@ -36,5 +36,5 @@ class ProfileIceshrimpApi @Inject constructor(private val httpClient: HttpClient
 					username = profileTag.split('@').first(), host = profileTag.split('@').last()
 				)
 			)
-		}.body()
+		}.body<List<UserDetailedNotMe>>()
 }

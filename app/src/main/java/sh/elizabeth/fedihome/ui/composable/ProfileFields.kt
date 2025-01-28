@@ -19,7 +19,11 @@ import sh.elizabeth.fedihome.model.ProfileField
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 
 @Composable
-fun ProfileFields(fields: List<ProfileField>) {
+fun ProfileFields(
+	fields: List<ProfileField>,
+	instance: String,
+	navToProfile: (profileTag: String) -> Unit
+) {
 	Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
 		fields.forEach { field ->
 			Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -30,12 +34,13 @@ fun ProfileFields(fields: List<ProfileField>) {
 						.weight(1f)
 						.padding(end = 4.dp)
 				)
-				Text(
+				EnrichedText(
 					text = field.value,
 					style = MaterialTheme.typography.bodyLarge,
-					maxLines = 1,
 					modifier = Modifier.weight(2f),
-					overflow = TextOverflow.Ellipsis
+					overflow = TextOverflow.Ellipsis,
+					navToProfileTag = navToProfile,
+					instance = instance,
 				)
 			}
 		}
@@ -57,8 +62,9 @@ fun ProfileFieldsPreview() {
 					ProfileField("Location", "The Moon"),
 					ProfileField("Website", "https://example.com"),
 					ProfileField("Foo", "Bar"),
-				)
-
+				),
+				instance = "foo",
+				navToProfile = {}
 			)
 		}
 	}

@@ -46,11 +46,11 @@ class ProfileRemoteDataSource @Inject constructor(
 	): Profile = when (instanceType) {
 		SupportedInstances.ICESHRIMP -> profileIceshrimpApi.fetchProfileByTag(
 			endpoint = endpoint, token = token, profileTag = profileTag
-		).toDomain(instance)
+		).first().toDomain(instance)
 
 		SupportedInstances.SHARKEY -> profileSharkeyApi.fetchProfileByTag(
 			endpoint = endpoint, token = token, profileTag = profileTag
-		).toDomain(instance)
+		).first().toDomain(instance)
 
 		SupportedInstances.GLITCH,
 		SupportedInstances.MASTODON,

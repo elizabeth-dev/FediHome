@@ -48,7 +48,7 @@ private val AVATAR_SIZE = 72.dp
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun ProfileHeader(profile: Profile) {
+fun ProfileHeader(profile: Profile, navToProfile: (profileTag: String) -> Unit) {
 	val resources = LocalContext.current.resources
 
 	Surface(
@@ -138,11 +138,17 @@ fun ProfileHeader(profile: Profile) {
 						text = profile.description,
 						emojis = profile.emojis,
 						style = MaterialTheme.typography.bodyLarge,
+						instance = profile.instance,
+						navToProfileTag = navToProfile
 					)
 
 					if (profile.fields.isNotEmpty()) {
 						HorizontalDivider(thickness = 1.dp)
-						ProfileFields(profile.fields)
+						ProfileFields(
+							profile.fields,
+							instance = profile.instance,
+							navToProfile = navToProfile
+						)
 					}
 
 					Row(
@@ -184,7 +190,8 @@ fun ProfileHeader(profile: Profile) {
 fun ProfileHeaderPreview() {
 	FediHomeTheme {
 		ProfileHeader(
-			profile = defaultProfile
+			profile = defaultProfile,
+			navToProfile = {}
 		)
 	}
 }
