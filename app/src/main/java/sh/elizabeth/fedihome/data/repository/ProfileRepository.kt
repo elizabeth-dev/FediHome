@@ -36,6 +36,10 @@ class ProfileRepository @Inject constructor(
 		profileLocalDataSource.insertOrReplace(*profiles)
 	}
 
+	fun insert(vararg profiles: Profile) {
+		profileLocalDataSource.insert(*profiles)
+	}
+
 	fun insertOrReplaceEmojiCrossRef(vararg refs: ProfileEmojiCrossRef) {
 		profileLocalDataSource.insertOrReplaceEmojiCrossRef(*refs)
 	}

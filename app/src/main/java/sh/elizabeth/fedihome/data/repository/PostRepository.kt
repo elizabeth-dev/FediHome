@@ -147,7 +147,7 @@ class PostRepository @Inject constructor(
 				emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray())
 			}
 
-			profileRepository.insertOrReplace(*profiles.toTypedArray())
+			profileRepository.insert(*profiles.toTypedArray())
 			insertOrReplace(*posts.toTypedArray())
 
 			emojiRef.await()

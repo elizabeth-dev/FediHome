@@ -3,7 +3,7 @@ import kotlin.collections.List;
 import sh.elizabeth.fedihome.data.database.entity.ProfileFieldEntity;
 
 CREATE TABLE ProfileEntity (
-    profileId TEXT PRIMARY KEY NOT NULL,
+    profileId TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE,
     name TEXT,
     username TEXT NOT NULL UNIQUE ON CONFLICT REPLACE,
     instance TEXT NOT NULL,
@@ -31,6 +31,9 @@ CREATE INDEX profile_username ON ProfileEntity (username);
 
 insertOrReplace:
 INSERT OR REPLACE INTO ProfileEntity VALUES ?;
+
+insert:
+INSERT OR IGNORE INTO ProfileEntity VALUES ?;
 
 insertOrReplaceProfileEmojiCrossRef:
 INSERT OR REPLACE INTO ProfileEmojiCrossRef VALUES ?;

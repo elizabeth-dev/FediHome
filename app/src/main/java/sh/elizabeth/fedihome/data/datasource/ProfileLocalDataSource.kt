@@ -21,6 +21,12 @@ class ProfileLocalDataSource @Inject constructor(private val appDatabase: AppDat
 		}
 	}
 
+	fun insert(vararg profiles: Profile) {
+		profiles.forEach { profile ->
+			appDatabase.profileQueries.insert(profile.toEntity())
+		}
+	}
+
 	fun insertOrReplaceEmojiCrossRef(
 		vararg refs: ProfileEmojiCrossRef,
 	) = appDatabase.profileQueries.transaction {
