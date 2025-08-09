@@ -83,9 +83,6 @@ fun EmbeddedNotificationContext(notification: Notification) {
 @Composable
 fun NotificationCard(
 	notification: Notification,
-	navToPost: (postId: String) -> Unit,
-	navToProfile: (profileId: String) -> Unit,
-	onReply: (String) -> Unit,
 	onVotePoll: (choices: List<Int>) -> Unit,
 	onAddFavorite: (postId: String) -> Unit = {},
 	onRemoveReaction: (postId: String) -> Unit = {},
@@ -113,16 +110,11 @@ fun NotificationCard(
 			PostPreview(
 				modifier = Modifier.fillMaxWidth(),
 				post = notification.post!!,
-				navToPost = navToPost,
-				navToProfile = navToProfile
 			)
 		} else if (notification.post != null) {
 			SlimPostCard(
 				post = notification.post,
-				onReply = onReply,
 				onVotePoll = onVotePoll,
-				navToPost = navToPost,
-				navToProfile = navToProfile,
 				showDivider = false,
 				onAddFavorite = onAddFavorite,
 				onRemoveReaction = onRemoveReaction,
@@ -145,7 +137,7 @@ fun NotificationCard(
 @Composable
 fun NotificationCardMentionPreview() {
 	FediHomeTheme {
-		NotificationCard(mentionNotification, {}, {}, {}, {}, {}, {}, { _, _ -> })
+		NotificationCard(mentionNotification, {}, {}, {}, { _, _ -> })
 	}
 }
 
@@ -153,7 +145,7 @@ fun NotificationCardMentionPreview() {
 @Composable
 fun NotificationCardReactionPreview() {
 	FediHomeTheme {
-		NotificationCard(reactionNotification, {}, {}, {}, {}, {}, {}, { _, _ -> })
+		NotificationCard(reactionNotification, {}, {}, {}, { _, _ -> })
 	}
 }
 
@@ -161,6 +153,6 @@ fun NotificationCardReactionPreview() {
 @Composable
 fun NotificationCardFollowPreview() {
 	FediHomeTheme {
-		NotificationCard(followNotification, {}, {}, {}, {}, {}, {}, { _, _ -> })
+		NotificationCard(followNotification, {}, {}, {}, { _, _ -> })
 	}
 }

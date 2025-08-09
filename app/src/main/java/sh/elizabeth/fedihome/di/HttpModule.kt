@@ -33,7 +33,6 @@ object HttpModule {
 			install(HttpTimeout) {
 				socketTimeoutMillis = 60000
 			}
-			developmentMode = true
 
 		}
 }

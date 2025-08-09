@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import sh.elizabeth.fedihome.localNavToProfile
 import sh.elizabeth.fedihome.mock.defaultPost
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
@@ -27,9 +28,10 @@ import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 fun PostPreview(
 	modifier: Modifier = Modifier,
 	post: Post,
-	navToPost: (postId: String) -> Unit,
-	navToProfile: (profileId: String) -> Unit,
 ) {
+	val navToProfile = localNavToProfile.current
+	val navToPost = localNavToProfile.current
+
 	Surface(
 		modifier = modifier.border(
 			1.dp,
@@ -49,14 +51,12 @@ fun PostPreview(
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			SlimProfileSummary(
-				profile = post.author,
-				onClick = { navToProfile(post.author.username) })
+				profile = post.author, onClick = { navToProfile(post.author.username) })
 			if (!post.text.isNullOrBlank()) EnrichedText(
 				text = post.text,
 				emojis = post.emojis,
 				emojiSize = 21.sp,
 				style = MaterialTheme.typography.bodyMedium,
-				navToProfileTag = navToProfile,
 				instance = post.author.instance
 			)
 			if (post.poll != null) AssistChip(
@@ -89,8 +89,6 @@ fun PostPreviewPreview() {
 				.padding(8.dp)
 				.fillMaxWidth(),
 			post = defaultPost,
-			navToPost = {},
-			navToProfile = {},
 		)
 	}
 }

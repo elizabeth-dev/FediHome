@@ -22,7 +22,6 @@ import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 fun ProfileFields(
 	fields: List<ProfileField>,
 	instance: String,
-	navToProfile: (profileTag: String) -> Unit
 ) {
 	Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
 		fields.forEach { field ->
@@ -39,7 +38,6 @@ fun ProfileFields(
 					style = MaterialTheme.typography.bodyLarge,
 					modifier = Modifier.weight(2f),
 					overflow = TextOverflow.Ellipsis,
-					navToProfileTag = navToProfile,
 					instance = instance,
 				)
 			}
@@ -62,9 +60,7 @@ fun ProfileFieldsPreview() {
 					ProfileField("Location", "The Moon"),
 					ProfileField("Website", "https://example.com"),
 					ProfileField("Foo", "Bar"),
-				),
-				instance = "foo",
-				navToProfile = {}
+				), instance = "foo"
 			)
 		}
 	}

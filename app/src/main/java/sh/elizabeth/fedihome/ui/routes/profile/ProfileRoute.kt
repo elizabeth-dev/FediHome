@@ -25,11 +25,7 @@ import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 @Composable
 fun ProfileRoute(
 	profileViewModel: ProfileViewModel = hiltViewModel(),
-
 	navBack: () -> Unit,
-	navToCompose: (postId: String) -> Unit,
-	navToPost: (postId: String) -> Unit,
-	navToProfile: (profileTag: String) -> Unit,
 ) {
 	val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -37,10 +33,7 @@ fun ProfileRoute(
 		uiState = uiState,
 		navBack = navBack,
 		onRefresh = profileViewModel::refreshProfile,
-		onReply = navToCompose,
 		onVotePoll = profileViewModel::votePoll,
-		navToPost = navToPost,
-		navToProfile = navToProfile,
 		onAddFavorite = profileViewModel::addFavorite,
 		onRemoveReaction = profileViewModel::removeReaction,
 		onAddReaction = profileViewModel::addReaction,
@@ -53,10 +46,7 @@ fun ProfileRoute(
 	uiState: ProfileUiState,
 	navBack: () -> Unit,
 	onRefresh: (activeAccount: String, profileTag: String, profileId: String?) -> Unit,
-	onReply: (String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	navToPost: (String) -> Unit,
-	navToProfile: (String) -> Unit,
 	onAddFavorite: (String, String) -> Unit,
 	onRemoveReaction: (String, String) -> Unit,
 	onAddReaction: (String, String, String) -> Unit,
@@ -95,10 +85,7 @@ fun ProfileRoute(
 			uiState = uiState,
 			onRefresh = onRefresh,
 			contentPadding = contentPadding,
-			onReply = onReply,
 			onVotePoll = onVotePoll,
-			navToPost = navToPost,
-			navToProfile = navToProfile,
 			onAddReaction = onAddReaction,
 			onAddFavorite = onAddFavorite,
 			onRemoveReaction = onRemoveReaction,
@@ -119,10 +106,7 @@ fun ProfileRoutePreview() {
 		),
 			navBack = {},
 			onRefresh = { _, _, _ -> },
-			onReply = {},
 			onVotePoll = { _, _, _, _ -> },
-			navToPost = {},
-			navToProfile = {},
 			onAddFavorite = { _, _ -> },
 			onRemoveReaction = { _, _ -> },
 			onAddReaction = { _, _, _ -> })

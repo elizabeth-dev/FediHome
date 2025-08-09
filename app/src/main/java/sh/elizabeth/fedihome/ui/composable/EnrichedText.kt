@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.TextUnit
 import coil.compose.AsyncImage
+import sh.elizabeth.fedihome.localNavToProfile
 import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.util.DEFAULT_EMOJI_SIZE
 import java.util.regex.Pattern
@@ -45,10 +46,10 @@ fun EnrichedText(
 	minLines: Int = 1,
 	style: TextStyle = LocalTextStyle.current,
 	color: Color = Color.Unspecified,
-	navToProfileTag: (profileTag: String) -> Unit = {},
 	instance: String? = null,
 	allowClickable: Boolean = true,
 ) {
+	val navToProfileTag = localNavToProfile.current
 	val _emojiSize = with(LocalDensity.current) {
 		emojiSize.toDp()
 	}

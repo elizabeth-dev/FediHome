@@ -1,7 +1,6 @@
 package sh.elizabeth.fedihome.ui.routes.dashboard
 
 import android.content.res.Configuration
-import android.text.Html
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import sh.elizabeth.fedihome.localNavToCompose
 import sh.elizabeth.fedihome.mock.defaultProfile
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.ui.composable.AccountPicker
@@ -37,9 +37,6 @@ fun DashboardRoute(
 	dashboardViewModel: DashboardViewModel = hiltViewModel(),
 	windowSizeClass: WindowSizeClass,
 	navToLogin: () -> Unit,
-	navToCompose: (String?) -> Unit,
-	navToPost: (String) -> Unit,
-	navToProfile: (String) -> Unit,
 ) {
 	val uiState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -50,12 +47,10 @@ fun DashboardRoute(
 			return
 		}
 
-		is DashboardUiState.LoggedIn -> DashboardRoute(windowWidthSizeClass = windowSizeClass.widthSizeClass,
+		is DashboardUiState.LoggedIn -> DashboardRoute(
+			windowWidthSizeClass = windowSizeClass.widthSizeClass,
 			loggedInProfiles = (uiState as DashboardUiState.LoggedIn).loggedInProfiles,
 			activeAccount = (uiState as DashboardUiState.LoggedIn).activeAccount,
-			navToCompose = navToCompose,
-			navToPost = navToPost,
-			navToProfile = navToProfile,
 			navToAddAccount = navToLogin,
 			switchActiveProfile = {
 				dashboardViewModel.switchActiveProfile(
@@ -72,15 +67,12 @@ fun DashboardRoute(
 	windowWidthSizeClass: WindowWidthSizeClass,
 	loggedInProfiles: List<Profile>,
 	activeAccount: String,
-	navToCompose: (String?) -> Unit,
-	navToPost: (String) -> Unit,
-	navToProfile: (String) -> Unit,
 	navToAddAccount: () -> Unit,
 	switchActiveProfile: (profileId: String) -> Unit,
 ) {
+	val navToCompose = localNavToCompose.current
 	var selectedTab by remember { mutableStateOf(HOME.route) }
-	val scrollBehavior =
-		TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+	val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 	var showAccountPicker by remember { mutableStateOf(false) }
 
 	// FIXME: activeAccount might not be cached? cache on startup?
@@ -111,19 +103,12 @@ fun DashboardRoute(
 					selectedTab = it
 				}, onAccountPickerShow = { showAccountPicker = true })
 			}
-			if (selectedTab == HOME.route) HomeScreen(
-				navToCompose = navToCompose,
-				navToPost = navToPost,
-				navToProfile = navToProfile,
-			)
-			if (selectedTab == NOTIFICATIONS.route) NotificationsScreen(
-				navToCompose = navToCompose,
-				navToPost = navToPost,
-				navToProfile = navToProfile
-			)
+			if (selectedTab == HOME.route) HomeScreen()
+			if (selectedTab == NOTIFICATIONS.route) NotificationsScreen()
 			if (selectedTab == SEARCH.route) Text("Search screen")
 
-			AccountPicker(isVisible = showAccountPicker,
+			AccountPicker(
+				isVisible = showAccountPicker,
 				profiles = loggedInProfiles,
 				activeProfileId = activeAccount,
 				canAddProfile = true,
@@ -141,10 +126,8 @@ fun DashboardRoute(
 @Composable
 fun DashboardRoutePreview() {
 	FediHomeTheme {
-		DashboardRoute(windowWidthSizeClass = WindowWidthSizeClass.Compact,
-			navToCompose = {},
-			navToPost = {},
-			navToProfile = {},
+		DashboardRoute(
+			windowWidthSizeClass = WindowWidthSizeClass.Compact,
 			loggedInProfiles = listOf(defaultProfile, defaultProfile),
 			switchActiveProfile = {},
 			activeAccount = "foo",

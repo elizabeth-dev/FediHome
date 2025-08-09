@@ -48,7 +48,7 @@ private val AVATAR_SIZE = 72.dp
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun ProfileHeader(profile: Profile, navToProfile: (profileTag: String) -> Unit) {
+fun ProfileHeader(profile: Profile) {
 	val resources = LocalContext.current.resources
 
 	Surface(
@@ -79,15 +79,14 @@ fun ProfileHeader(profile: Profile, navToProfile: (profileTag: String) -> Unit) 
 				modifier = Modifier
 					.zIndex(1f)
 					.offset(
-						y = maxWidth
-							.div(HEADER_RATIO)
-							.minus(AVATAR_SIZE.div(2)), x = 16.dp
+						y = maxWidth.div(HEADER_RATIO).minus(AVATAR_SIZE.div(2)), x = 16.dp
 					)
 			)
 
 			Column(Modifier.fillMaxWidth()) {
 				// Header
-				if (profile.headerUrl != null) AsyncImage(model = profile.headerUrl,
+				if (profile.headerUrl != null) AsyncImage(
+					model = profile.headerUrl,
 					contentDescription = null,
 					modifier = Modifier
 						.width(_maxWidth)
@@ -113,9 +112,10 @@ fun ProfileHeader(profile: Profile, navToProfile: (profileTag: String) -> Unit) 
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(
-							top = AVATAR_SIZE
-								.div(2)
-								.plus(8.dp), start = 16.dp, end = 16.dp, bottom = 8.dp
+							top = AVATAR_SIZE.div(2).plus(8.dp),
+							start = 16.dp,
+							end = 16.dp,
+							bottom = 8.dp
 						),
 					verticalArrangement = Arrangement.spacedBy(12.dp),
 				) {
@@ -139,7 +139,6 @@ fun ProfileHeader(profile: Profile, navToProfile: (profileTag: String) -> Unit) 
 						emojis = profile.emojis,
 						style = MaterialTheme.typography.bodyLarge,
 						instance = profile.instance,
-						navToProfileTag = navToProfile
 					)
 
 					if (profile.fields.isNotEmpty()) {
@@ -147,7 +146,6 @@ fun ProfileHeader(profile: Profile, navToProfile: (profileTag: String) -> Unit) 
 						ProfileFields(
 							profile.fields,
 							instance = profile.instance,
-							navToProfile = navToProfile
 						)
 					}
 
@@ -191,7 +189,6 @@ fun ProfileHeaderPreview() {
 	FediHomeTheme {
 		ProfileHeader(
 			profile = defaultProfile,
-			navToProfile = {}
 		)
 	}
 }

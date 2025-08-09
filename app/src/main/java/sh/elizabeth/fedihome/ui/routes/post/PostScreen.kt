@@ -28,9 +28,7 @@ fun PostScreen(
 	uiState: PostUiState,
 	contentPadding: PaddingValues,
 	onPostRefresh: (activeAccount: String, postId: String) -> Unit,
-	onReply: (String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	navToProfile: (String) -> Unit,
 	onAddFavorite: (String, String) -> Unit,
 	onRemoveReaction: (String, String) -> Unit,
 	onAddReaction: (String, String, String) -> Unit,
@@ -65,21 +63,20 @@ fun PostScreen(
 				Surface {
 					SlimPostCard(
 						post = uiState.post,
-						onReply = onReply,
 						onVotePoll = {
 							onVotePoll(
 								uiState.activeAccount, uiState.post.id, uiState.post.poll?.id, it
 							)
 						},
-						navToPost = {},
-						navToProfile = navToProfile,
 						onAddFavorite = { onAddFavorite(uiState.activeAccount, it) },
 						onRemoveReaction = { onRemoveReaction(uiState.activeAccount, it) },
 						onAddReaction = { postId, reaction ->
 							onAddReaction(
 								uiState.activeAccount, postId, reaction
 							)
-						})
+						},
+						disablePostClick = true
+					)
 				}
 			}
 		}

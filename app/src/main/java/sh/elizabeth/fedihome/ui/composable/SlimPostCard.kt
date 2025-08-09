@@ -23,6 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import sh.elizabeth.fedihome.localNavToCompose
+import sh.elizabeth.fedihome.localNavToPost
+import sh.elizabeth.fedihome.localNavToProfile
 import sh.elizabeth.fedihome.mock.defaultPost
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
@@ -30,20 +33,22 @@ import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 @Composable
 fun SlimPostCard(
 	post: Post,
-	onReply: (String) -> Unit,
 	onVotePoll: (choices: List<Int>) -> Unit,
-	navToPost: (postId: String) -> Unit,
-	navToProfile: (profileId: String) -> Unit,
 	showDivider: Boolean = true,
 	onAddFavorite: (postId: String) -> Unit,
 	onRemoveReaction: (postId: String) -> Unit,
 	onAddReaction: (postId: String, reaction: String) -> Unit,
+	disablePostClick: Boolean = false,
 ) { // TODO: Check if it's better to pass individual props
+	val navToPost = localNavToPost.current
+	val navToProfile = localNavToProfile.current
+	val onReply = localNavToCompose.current
+
 	Surface(
 		modifier = Modifier.fillMaxWidth(),
 		color = MaterialTheme.colorScheme.surface,
 		contentColor = MaterialTheme.colorScheme.onSurface,
-		onClick = { navToPost(post.id) },
+		onClick = { if (!disablePostClick) navToPost(post.id) },
 	) {
 		Column {
 			Column(
@@ -73,7 +78,6 @@ fun SlimPostCard(
 					emojis = post.emojis,
 					style = MaterialTheme.typography.bodyLarge, // TODO: Maybe use a smaller font size like bodyMedium
 					modifier = Modifier,
-					navToProfileTag = navToProfile,
 					instance = post.author.instance
 				)
 
@@ -84,8 +88,6 @@ fun SlimPostCard(
 						.fillMaxWidth()
 						.padding(top = 4.dp),
 					post = post.quote,
-					navToPost = navToPost,
-					navToProfile = navToProfile
 				)
 
 				if (post.reactions.isNotEmpty()) Row(
@@ -158,10 +160,7 @@ fun SlimPostCardPreview() {
 	FediHomeTheme {
 		SlimPostCard(
 			post = defaultPost,
-			onReply = {},
 			onVotePoll = { },
-			navToPost = { },
-			navToProfile = { },
 			onAddFavorite = {},
 			onRemoveReaction = {},
 			onAddReaction = { _, _ -> })

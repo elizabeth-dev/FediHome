@@ -26,19 +26,13 @@ import sh.elizabeth.fedihome.ui.composable.NotificationCard
 @Composable
 fun NotificationsScreen(
 	notificationsViewModel: NotificationsViewModel = hiltViewModel(),
-	navToCompose: (String) -> Unit,
-	navToPost: (String) -> Unit,
-	navToProfile: (String) -> Unit,
 ) {
 	val uiState by notificationsViewModel.uiState.collectAsStateWithLifecycle()
 
 	NotificationsScreen(
 		uiState = uiState,
 		onRefresh = notificationsViewModel::refreshNotifications,
-		onReply = navToCompose,
 		onVotePoll = notificationsViewModel::votePoll,
-		navToPost = navToPost,
-		navToProfile = navToProfile,
 		onAddFavorite = notificationsViewModel::addFavorite,
 		onRemoveReaction = notificationsViewModel::removeReaction,
 		onAddReaction = notificationsViewModel::addReaction,
@@ -50,9 +44,6 @@ fun NotificationsScreen(
 fun NotificationsScreen(
 	uiState: NotificationsUiState,
 	onRefresh: (profileId: String) -> Unit,
-	navToPost: (String) -> Unit,
-	navToProfile: (String) -> Unit,
-	onReply: (String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 	onAddFavorite: (String, String) -> Unit,
 	onRemoveReaction: (String, String) -> Unit,
@@ -86,9 +77,6 @@ fun NotificationsScreen(
 					items(uiState.notifications) { notification ->
 						NotificationCard(
 							notification = notification,
-							navToProfile = navToProfile,
-							navToPost = navToPost,
-							onReply = onReply,
 							onVotePoll = {
 								onVotePoll(
 									uiState.activeAccount,

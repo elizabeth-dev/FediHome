@@ -25,19 +25,13 @@ import sh.elizabeth.fedihome.ui.composable.SlimPostCard
 @Composable
 fun HomeScreen(
 	homeViewModel: HomeViewModel = hiltViewModel(),
-	navToCompose: (String) -> Unit,
-	navToPost: (String) -> Unit,
-	navToProfile: (String) -> Unit,
 ) {
 	val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
 	HomeScreen(
 		uiState = uiState,
 		onRefresh = homeViewModel::refreshTimeline,
-		onReply = navToCompose,
 		onVotePoll = homeViewModel::votePoll,
-		navToPost = navToPost,
-		navToProfile = navToProfile,
 		onAddFavorite = homeViewModel::addFavorite,
 		onRemoveReaction = homeViewModel::removeReaction,
 		onAddReaction = homeViewModel::addReaction
@@ -49,10 +43,7 @@ fun HomeScreen(
 fun HomeScreen(
 	uiState: HomeUiState,
 	onRefresh: (String) -> Unit,
-	onReply: (String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	navToPost: (String) -> Unit,
-	navToProfile: (String) -> Unit,
 	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
 	onRemoveReaction: (activeAccount: String, postId: String) -> Unit,
 	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
@@ -85,21 +76,16 @@ fun HomeScreen(
 				items(uiState.posts) { post ->
 					SlimPostCard(
 						post = post,
-						onReply = onReply,
 						onVotePoll = {
 							onVotePoll(
 								uiState.activeAccount, post.id, post.poll?.id, it
 							)
 						},
-						navToPost = navToPost,
-						navToProfile = navToProfile,
 						onAddFavorite = { onAddFavorite(uiState.activeAccount, it) },
 						onRemoveReaction = { onRemoveReaction(uiState.activeAccount, it) },
 						onAddReaction = { postId, reaction ->
 							onAddReaction(
-								uiState.activeAccount,
-								postId,
-								reaction
+								uiState.activeAccount, postId, reaction
 							)
 						})
 				}
