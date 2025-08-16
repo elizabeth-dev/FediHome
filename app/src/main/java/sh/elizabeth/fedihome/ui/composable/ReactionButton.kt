@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.util.DEFAULT_EMOJI_SIZE
 

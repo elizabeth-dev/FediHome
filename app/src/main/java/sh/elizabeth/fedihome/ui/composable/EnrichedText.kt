@@ -23,7 +23,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.TextUnit
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import sh.elizabeth.fedihome.localNavToProfile
 import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.util.DEFAULT_EMOJI_SIZE

@@ -20,8 +20,8 @@ android {
 		applicationId = "sh.elizabeth.fedihome"
 		minSdk = 24
 		targetSdk = 36
-		versionCode = 1
-		versionName = "0.0.1"
+		versionCode = 2
+		versionName = "0.0.2"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables {
@@ -163,14 +163,17 @@ dependencies {
 	implementation("io.ktor:ktor-client-auth:$ktorVersion")
 
 	// Coil + BlurHash
-	implementation(platform("io.coil-kt:coil-bom:2.7.0"))
-	implementation("io.coil-kt:coil")
-	implementation("io.coil-kt:coil-compose")
-	implementation("io.coil-kt:coil-gif")
-	implementation("io.coil-kt:coil-svg")
-	testImplementation("io.coil-kt:coil-test")
-	androidTestImplementation("io.coil-kt:coil-test:2.7.0")
+	implementation(platform("io.coil-kt.coil3:coil-bom:3.3.0"))
+	implementation("io.coil-kt.coil3:coil")
+	implementation("io.coil-kt.coil3:coil-compose")
+	implementation("io.coil-kt.coil3:coil-gif")
+	implementation("io.coil-kt.coil3:coil-svg")
+	implementation("io.coil-kt.coil3:coil-network-ktor3")
+	implementation("io.coil-kt.coil3:coil-network-cache-control")
+	testImplementation("io.coil-kt.coil3:coil-test")
+	androidTestImplementation("io.coil-kt.coil3:coil-test")
 	implementation("com.vanniktech:blurhash:0.3.0")
+	implementation("com.github.penfeizhou.android.animation:apng:3.0.5")
 
 	// SQLDelight
 	implementation("app.cash.sqldelight:android-driver:2.1.0")
