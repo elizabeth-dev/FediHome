@@ -176,8 +176,8 @@ dependencies {
 	implementation("com.github.penfeizhou.android.animation:apng:3.0.5")
 
 	// SQLDelight
-	implementation("app.cash.sqldelight:android-driver:2.1.0")
-	implementation("app.cash.sqldelight:coroutines-extensions:2.1.0")
+	implementation("app.cash.sqldelight:android-driver:2.0.1")
+	implementation("app.cash.sqldelight:coroutines-extensions:2.0.1")
 	implementation("com.google.code.gson:gson:2.13.1")
 
 	// Firebase
