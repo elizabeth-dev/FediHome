@@ -3,7 +3,6 @@ package sh.elizabeth.fedihome.api.mastodon.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import sh.elizabeth.fedihome.model.PollChoice
-import sh.elizabeth.fedihome.util.DEFAULT_FAVORITE_EMOJI
 import sh.elizabeth.fedihome.util.InstantAsString
 import sh.elizabeth.fedihome.model.Poll as DomainPoll
 import sh.elizabeth.fedihome.model.Post as DomainPost
@@ -19,14 +18,14 @@ data class Post(
 	val visibility: PostVisibility,
 	val sensitive: Boolean,
 	@SerialName("spoiler_text") val spoilerText: String,
-	val media_attachments: List<Media>,
+	@SerialName("media_attachments") val mediaAttachments: List<Media>,
 	val application: Application? = null,
 	val mentions: List<Mention>,
 	val tags: List<Hashtag>,
 	val emojis: List<Emoji>,
-	val reblogs_count: Int,
-	val favourites_count: Int,
-	val replies_count: Int,
+	@SerialName("reblogs_count") val reblogsCount: Long,
+	@SerialName("favourites_count") val favouritesCount: Long,
+	@SerialName("replies_count") val repliesCount: Long,
 	val url: String? = null,
 	@SerialName("in_reply_to_id") val inReplyToId: String? = null,
 	@SerialName("in_reply_to_account_id") val inReplyToAccountId: String? = null,
@@ -40,6 +39,11 @@ data class Post(
 	val muted: Boolean,
 	val bookmarked: Boolean,
 	val pinned: Boolean? = null,
+	val filtered: List<FilterResult>,
+	// From Iceshrimp.NET
+	val reactions: List<Reaction>? = null,
+	val quote: Post? = null,
+	@SerialName("quote_id") val quoteId: String? = null,
 )
 
 fun Post.toDomain(fetchedFromInstance: String): DomainPost {
@@ -54,13 +58,25 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			repostedBy = account.toDomain(fetchedFromInstance),
 			quote = null,
 			poll = reblog.poll?.toDomain(),
-			reactions = mapOf(DEFAULT_FAVORITE_EMOJI to reblog.favourites_count),
-			myReaction = if (reblog.favourited) DEFAULT_FAVORITE_EMOJI else null,
+			reactions = reblog.reactions?.associate {
+				Pair(
+					it.name, it.count
+				)
+			} ?: emptyMap(),
+			myReaction = reblog.reactions?.firstOrNull() { it.me }?.name,
 			emojis = reblog.emojis.associate {
 				Pair(
 					it.shortcode, it.toDomain(fetchedFromInstance)
 				)
-			},
+			}
+				.plus(reblog.reactions?.filter { !it.url.isNullOrBlank() || !it.staticUrl.isNullOrBlank() }
+					?.associate {
+						Pair(
+							it.name, it.toEmojiDomain(fetchedFromInstance)
+						)
+					} ?: emptyMap()),
+			favorites = reblog.favouritesCount,
+			favorited = reblog.favourited,
 		)
 	}
 
@@ -74,11 +90,45 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		repostedBy = null,
 		quote = null,
 		poll = poll?.toDomain(),
-		emojis = emojis.associate { Pair(it.shortcode, it.toDomain(fetchedFromInstance)) },
-		reactions = mapOf(DEFAULT_FAVORITE_EMOJI to favourites_count),
-		myReaction = if (favourited) DEFAULT_FAVORITE_EMOJI else null,
+		reactions = reactions?.associate {
+			Pair(
+				it.name, it.count
+			)
+		} ?: emptyMap(),
+		myReaction = reactions?.firstOrNull { it.me }?.name,
+		emojis = emojis.associate {
+			Pair(
+				it.shortcode, it.toDomain(fetchedFromInstance)
+			)
+		}.plus(reactions?.filter { !it.url.isNullOrBlank() || !it.staticUrl.isNullOrBlank() }
+			?.associate {
+				Pair(
+					it.name, it.toEmojiDomain(fetchedFromInstance)
+				)
+			} ?: emptyMap()),
+		favorites = favouritesCount,
+		favorited = favourited,
 	)
 }
+
+@Serializable
+data class Reaction(
+	val name: String,
+	val count: Int,
+	val me: Boolean,
+	val url: String? = null,
+	@SerialName("static_url") val staticUrl: String? = null,
+	val accounts: List<Profile>? = null,
+	@SerialName("account_ids") val accountIds: List<String>
+)
+
+fun Reaction.toEmojiDomain(fetchedFromInstance: String) =
+	sh.elizabeth.fedihome.model.Emoji(
+		shortcode = name.split('@').first(),
+		url = url ?: staticUrl!!,
+		instance = if (name.contains('@')) name.split('@').last() else fetchedFromInstance,
+		fullEmojiId = if (name.contains('@')) name else "$name@$fetchedFromInstance",
+	)
 
 @Serializable
 enum class PostVisibility {

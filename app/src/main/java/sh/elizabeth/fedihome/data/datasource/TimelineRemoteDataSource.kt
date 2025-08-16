@@ -28,9 +28,9 @@ class TimelineRemoteDataSource @Inject constructor(
 		SupportedInstances.SHARKEY -> timelineSharkeyApi.getHome(endpoint = endpoint, token = token)
 			.map { it.toDomain(instance) }
 
-		SupportedInstances.GLITCH,
-		SupportedInstances.MASTODON,
-			-> timelineMastodonApi.getHome(endpoint = endpoint, token = token)
-			.map { it.toDomain(instance) }
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> timelineMastodonApi.getHome(
+			endpoint = endpoint,
+			token = token
+		).map { it.toDomain(instance) }
 	}
 }

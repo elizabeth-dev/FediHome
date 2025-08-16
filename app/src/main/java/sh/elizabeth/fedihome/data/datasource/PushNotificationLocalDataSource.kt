@@ -55,7 +55,7 @@ class PushNotificationLocalDataSource @Inject constructor() {
 		context: Context,
 	) {
 		val pushNotification: PushNotification = when (instanceType) {
-			SupportedInstances.MASTODON, SupportedInstances.GLITCH -> handleMastodonNotification(
+			SupportedInstances.MASTODON, SupportedInstances.GLITCH, SupportedInstances.ICESHRIMPNET -> handleMastodonNotification(
 				accountId, instance, account, messageData
 			)
 

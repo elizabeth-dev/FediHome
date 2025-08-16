@@ -69,6 +69,7 @@ fun PostDraft.toCreatePost() = CreatePostRequest(
 	visibility = visibility.toMastodon(),
 	cw = cw,
 	replyId = replyId,
+	localOnly = localOnly
 )
 
 fun DomainPostVisibility.toMastodon(): PostVisibility = when (this) {

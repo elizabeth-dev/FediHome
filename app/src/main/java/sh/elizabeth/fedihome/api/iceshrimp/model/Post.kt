@@ -86,6 +86,9 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			myReaction = renote.myReaction.let {
 				if (it != null && it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
 			},
+			// TODO: handle favorites in Iceshrimp
+			favorites = 0,
+			favorited = false,
 		)
 	}
 	return DomainPost(
@@ -108,6 +111,9 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		myReaction = myReaction.let {
 			if (it != null && it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
 		},
+		// TODO: handle favorites in Iceshrimp
+		favorites = 0,
+		favorited = false,
 	)
 }
 

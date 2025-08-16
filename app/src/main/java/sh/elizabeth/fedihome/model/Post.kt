@@ -14,6 +14,8 @@ data class Post(
 	val poll: Poll?,
 	val reactions: Map<String, Int>,
 	val myReaction: String?,
+	val favorites: Long,
+	val favorited: Boolean,
 	val emojis: Map<String, Emoji>,
 )
 

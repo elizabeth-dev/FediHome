@@ -11,28 +11,28 @@ import sh.elizabeth.fedihome.util.SupportedInstances
 import javax.inject.Inject
 
 class NotificationRemoteDataSource @Inject constructor(
-    private val notificationSharkeyApi: NotificationSharkeyApi,
-    private val notificationIceshrimpApi: NotificationIceshrimpApi,
-    private val notificationMastodonApi: NotificationMastodonApi,
+	private val notificationSharkeyApi: NotificationSharkeyApi,
+	private val notificationIceshrimpApi: NotificationIceshrimpApi,
+	private val notificationMastodonApi: NotificationMastodonApi,
 ) {
-    suspend fun getNotifications(
-        forAccount: String,
-        instance: String,
-        endpoint: String,
-        instanceType: SupportedInstances,
-        token: String,
-    ): List<Notification> = when (instanceType) {
-        SupportedInstances.SHARKEY -> notificationSharkeyApi.getNotifications(
-            endpoint = endpoint, token = token
-        ).map { it.toDomain(instance, forAccount) }
+	suspend fun getNotifications(
+		forAccount: String,
+		instance: String,
+		endpoint: String,
+		instanceType: SupportedInstances,
+		token: String,
+	): List<Notification> = when (instanceType) {
+		SupportedInstances.SHARKEY -> notificationSharkeyApi.getNotifications(
+			endpoint = endpoint, token = token
+		).map { it.toDomain(instance, forAccount) }
 
-        SupportedInstances.ICESHRIMP -> notificationIceshrimpApi.getNotifications(
-            endpoint = endpoint, token = token
-        ).map { it.toDomain(instance, forAccount) }
+		SupportedInstances.ICESHRIMP -> notificationIceshrimpApi.getNotifications(
+			endpoint = endpoint, token = token
+		).map { it.toDomain(instance, forAccount) }
 
-        SupportedInstances.MASTODON, SupportedInstances.GLITCH -> notificationMastodonApi.getNotifications(
-            endpoint = endpoint, token = token
-        ).map { it.toDomain(instance, forAccount) }
+		SupportedInstances.MASTODON, SupportedInstances.GLITCH, SupportedInstances.ICESHRIMPNET -> notificationMastodonApi.getNotifications(
+			endpoint = endpoint, token = token
+		).map { it.toDomain(instance, forAccount) }
 
-    }
+	}
 }

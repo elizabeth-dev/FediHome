@@ -7,8 +7,8 @@ import sh.elizabeth.fedihome.util.InstantAsString
 @Serializable
 data class FilterResult(
 	val filter: Filter,
-	val keyword_matches: List<String>? = null,
-	val status_matches: String? = null,
+	@SerialName("keyword_matches") val keywordMatches: List<String>,
+	@SerialName("status_matches") val statusMatches: List<String>,
 )
 
 @Serializable
@@ -16,8 +16,8 @@ data class Filter(
 	val id: String,
 	val title: String,
 	val context: List<FilterContext>,
-	val expires_at: InstantAsString? = null,
-	val filter_action: FilterAction,
+	@SerialName("expires_at") val expiresAt: InstantAsString? = null,
+	@SerialName("filter_action") val filterAction: FilterAction,
 	val keywords: List<FilterKeyword>,
 	val statuses: FilterStatus,
 )
@@ -53,11 +53,11 @@ enum class FilterAction {
 data class FilterKeyword(
 	val id: String,
 	val keyword: String,
-	val whole_word: Boolean,
+	@SerialName("whole_word") val wholeWord: Boolean,
 )
 
 @Serializable
 data class FilterStatus(
 	val id: String,
-	val status_id: String,
+	@SerialName("status_id") val statusId: String,
 )

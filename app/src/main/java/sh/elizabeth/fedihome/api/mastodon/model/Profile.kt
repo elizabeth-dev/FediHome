@@ -16,26 +16,28 @@ data class Profile(
 	val note: String, // Needs to be cleaned up
 	val uri: String? = null,
 	val avatar: String? = null,
-	val avatar_static: String? = null,
+	@SerialName("avatar_static") val avatarStatic: String? = null,
 	val header: String? = null,
-	val header_static: String? = null,
+	@SerialName("header_static") val headerStatic: String? = null,
 	val locked: Boolean,
 	val fields: List<ProfileField>,
 	val emojis: List<Emoji>,
 	val bot: Boolean,
-	val group: Boolean,
+	val group: Boolean? = null,
 	val discoverable: Boolean? = null,
 	val noindex: Boolean? = null,
 	val moved: Profile? = null,
 	val suspended: Boolean? = null,
 	val limited: Boolean? = null,
 	@SerialName("created_at") val createdAt: InstantAsString,
-	val last_status_at: String? = null,
+	@SerialName("last_status_at") val lastStatusAt: String? = null,
 	@SerialName("statuses_count") val statusesCount: Int,
 	@SerialName("followers_count") val followersCount: Int,
 	@SerialName("following_count") val followingCount: Int,
-	val mute_expired_at: InstantAsString? = null,
+	@SerialName("mute_expired_at") val muteExpiredAt: InstantAsString? = null,
 	// Check roles field on a mod
+	// From Iceshrimp.NET
+	val fqn: String? = null,
 )
 
 fun Profile.toDomain(fetchedFromInstance: String): DomainProfile {

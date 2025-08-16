@@ -15,6 +15,7 @@ class MetaRemoteDataSource @Inject constructor(
 			"mastodon" -> if (nodeInfoSoftware.version.contains("glitch")) SupportedInstances.GLITCH else SupportedInstances.MASTODON
 			"iceshrimp" -> SupportedInstances.ICESHRIMP
 			"sharkey" -> SupportedInstances.SHARKEY
+			"Iceshrimp.NET" -> SupportedInstances.ICESHRIMPNET
 			else -> return null
 		}
 

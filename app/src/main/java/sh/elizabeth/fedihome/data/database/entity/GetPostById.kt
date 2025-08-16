@@ -64,11 +64,15 @@ fun GetPostById.toPostDomain(emojiList: List<EmojiEntity>): Post {
 			poll = poll_?.toDomain(),
 			emojis = emojis,
 			reactions = reactions ?: emptyMap(),
-			myReaction = myReaction
+			myReaction = myReaction,
+			favorites = favoriteCount,
+			favorited = favorited,
 		) else null,
 		poll = poll?.toDomain(),
 		emojis = emojis,
 		reactions = reactions ?: emptyMap(),
-		myReaction = myReaction
+		myReaction = myReaction,
+		favorites = favoriteCount,
+		favorited = favorited,
 	)
 }

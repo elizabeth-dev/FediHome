@@ -15,6 +15,10 @@ data class CreatePostRequest(
 	@SerialName("scheduled_at") val scheduledAt: InstantAsString? = null,
 	val poll: NewPoll? = null,
 	val language: String? = null,
+	// Glitch + Iceshrimp.NET
+	@SerialName("local_only") val localOnly: Boolean,
+	// Iceshrimp.NET
+	@SerialName("quote_id") val quoteId: String? = null,
 )
 
 @Serializable

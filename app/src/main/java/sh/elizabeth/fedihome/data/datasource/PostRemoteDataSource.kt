@@ -34,10 +34,11 @@ class PostRemoteDataSource @Inject constructor(
 			endpoint = endpoint, token = token, newPost = newPost
 		).createdNote.toDomain(instance)
 
-		SupportedInstances.GLITCH,
-		SupportedInstances.MASTODON,
-			-> postMastodonApi.createPost(endpoint = endpoint, token = token, newPost = newPost)
-			.toDomain(instance)
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.createPost(
+			endpoint = endpoint,
+			token = token,
+			newPost = newPost
+		).toDomain(instance)
 
 	}
 
@@ -56,10 +57,11 @@ class PostRemoteDataSource @Inject constructor(
 			endpoint = endpoint, token = token, postId = postId
 		).toDomain(instance)
 
-		SupportedInstances.GLITCH,
-		SupportedInstances.MASTODON,
-			-> postMastodonApi.fetchPost(endpoint = endpoint, token = token, postId = postId)
-			.toDomain(instance)
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.fetchPost(
+			endpoint = endpoint,
+			token = token,
+			postId = postId
+		).toDomain(instance)
 	}
 
 	suspend fun fetchPostsByProfile(
@@ -77,9 +79,7 @@ class PostRemoteDataSource @Inject constructor(
 			endpoint = endpoint, token = token, profileId = profileId
 		).map { it.toDomain(instance) }
 
-		SupportedInstances.GLITCH,
-		SupportedInstances.MASTODON,
-			-> postMastodonApi.fetchPostsByProfile(
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.fetchPostsByProfile(
 			endpoint = endpoint, token = token, profileId = profileId
 		).map { it.toDomain(instance) }
 	}
@@ -104,9 +104,7 @@ class PostRemoteDataSource @Inject constructor(
 			return@coroutineScope
 		}
 
-		SupportedInstances.GLITCH,
-		SupportedInstances.MASTODON,
-			-> postMastodonApi.votePoll(
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.votePoll(
 			endpoint = endpoint, token = token, pollId = pollId, choices = choices
 		)
 	}
@@ -134,10 +132,11 @@ class PostRemoteDataSource @Inject constructor(
 			).toDomain(instance)
 		}
 
-		SupportedInstances.GLITCH,
-		SupportedInstances.MASTODON,
-			-> postMastodonApi.deleteFavorite(endpoint = endpoint, token = token, postId = postId)
-			.toDomain(instance)
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.deleteFavorite(
+			endpoint = endpoint,
+			token = token,
+			postId = postId
+		).toDomain(instance)
 	}
 
 	suspend fun createReaction(
@@ -164,9 +163,7 @@ class PostRemoteDataSource @Inject constructor(
 			).toDomain(instance)
 		}
 
-		SupportedInstances.GLITCH,
-		SupportedInstances.MASTODON,
-			-> postMastodonApi.createFavorite(
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.createFavorite(
 			endpoint = endpoint, token = token, postId = postId
 		).toDomain(instance)
 	}

@@ -63,6 +63,12 @@ val instantAdapter = object : ColumnAdapter<Instant, Long> {
 	override fun encode(value: Instant): Long = value.toEpochMilli()
 }
 
+val booleanAdapter = object : ColumnAdapter<Boolean, Int> {
+	override fun decode(databaseValue: Int): Boolean = databaseValue == 1
+
+	override fun encode(value: Boolean): Int = if (value) 1 else 0
+}
+
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {

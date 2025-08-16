@@ -31,7 +31,7 @@ class ProfileRemoteDataSource @Inject constructor(
 		).toDomain(instance)
 
 		SupportedInstances.GLITCH,
-		SupportedInstances.MASTODON,
+		SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET
 			-> profileMastodonApi.fetchProfile(
 			endpoint = endpoint, token = token, profileId = profileId
 		).toDomain(instance)
@@ -53,7 +53,7 @@ class ProfileRemoteDataSource @Inject constructor(
 		).first().toDomain(instance)
 
 		SupportedInstances.GLITCH,
-		SupportedInstances.MASTODON,
+		SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET
 			-> profileMastodonApi.fetchProfileByTag(
 			endpoint = endpoint, token = token, profileTag = profileTag
 		).toDomain(instance)

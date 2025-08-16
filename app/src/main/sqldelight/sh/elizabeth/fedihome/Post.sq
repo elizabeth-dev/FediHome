@@ -1,4 +1,5 @@
 import java.time.Instant;
+import kotlin.Boolean;
 import kotlin.Int;
 import kotlin.String;
 import kotlin.collections.Map;
@@ -15,6 +16,8 @@ CREATE TABLE PostEntity (
     poll TEXT AS PollEntity,
     reactions TEXT AS Map<String, Int>,
     myReaction TEXT,
+    favoriteCount INTEGER NOT NULL,
+    favorited INTEGER AS Boolean NOT NULL,
     FOREIGN KEY (authorId) REFERENCES ProfileEntity(profileId),
     FOREIGN KEY (quoteId) REFERENCES PostEntity(postId)
 );

@@ -87,4 +87,6 @@ fun Post.toEntity() = PostEntity(
 			)
 		}, expiresAt = poll.expiresAt, multiple = poll.multiple
 	) else null,
+	favorited = favorited,
+	favoriteCount = favorites
 )

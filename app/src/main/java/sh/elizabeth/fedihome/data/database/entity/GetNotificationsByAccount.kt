@@ -65,7 +65,9 @@ fun GetNotificationByAccount.toDomain(emojiList: List<EmojiEntity>): Notificatio
 			quote = null,
 			poll = poll?.toDomain(),
 			reactions = reactions ?: emptyMap(),
-			myReaction = myReaction
+			myReaction = myReaction,
+			favorites = favoriteCount!!,
+			favorited = favorited!!,
 		) else null
 	)
 }

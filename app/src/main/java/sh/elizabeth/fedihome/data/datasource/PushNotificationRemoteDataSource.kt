@@ -52,21 +52,18 @@ class PushNotificationRemoteDataSource @Inject constructor(
 
 		when (instanceType) {
 			SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> {
-				val registerResult =
-					notificationSharkeyApi.createPushSubscription(
-						instance = instance,
-						token = token,
-						deviceToken = deviceToken,
-						pushAccountId = pushAccountId,
-						publicKey = encodedPublicKey,
-						authSecret = authSecret
-					)
+				val registerResult = notificationSharkeyApi.createPushSubscription(
+					instance = instance,
+					token = token,
+					deviceToken = deviceToken,
+					pushAccountId = pushAccountId,
+					publicKey = encodedPublicKey,
+					authSecret = authSecret
+				)
 
 				return object : RegisterPushResult {
-					override val publicKey: String =
-						Base64.UrlSafe.encode(keyPair.public.encoded)
-					override val privateKey: String =
-						Base64.UrlSafe.encode(keyPair.private.encoded)
+					override val publicKey: String = Base64.UrlSafe.encode(keyPair.public.encoded)
+					override val privateKey: String = Base64.UrlSafe.encode(keyPair.private.encoded)
 					override val serverKey: String = registerResult.key
 					override val pushAccountId: String = pushAccountId
 					override val authSecret: String = authSecret
@@ -74,7 +71,7 @@ class PushNotificationRemoteDataSource @Inject constructor(
 				}
 			}
 
-			SupportedInstances.GLITCH, SupportedInstances.MASTODON -> {
+			SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> {
 				val pushData = notificationMastodonApi.createPushSubscription(
 					instance = instance,
 					token = token,
@@ -85,10 +82,8 @@ class PushNotificationRemoteDataSource @Inject constructor(
 				)
 
 				return object : RegisterPushResult {
-					override val publicKey: String =
-						Base64.UrlSafe.encode(keyPair.public.encoded)
-					override val privateKey: String =
-						Base64.UrlSafe.encode(keyPair.private.encoded)
+					override val publicKey: String = Base64.UrlSafe.encode(keyPair.public.encoded)
+					override val privateKey: String = Base64.UrlSafe.encode(keyPair.private.encoded)
 					override val serverKey: String = pushData.serverKey
 					override val pushAccountId: String = pushAccountId
 					override val authSecret: String = authSecret
@@ -122,7 +117,7 @@ class PushNotificationRemoteDataSource @Inject constructor(
 			instance, token, oldEndpoint
 		)
 
-		SupportedInstances.GLITCH, SupportedInstances.MASTODON -> notificationMastodonApi.deletePushSubscription(
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> notificationMastodonApi.deletePushSubscription(
 			instance, token
 		)
 	}

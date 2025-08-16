@@ -81,6 +81,10 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 			myReaction = renote.myReaction.let {
 				if (it != null && it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
 			},
+
+			// TODO: handle favorites in Sharkey
+			favorites = 0,
+			favorited = false,
 		)
 	}
 	return sh.elizabeth.fedihome.model.Post(
@@ -102,6 +106,10 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 		myReaction = myReaction.let {
 			if (it != null && it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
 		},
+
+		// TODO: handle favorites in Sharkey
+		favorites = 0,
+		favorited = false,
 	)
 }
 

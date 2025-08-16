@@ -56,6 +56,9 @@ enum class SupportedInstances {
 
 	@SerialName("glitch-soc")
 	GLITCH,
+
+	@SerialName("iceshrimpnet")
+	ICESHRIMPNET,
 }
 
 val DEFAULT_EMOJI_SIZE = 24.sp
