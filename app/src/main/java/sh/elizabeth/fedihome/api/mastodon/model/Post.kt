@@ -98,7 +98,8 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		myReaction = reactions?.firstOrNull { it.me }?.name,
 		emojis = emojis.associate {
 			Pair(
-				it.shortcode, it.toDomain(fetchedFromInstance)
+				it.shortcode,
+				it.toDomain(fetchedFromInstance) // TODO: should this be shortcode? what if two instances use the same shortcode?
 			)
 		}.plus(reactions?.filter { !it.url.isNullOrBlank() || !it.staticUrl.isNullOrBlank() }
 			?.associate {

@@ -7,7 +7,8 @@ import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
 
 fun GetPostById.toPostDomain(emojiList: List<EmojiEntity>): Post {
-	val emojis = emojiList.associate { it.shortcode to it.toDomain() }
+	val emojis =
+		emojiList.associate { it.emojiId to it.toDomain() } // TODO: should this be emojiId? or shortcode? it being shortcode caused issues with reactions from other instances
 	return Post(
 		id = postId,
 		createdAt = createdAt,
