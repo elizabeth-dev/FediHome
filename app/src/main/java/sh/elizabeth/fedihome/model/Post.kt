@@ -17,6 +17,7 @@ data class Post(
 	val favorites: Long,
 	val favorited: Boolean,
 	val emojis: Map<String, Emoji>,
+	val mentionLinksMap: Map<String, String>? = null,
 )
 
 fun Post.unwrapQuotes(): List<Post> {

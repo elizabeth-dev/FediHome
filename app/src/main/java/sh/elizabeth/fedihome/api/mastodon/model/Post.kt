@@ -63,7 +63,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 					it.name, it.count
 				)
 			} ?: emptyMap(),
-			myReaction = reblog.reactions?.firstOrNull() { it.me }?.name,
+			myReaction = reblog.reactions?.firstOrNull { it.me }?.name,
 			emojis = reblog.emojis.associate {
 				Pair(
 					it.shortcode, it.toDomain(fetchedFromInstance)
@@ -77,7 +77,12 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 					} ?: emptyMap()),
 			favorites = reblog.favouritesCount,
 			favorited = reblog.favourited,
-		)
+			mentionLinksMap = reblog.mentions.associate {
+				Pair(
+					it.url,
+					if (it.acct.contains('@')) it.acct else "${it.acct}@$fetchedFromInstance"
+				)
+			})
 	}
 
 	return DomainPost(
@@ -109,7 +114,12 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			} ?: emptyMap()),
 		favorites = favouritesCount,
 		favorited = favourited,
-	)
+		mentionLinksMap = mentions.associate {
+			Pair(
+				it.url,
+				if (it.acct.contains('@')) it.acct else "${it.acct}@$fetchedFromInstance"
+			)
+		})
 }
 
 @Serializable
@@ -123,13 +133,12 @@ data class Reaction(
 	@SerialName("account_ids") val accountIds: List<String>
 )
 
-fun Reaction.toEmojiDomain(fetchedFromInstance: String) =
-	sh.elizabeth.fedihome.model.Emoji(
-		shortcode = name.split('@').first(),
-		url = url ?: staticUrl!!,
-		instance = if (name.contains('@')) name.split('@').last() else fetchedFromInstance,
-		fullEmojiId = if (name.contains('@')) name else "$name@$fetchedFromInstance",
-	)
+fun Reaction.toEmojiDomain(fetchedFromInstance: String) = sh.elizabeth.fedihome.model.Emoji(
+	shortcode = name.split('@').first(),
+	url = url ?: staticUrl!!,
+	instance = if (name.contains('@')) name.split('@').last() else fetchedFromInstance,
+	fullEmojiId = if (name.contains('@')) name else "$name@$fetchedFromInstance",
+)
 
 @Serializable
 enum class PostVisibility {

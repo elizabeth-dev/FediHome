@@ -76,6 +76,7 @@ fun SlimPostCard(
 				if (!post.text.isNullOrBlank()) EnrichedText(
 					post.text,
 					emojis = post.emojis,
+					mentionLinksMap = post.mentionLinksMap,
 					style = MaterialTheme.typography.bodyLarge, // TODO: Maybe use a smaller font size like bodyMedium
 					modifier = Modifier,
 					instance = post.author.instance

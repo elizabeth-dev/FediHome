@@ -57,16 +57,22 @@ val mapAdapter = object : ColumnAdapter<Map<String, Int>, String> {
 	}
 }
 
+val mapStringStringAdapter = object : ColumnAdapter<Map<String, String>, String> {
+	override fun decode(databaseValue: String): Map<String, String> {
+		val type = object : TypeToken<Map<String, String>>() {}.type
+		return Gson().fromJson(databaseValue, type)
+	}
+
+	override fun encode(value: Map<String, String>): String {
+		val type = object : TypeToken<Map<String, String>>() {}.type
+		return Gson().toJson(value, type)
+	}
+}
+
 val instantAdapter = object : ColumnAdapter<Instant, Long> {
 	override fun decode(databaseValue: Long): Instant = Instant.ofEpochMilli(databaseValue)
 
 	override fun encode(value: Instant): Long = value.toEpochMilli()
-}
-
-val booleanAdapter = object : ColumnAdapter<Boolean, Int> {
-	override fun decode(databaseValue: Int): Boolean = databaseValue == 1
-
-	override fun encode(value: Boolean): Int = if (value) 1 else 0
 }
 
 @Module
@@ -99,6 +105,7 @@ object DatabaseModule {
 			createdAtAdapter = instantAdapter,
 			updatedAtAdapter = instantAdapter,
 			reactionsAdapter = mapAdapter,
+			mentionLinksAdapter = mapStringStringAdapter,
 		), ProfileEntityAdapter = ProfileEntity.Adapter(
 			fieldsAdapter = profileFieldEntityListAdapter, createdAtAdapter = instantAdapter
 		),

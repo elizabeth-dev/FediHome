@@ -18,6 +18,7 @@ CREATE TABLE PostEntity (
     myReaction TEXT,
     favoriteCount INTEGER NOT NULL,
     favorited INTEGER AS Boolean NOT NULL,
+    mentionLinks TEXT AS Map<String, String>,
     FOREIGN KEY (authorId) REFERENCES ProfileEntity(profileId),
     FOREIGN KEY (quoteId) REFERENCES PostEntity(postId)
 );
