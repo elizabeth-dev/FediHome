@@ -63,6 +63,6 @@ fun Profile.toDomain(fetchedFromInstance: String): DomainProfile {
 			)
 		}, // TODO: Add verified field status
 		description = note,
-		emojis = emojis.associate { Pair(it.shortcode, it.toDomain(instance)) },
+		emojis = emojis.associate { Pair("${it.shortcode}@$instance", it.toDomain(instance)) },
 	)
 }

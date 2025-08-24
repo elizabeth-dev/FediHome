@@ -1,14 +1,19 @@
 package sh.elizabeth.fedihome.data.database.entity
 
-import sh.elizabeth.fedihome.EmojiEntity
+import sh.elizabeth.fedihome.GetEmojisForPosts
+import sh.elizabeth.fedihome.GetEmojisForProfiles
 import sh.elizabeth.fedihome.GetPostById
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
 
-fun GetPostById.toPostDomain(emojiList: List<EmojiEntity>): Post {
-	val emojis =
-		emojiList.associate { it.emojiId to it.toDomain() } // TODO: should this be emojiId? or shortcode? it being shortcode caused issues with reactions from other instances
+fun GetPostById.toPostDomain(
+	postEmojiList: List<GetEmojisForPosts>,
+	profileEmojiList: List<GetEmojisForProfiles>
+): Post {
+	val postEmojis = postEmojiList.associate { it.emojiId to it.toDomain() }
+	val profileEmojis = profileEmojiList.associate { it.emojiId to it.toDomain() }
+
 	return Post(
 		id = postId,
 		createdAt = createdAt,
@@ -32,7 +37,7 @@ fun GetPostById.toPostDomain(emojiList: List<EmojiEntity>): Post {
 			avatarBlur = avatarBlur,
 			headerUrl = headerUrl,
 			headerBlur = headerBlur,
-			emojis = emojis,
+			emojis = profileEmojis,
 		),
 		repostedBy = null,
 		quote = if (postId_ != null && profileId_ != null) Post(
@@ -58,12 +63,12 @@ fun GetPostById.toPostDomain(emojiList: List<EmojiEntity>): Post {
 				avatarBlur = avatarBlur_,
 				headerUrl = headerUrl_,
 				headerBlur = headerBlur_,
-				emojis = emojis,
+				emojis = profileEmojis,
 			),
 			repostedBy = null,
 			quote = null,
 			poll = poll_?.toDomain(),
-			emojis = emojis,
+			emojis = postEmojis,
 			reactions = reactions ?: emptyMap(),
 			myReaction = myReaction,
 			favorites = favoriteCount,
@@ -71,7 +76,7 @@ fun GetPostById.toPostDomain(emojiList: List<EmojiEntity>): Post {
 			mentionLinksMap = mentionLinks
 		) else null,
 		poll = poll?.toDomain(),
-		emojis = emojis,
+		emojis = postEmojis,
 		reactions = reactions ?: emptyMap(),
 		myReaction = myReaction,
 		favorites = favoriteCount,

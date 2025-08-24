@@ -56,6 +56,7 @@ fun SlimProfileSummary(
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
 					allowClickable = false,
+					instance = profile.instance
 				)
 				Text(
 					"@${profile.username}",

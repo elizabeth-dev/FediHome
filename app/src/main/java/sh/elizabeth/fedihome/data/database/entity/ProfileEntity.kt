@@ -1,6 +1,6 @@
 package sh.elizabeth.fedihome.data.database.entity
 
-import sh.elizabeth.fedihome.EmojiEntity
+import sh.elizabeth.fedihome.GetEmojisForProfiles
 import sh.elizabeth.fedihome.ProfileEntity
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
@@ -10,7 +10,7 @@ data class ProfileFieldEntity(
 	val value: String,
 )
 
-fun ProfileEntity.toDomain(emojiList: List<EmojiEntity>): Profile = Profile(
+fun ProfileEntity.toDomain(emojiList: List<GetEmojisForProfiles>): Profile = Profile(
 	id = profileId,
 	username = username,
 	instance = instance,
@@ -27,5 +27,5 @@ fun ProfileEntity.toDomain(emojiList: List<EmojiEntity>): Profile = Profile(
 	avatarBlur = avatarBlur,
 	headerUrl = headerUrl,
 	headerBlur = headerBlur,
-	emojis = emojiList.associate { it.shortcode to it.toDomain() },
+	emojis = emojiList.associate { it.emojiId to it.toDomain() },
 )

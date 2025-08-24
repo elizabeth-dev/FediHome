@@ -48,7 +48,7 @@ getMultipleProfilesByIds:
 SELECT * FROM ProfileEntity WHERE profileId IN ?;
 
 getEmojisForProfiles:
-SELECT EmojiEntity.* FROM ProfileEmojiCrossRef
+SELECT ProfileEmojiCrossRef.profileId, EmojiEntity.* FROM ProfileEmojiCrossRef
 
 JOIN EmojiEntity ON ProfileEmojiCrossRef.emojiId = EmojiEntity.emojiId
 

@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
@@ -21,11 +22,13 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import sh.elizabeth.fedihome.localNavToProfile
 import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.util.DEFAULT_EMOJI_SIZE
 import sh.elizabeth.fedihome.util.fromHtml
+import sh.elizabeth.fedihome.util.openLinkInBrowser
 
 //val contentPattern =
 //	":(?<emoji>[\\w-]+):|(?<url>(\\s|^)${Patterns.WEB_URL.pattern()})|(?<mention>(\\s|^)@\\w+(@${Patterns.DOMAIN_NAME})?)"
@@ -48,23 +51,26 @@ fun EnrichedText(
 	instance: String? = null,
 	allowClickable: Boolean = true,
 ) {
+	val ctx = LocalContext.current
+
 	val navToProfileTag = localNavToProfile.current
 	val _emojiSize = with(LocalDensity.current) {
 		emojiSize.toDp()
 	}
+
 	val linkStyles = TextLinkStyles(style = SpanStyle(color = MaterialTheme.colorScheme.primary))
-	val linkInteractionListener = object : LinkInteractionListener {
+	val linkInteractionListener = if (allowClickable) object : LinkInteractionListener {
 		override fun onClick(link: LinkAnnotation) {
 			if (link is LinkAnnotation.Url) {
-				val linkMapping = mentionLinksMap!![link.url]
+				val linkMapping = mentionLinksMap?.get(link.url)
 				if (linkMapping != null) {
 					navToProfileTag(linkMapping)
 				} else {
-					return
+					openLinkInBrowser(link.url.toUri(), ctx)
 				}
 			}
 		}
-	}
+	} else null
 
 	Text(
 		/*		text = buildAnnotatedString {
@@ -126,7 +132,7 @@ fun EnrichedText(
 			),
 			linkStyles = linkStyles,
 			linkInteractionListener = linkInteractionListener,
-		),
+		).trim() as AnnotatedString,
 		modifier = modifier,
 		overflow = overflow,
 		softWrap = softWrap,
@@ -134,8 +140,8 @@ fun EnrichedText(
 		minLines = minLines,
 		style = style,
 		color = color,
-		inlineContent = emojis.map { (key, emoji) ->
-			key to InlineTextContent(
+		inlineContent = emojis.filter { it.key.endsWith("@$instance") }.map { (key, emoji) ->
+			key.split('@').first() to InlineTextContent(
 				placeholder = Placeholder(
 					width = emojiSize,
 					height = emojiSize,

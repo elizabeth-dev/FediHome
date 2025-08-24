@@ -1,13 +1,17 @@
 package sh.elizabeth.fedihome.data.database.entity
 
-import sh.elizabeth.fedihome.EmojiEntity
+import sh.elizabeth.fedihome.GetEmojisForPosts
+import sh.elizabeth.fedihome.GetEmojisForProfiles
 import sh.elizabeth.fedihome.GetTimelinePosts
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
 
-fun GetTimelinePosts.toPostDomain(emojiList: List<EmojiEntity>): Post {
-	val emojis = emojiList.associate { Pair(it.shortcode, it.toDomain()) }
+fun GetTimelinePosts.toPostDomain(
+	postEmojiList: List<GetEmojisForPosts>, profileEmojiList: List<GetEmojisForProfiles>
+): Post {
+	val postEmojis = postEmojiList.associate { it.emojiId to it.toDomain() }
+	val profileEmojis = profileEmojiList.associate { it.emojiId to it.toDomain() }
 	return Post(
 		id = postId_,
 		createdAt = createdAt,
@@ -31,7 +35,7 @@ fun GetTimelinePosts.toPostDomain(emojiList: List<EmojiEntity>): Post {
 			avatarBlur = avatarBlur,
 			headerUrl = headerUrl,
 			headerBlur = headerBlur,
-			emojis = emojis,
+			emojis = profileEmojis,
 		),
 		repostedBy = if (profileId_ != null) Profile(
 			id = profileId_,
@@ -50,7 +54,7 @@ fun GetTimelinePosts.toPostDomain(emojiList: List<EmojiEntity>): Post {
 			avatarBlur = avatarBlur_,
 			headerUrl = headerUrl_,
 			headerBlur = headerBlur_,
-			emojis = emojis,
+			emojis = profileEmojis,
 		) else null,
 		quote = if (postId__ != null && profileId__ != null) Post(
 			id = postId__,
@@ -75,22 +79,24 @@ fun GetTimelinePosts.toPostDomain(emojiList: List<EmojiEntity>): Post {
 				avatarBlur = avatarBlur__,
 				headerUrl = headerUrl__,
 				headerBlur = headerBlur__,
-				emojis = emojis,
+				emojis = profileEmojis,
 			),
 			repostedBy = null,
 			quote = null,
 			poll = poll_?.toDomain(),
-			emojis = emojis,
+			emojis = postEmojis,
 			reactions = reactions ?: emptyMap(),
 			myReaction = myReaction,
 			favorites = favoriteCount,
 			favorited = favorited,
+			mentionLinksMap = mentionLinks_
 		) else null,
 		poll = poll?.toDomain(),
-		emojis = emojis,
+		emojis = postEmojis,
 		reactions = reactions ?: emptyMap(),
 		myReaction = myReaction,
 		favorites = favoriteCount,
 		favorited = favorited,
+		mentionLinksMap = mentionLinks
 	)
 }

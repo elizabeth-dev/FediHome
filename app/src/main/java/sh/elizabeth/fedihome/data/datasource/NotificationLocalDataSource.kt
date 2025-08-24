@@ -30,10 +30,8 @@ class NotificationLocalDataSource @Inject constructor(private val appDatabase: A
 		}
 
 	fun getNotificationsFlow(forAccount: String): Flow<List<Notification>> =
-		appDatabase.notificationQueries.getNotificationByAccount(forAccount)
-			.asFlow()
-			.mapToList(Dispatchers.IO)
-			.map {
+		appDatabase.notificationQueries.getNotificationByAccount(forAccount).asFlow()
+			.mapToList(Dispatchers.IO).map {
 				val postIds = it.flatMap { listOf(it.postId, it.postId_) }
 				val profileIds = it.flatMap { listOf(it.profileId, it.profileId_, it.profileId__) }
 
@@ -41,7 +39,11 @@ class NotificationLocalDataSource @Inject constructor(private val appDatabase: A
 				val postEmojis = appDatabase.postQueries.getEmojisForPosts(postIds).executeAsList()
 				val profileEmojis =
 					appDatabase.profileQueries.getEmojisForProfiles(profileIds).executeAsList()
-				it.map { it.toDomain(postEmojis.plus(profileEmojis)) }
+				it.map {
+					it.toDomain(
+						postEmojis.filter { postEmoji -> postEmoji.postId == it.postId },
+						profileEmojis.filter { profileEmoji -> profileEmoji.profileId == it.profileId || profileEmoji.profileId == it.authorId })
+				}
 			}
 
 }

@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.Browser
 import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
 
@@ -20,8 +21,9 @@ fun openLinkInCustomTab(uri: Uri, context: Context) {
 	}
 }
 
-private fun openLinkInBrowser(uri: Uri?, context: Context) {
+fun openLinkInBrowser(uri: Uri?, context: Context) {
 	val intent = Intent(Intent.ACTION_VIEW, uri)
+	intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.packageName)
 	try {
 		context.startActivity(intent)
 	} catch (e: ActivityNotFoundException) {

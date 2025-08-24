@@ -42,7 +42,9 @@ class PostLocalDataSource @Inject constructor(private val appDatabase: AppDataba
 				appDatabase.profileQueries.getEmojisForProfiles(listOf(it.profileId, it.profileId_))
 					.executeAsList()
 
-			it.toPostDomain(postEmojis.plus(profileEmojis))
+			it.toPostDomain(
+				postEmojis.filter { postEmoji -> postEmoji.postId == it.postId || postEmoji.postId == it.postId_ },
+				profileEmojis.filter { profileEmoji -> profileEmoji.profileId == it.authorId || profileEmoji.profileId == it.authorId_ })
 		}
 
 	fun getPostSingle(postId: String): Post? =
@@ -54,7 +56,9 @@ class PostLocalDataSource @Inject constructor(private val appDatabase: AppDataba
 				appDatabase.profileQueries.getEmojisForProfiles(listOf(it.profileId, it.profileId_))
 					.executeAsList()
 
-			it.toPostDomain(postEmojis.plus(profileEmojis))
+			it.toPostDomain(
+				postEmojis.filter { postEmoji -> postEmoji.postId == it.postId || postEmoji.postId == it.postId_ },
+				profileEmojis.filter { profileEmoji -> profileEmoji.profileId == it.authorId || profileEmoji.profileId == it.authorId_ })
 		}
 
 	fun getPostsByProfile(profileId: String) =
@@ -66,7 +70,11 @@ class PostLocalDataSource @Inject constructor(private val appDatabase: AppDataba
 			val postEmojis = appDatabase.postQueries.getEmojisForPosts(postIds).executeAsList()
 			val profileEmojis =
 				appDatabase.profileQueries.getEmojisForProfiles(profileIds).executeAsList()
-			it.map { it.toPostDomain(postEmojis.plus(profileEmojis)) }
+			it.map { post ->
+				post.toPostDomain(
+					postEmojis.filter { postEmoji -> postEmoji.postId == post.postId || postEmoji.postId == post.postId_ },
+					profileEmojis.filter { profileEmoji -> profileEmoji.profileId == post.authorId || profileEmoji.profileId == post.authorId_ })
+			}
 		}
 }
 

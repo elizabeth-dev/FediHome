@@ -59,7 +59,7 @@ WHERE PostEntity.authorId = ?
 ORDER BY PostEntity.createdAt DESC;
 
 getEmojisForPosts:
-SELECT EmojiEntity.* FROM PostEmojiCrossRef
+SELECT PostEmojiCrossRef.postId, EmojiEntity.* FROM PostEmojiCrossRef
 
 JOIN EmojiEntity ON PostEmojiCrossRef.emojiId = EmojiEntity.emojiId
 

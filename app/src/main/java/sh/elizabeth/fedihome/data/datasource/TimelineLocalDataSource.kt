@@ -30,7 +30,11 @@ class TimelineLocalDataSource @Inject constructor(private val appDatabase: AppDa
 				val profileEmojis =
 					appDatabase.profileQueries.getEmojisForProfiles(profileIds).executeAsList()
 
-				it.map { it.toPostDomain(postEmojis.plus(profileEmojis)) }
+				it.map {
+					it.toPostDomain(
+						postEmojis.filter { postEmoji -> postEmoji.postId == it.postId || postEmoji.postId == it.postId__ },
+						profileEmojis.filter { profileEmoji -> profileEmoji.profileId == it.authorId || profileEmoji.profileId == it.authorId_ || profileEmoji.profileId == it.profileId_ })
+				}
 			}
 }
 

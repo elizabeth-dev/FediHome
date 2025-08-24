@@ -1,14 +1,20 @@
 package sh.elizabeth.fedihome.data.database.entity
 
-import sh.elizabeth.fedihome.EmojiEntity
+import sh.elizabeth.fedihome.GetEmojisForPosts
+import sh.elizabeth.fedihome.GetEmojisForProfiles
 import sh.elizabeth.fedihome.GetNotificationByAccount
 import sh.elizabeth.fedihome.model.Notification
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
 
-fun GetNotificationByAccount.toDomain(emojiList: List<EmojiEntity>): Notification {
-	val emojis = emojiList.associate { it.shortcode to it.toDomain() }
+fun GetNotificationByAccount.toDomain(
+	postEmojiList: List<GetEmojisForPosts>,
+	profileEmojiList: List<GetEmojisForProfiles>
+): Notification {
+	val postEmojis = postEmojiList.associate { it.emojiId to it.toDomain() }
+	val profileEmojis = profileEmojiList.associate { it.emojiId to it.toDomain() }
+
 	return Notification(
 		id = notificationId,
 		forAccount = forAccount,
@@ -32,7 +38,7 @@ fun GetNotificationByAccount.toDomain(emojiList: List<EmojiEntity>): Notificatio
 			fields = fields!!.map {
 				ProfileField(name = it.name, value = it.value)
 			},
-			emojis = emojis
+			emojis = profileEmojis
 		) else null,
 		post = if (postId_ != null && profileId__ !== null) Post(
 			id = postId_,
@@ -58,9 +64,9 @@ fun GetNotificationByAccount.toDomain(emojiList: List<EmojiEntity>): Notificatio
 				avatarBlur = avatarBlur_,
 				headerUrl = headerUrl_,
 				headerBlur = headerBlur_,
-				emojis = emojis,
+				emojis = profileEmojis,
 			),
-			emojis = emojis,
+			emojis = postEmojis,
 			repostedBy = null,
 			quote = null,
 			poll = poll?.toDomain(),
