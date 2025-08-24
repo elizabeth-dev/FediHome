@@ -89,7 +89,9 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 					it.url,
 					if (it.acct.contains('@')) it.acct else "${it.acct}@$fetchedFromInstance"
 				)
-			})
+			},
+			attachments = reblog.mediaAttachments.map(Media::toDomain)
+		)
 	}
 
 	val originalPostInstance = account.acct.split('@').getOrElse(1) { fetchedFromInstance }
@@ -113,8 +115,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		myReaction = reactions?.firstOrNull { it.me }?.name,
 		emojis = emojis.associate {
 			Pair(
-				"${it.shortcode}@$originalPostInstance",
-				it.toDomain(originalPostInstance)
+				"${it.shortcode}@$originalPostInstance", it.toDomain(originalPostInstance)
 			)
 		}.plus(reactions?.filter { !it.url.isNullOrBlank() || !it.staticUrl.isNullOrBlank() }
 			?.associate {
@@ -129,7 +130,9 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			Pair(
 				it.url, if (it.acct.contains('@')) it.acct else "${it.acct}@$fetchedFromInstance"
 			)
-		})
+		},
+		attachments = mediaAttachments.map(Media::toDomain)
+	)
 }
 
 @Serializable

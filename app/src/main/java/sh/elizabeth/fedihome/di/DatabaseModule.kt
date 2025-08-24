@@ -16,6 +16,7 @@ import sh.elizabeth.fedihome.NotificationEntity
 import sh.elizabeth.fedihome.PostEntity
 import sh.elizabeth.fedihome.ProfileEntity
 import sh.elizabeth.fedihome.data.database.AppDatabase
+import sh.elizabeth.fedihome.data.database.entity.AttachmentEntity
 import sh.elizabeth.fedihome.data.database.entity.PollEntity
 import sh.elizabeth.fedihome.data.database.entity.ProfileFieldEntity
 import java.time.Instant
@@ -75,6 +76,19 @@ val instantAdapter = object : ColumnAdapter<Instant, Long> {
 	override fun encode(value: Instant): Long = value.toEpochMilli()
 }
 
+val attachmentEntityListAdapter = object : ColumnAdapter<List<AttachmentEntity>, String> {
+	override fun decode(databaseValue: String): List<AttachmentEntity> {
+		val type = object : TypeToken<List<AttachmentEntity>>() {}.type
+		return Gson().fromJson(databaseValue, type)
+	}
+
+	override fun encode(value: List<AttachmentEntity>): String {
+		val type = object : TypeToken<List<AttachmentEntity>>() {}.type
+		return Gson().toJson(value, type)
+	}
+}
+
+
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
@@ -100,13 +114,16 @@ object DatabaseModule {
 
 		NotificationEntityAdapter = NotificationEntity.Adapter(
 			typeAdapter = EnumColumnAdapter(), createdAtAdapter = instantAdapter
-		), PostEntityAdapter = PostEntity.Adapter(
+		),
+		PostEntityAdapter = PostEntity.Adapter(
 			pollAdapter = pollEntityAdapter,
 			createdAtAdapter = instantAdapter,
 			updatedAtAdapter = instantAdapter,
 			reactionsAdapter = mapAdapter,
 			mentionLinksAdapter = mapStringStringAdapter,
-		), ProfileEntityAdapter = ProfileEntity.Adapter(
+			attachmentsAdapter = attachmentEntityListAdapter
+		),
+		ProfileEntityAdapter = ProfileEntity.Adapter(
 			fieldsAdapter = profileFieldEntityListAdapter, createdAtAdapter = instantAdapter
 		),
 	)

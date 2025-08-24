@@ -27,6 +27,7 @@ import sh.elizabeth.fedihome.localNavToCompose
 import sh.elizabeth.fedihome.localNavToPost
 import sh.elizabeth.fedihome.localNavToProfile
 import sh.elizabeth.fedihome.mock.defaultPost
+import sh.elizabeth.fedihome.model.Attachment
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 
@@ -81,6 +82,8 @@ fun SlimPostCard(
 					modifier = Modifier,
 					instance = post.author.instance
 				)
+
+				if (post.attachments.isNotEmpty()) AttachmentGrid(attachments = post.attachments)
 
 				if (post.poll != null) PollDisplay(poll = post.poll) { onVotePoll(it) }
 
@@ -150,6 +153,18 @@ fun SlimPostCard(
 
 			}
 			if (showDivider) HorizontalDivider(thickness = 1.dp)
+		}
+	}
+}
+
+@Composable
+private fun AttachmentGrid(attachments: List<Attachment>) {
+	Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+		attachments.map {
+			BlurHashImage(
+				imageUrl = it.url,
+				imageBlur = it.blurhash,
+			)
 		}
 	}
 }

@@ -18,6 +18,7 @@ data class Post(
 	val favorited: Boolean,
 	val emojis: Map<String, Emoji>,
 	val mentionLinksMap: Map<String, String>? = null,
+	val attachments: List<Attachment>,
 )
 
 fun Post.unwrapQuotes(): List<Post> {
@@ -42,3 +43,15 @@ data class Poll(
 )
 
 data class PollChoice(val text: String, val votes: Int?, val isVoted: Boolean)
+
+data class Attachment(
+	val id: String,
+	val description: String?,
+	val type: AttachmentType,
+	val url: String,
+	val blurhash: String?
+)
+
+enum class AttachmentType {
+	IMAGE, VIDEO, AUDIO, UNKNOWN,
+}

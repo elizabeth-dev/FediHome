@@ -20,3 +20,27 @@ fun PollEntity.toDomain() = Poll(
 	expiresAt = expiresAt,
 	choices = choices.map { PollChoice(text = it.text, votes = it.votes, isVoted = it.isVoted) })
 
+data class AttachmentEntity(
+	val id: String,
+	val description: String?,
+	val type: AttachmentEntityType,
+	val url: String,
+	val blurhash: String?
+)
+
+enum class AttachmentEntityType {
+	IMAGE, VIDEO, AUDIO, UNKNOWN,
+}
+
+fun AttachmentEntity.toDomain() = sh.elizabeth.fedihome.model.Attachment(
+	id = id,
+	description = description,
+	type = when (type) {
+		AttachmentEntityType.IMAGE -> sh.elizabeth.fedihome.model.AttachmentType.IMAGE
+		AttachmentEntityType.VIDEO -> sh.elizabeth.fedihome.model.AttachmentType.VIDEO
+		AttachmentEntityType.AUDIO -> sh.elizabeth.fedihome.model.AttachmentType.AUDIO
+		AttachmentEntityType.UNKNOWN -> sh.elizabeth.fedihome.model.AttachmentType.UNKNOWN
+	},
+	url = url,
+	blurhash = blurhash,
+)

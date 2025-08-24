@@ -89,6 +89,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			// TODO: handle favorites in Iceshrimp
 			favorites = 0,
 			favorited = false,
+			attachments = files.map(File::toDomain)
 		)
 	}
 	return DomainPost(
@@ -114,6 +115,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		// TODO: handle favorites in Iceshrimp
 		favorites = 0,
 		favorited = false,
+		attachments = files.map(File::toDomain)
 	)
 }
 

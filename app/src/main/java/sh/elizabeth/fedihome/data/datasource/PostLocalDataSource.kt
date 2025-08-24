@@ -9,9 +9,12 @@ import kotlinx.coroutines.flow.map
 import sh.elizabeth.fedihome.PostEmojiCrossRef
 import sh.elizabeth.fedihome.PostEntity
 import sh.elizabeth.fedihome.data.database.AppDatabase
+import sh.elizabeth.fedihome.data.database.entity.AttachmentEntity
+import sh.elizabeth.fedihome.data.database.entity.AttachmentEntityType
 import sh.elizabeth.fedihome.data.database.entity.PollChoiceEntity
 import sh.elizabeth.fedihome.data.database.entity.PollEntity
 import sh.elizabeth.fedihome.data.database.entity.toPostDomain
+import sh.elizabeth.fedihome.model.AttachmentType
 import sh.elizabeth.fedihome.model.Post
 import javax.inject.Inject
 
@@ -97,5 +100,19 @@ fun Post.toEntity() = PostEntity(
 	) else null,
 	favorited = favorited,
 	favoriteCount = favorites,
-	mentionLinks = mentionLinksMap
+	mentionLinks = mentionLinksMap,
+	attachments = attachments.map {
+		AttachmentEntity(
+			id = it.id,
+			type = when (it.type) {
+				AttachmentType.IMAGE -> AttachmentEntityType.IMAGE
+				AttachmentType.VIDEO -> AttachmentEntityType.VIDEO
+				AttachmentType.AUDIO -> AttachmentEntityType.AUDIO
+				AttachmentType.UNKNOWN -> AttachmentEntityType.UNKNOWN
+			},
+			url = it.url,
+			blurhash = it.blurhash,
+			description = it.description,
+		)
+	},
 )

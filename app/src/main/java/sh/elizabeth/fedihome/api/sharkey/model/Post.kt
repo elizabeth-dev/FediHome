@@ -3,6 +3,7 @@ package sh.elizabeth.fedihome.api.sharkey.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import sh.elizabeth.fedihome.api.iceshrimp.model.File
+import sh.elizabeth.fedihome.api.iceshrimp.model.toDomain
 import sh.elizabeth.fedihome.util.InstantAsString
 
 @Serializable
@@ -85,6 +86,7 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 			// TODO: handle favorites in Sharkey
 			favorites = 0,
 			favorited = false,
+			attachments = files.map(File::toDomain)
 		)
 	}
 	return sh.elizabeth.fedihome.model.Post(
@@ -110,6 +112,7 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 		// TODO: handle favorites in Sharkey
 		favorites = 0,
 		favorited = false,
+		attachments = files.map(File::toDomain)
 	)
 }
 

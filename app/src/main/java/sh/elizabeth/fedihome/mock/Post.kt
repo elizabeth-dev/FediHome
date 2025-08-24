@@ -25,6 +25,7 @@ val defaultPost = Post(
 		myReaction = null,
 		favorites = 3L,
 		favorited = false,
+		attachments = emptyList()
 	),
 	repostedBy = defaultProfile,
 	poll = defaultPoll,
@@ -33,4 +34,5 @@ val defaultPost = Post(
 	myReaction = null,
 	favorites = 3L,
 	favorited = true,
+	attachments = emptyList()
 )

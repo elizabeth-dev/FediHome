@@ -1,6 +1,8 @@
 package sh.elizabeth.fedihome.api.iceshrimp.model
 
 import kotlinx.serialization.Serializable
+import sh.elizabeth.fedihome.model.Attachment
+import sh.elizabeth.fedihome.model.AttachmentType
 import sh.elizabeth.fedihome.util.InstantAsString
 
 @Serializable
@@ -21,6 +23,19 @@ data class File(
 	val folder: FileFolder?,
 	val userId: String?,
 	val user: UserLite?,
+)
+
+fun File.toDomain() = Attachment(
+	id = id,
+	description = comment,
+	type = when {
+		type.startsWith("image") -> AttachmentType.IMAGE
+		type.startsWith("video") -> AttachmentType.VIDEO
+		type.startsWith("audio") -> AttachmentType.AUDIO
+		else -> AttachmentType.UNKNOWN
+	},
+	url = url ?: "",
+	blurhash = blurhash,
 )
 
 @Serializable

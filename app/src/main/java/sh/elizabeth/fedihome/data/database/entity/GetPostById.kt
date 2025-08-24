@@ -69,11 +69,12 @@ fun GetPostById.toPostDomain(
 			quote = null,
 			poll = poll_?.toDomain(),
 			emojis = postEmojis,
-			reactions = reactions ?: emptyMap(),
-			myReaction = myReaction,
-			favorites = favoriteCount,
-			favorited = favorited,
-			mentionLinksMap = mentionLinks
+			reactions = reactions_ ?: emptyMap(),
+			myReaction = myReaction_,
+			favorites = favoriteCount_!!,
+			favorited = favorited_!!,
+			mentionLinksMap = mentionLinks_,
+			attachments = attachments_?.map(AttachmentEntity::toDomain) ?: emptyList(),
 		) else null,
 		poll = poll?.toDomain(),
 		emojis = postEmojis,
@@ -81,6 +82,7 @@ fun GetPostById.toPostDomain(
 		myReaction = myReaction,
 		favorites = favoriteCount,
 		favorited = favorited,
-		mentionLinksMap = mentionLinks
+		mentionLinksMap = mentionLinks,
+		attachments = attachments?.map(AttachmentEntity::toDomain) ?: emptyList(),
 	)
 }

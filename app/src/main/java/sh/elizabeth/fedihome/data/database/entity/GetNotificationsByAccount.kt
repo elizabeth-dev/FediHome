@@ -9,8 +9,7 @@ import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
 
 fun GetNotificationByAccount.toDomain(
-	postEmojiList: List<GetEmojisForPosts>,
-	profileEmojiList: List<GetEmojisForProfiles>
+	postEmojiList: List<GetEmojisForPosts>, profileEmojiList: List<GetEmojisForProfiles>
 ): Notification {
 	val postEmojis = postEmojiList.associate { it.emojiId to it.toDomain() }
 	val profileEmojis = profileEmojiList.associate { it.emojiId to it.toDomain() }
@@ -74,6 +73,7 @@ fun GetNotificationByAccount.toDomain(
 			myReaction = myReaction,
 			favorites = favoriteCount!!,
 			favorited = favorited!!,
+			attachments = attachments?.map(AttachmentEntity::toDomain) ?: emptyList(),
 		) else null
 	)
 }

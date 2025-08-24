@@ -69,10 +69,11 @@ fun GetPostByAuthor.toPostDomain(
 			quote = null,
 			poll = poll_?.toDomain(),
 			emojis = postEmojis,
-			reactions = reactions ?: emptyMap(),
-			myReaction = myReaction,
-			favorites = favoriteCount,
-			favorited = favorited,
+			reactions = reactions_ ?: emptyMap(),
+			myReaction = myReaction_,
+			favorites = favoriteCount_!!,
+			favorited = favorited_!!,
+			attachments = attachments_?.map(AttachmentEntity::toDomain) ?: emptyList(),
 		) else null,
 		poll = poll?.toDomain(),
 		emojis = postEmojis,
@@ -80,5 +81,6 @@ fun GetPostByAuthor.toPostDomain(
 		myReaction = myReaction,
 		favorites = favoriteCount,
 		favorited = favorited,
+		attachments = attachments?.map(AttachmentEntity::toDomain) ?: emptyList(),
 	)
 }
