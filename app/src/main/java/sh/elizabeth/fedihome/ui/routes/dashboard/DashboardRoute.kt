@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -73,23 +74,30 @@ fun DashboardRoute(
 ) {
 	val navToCompose = localNavToCompose.current
 	var selectedTab by remember { mutableStateOf(HOME.route) }
-	val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 	var showAccountPicker by remember { mutableStateOf(false) }
+
+	val homeScrollState = rememberLazyListState()
+	val notificationsScrollState = rememberLazyListState()
 
 	// FIXME: activeAccount might not be cached? cache on startup?
 	val activeProfile = loggedInProfiles.find { it.id == activeAccount }!!
 
+	val onTabPressed = { tabRoute: String ->
+		if (selectedTab == tabRoute) {
+			if (tabRoute == HOME.route) homeScrollState.requestScrollToItem(0)
+			if (tabRoute == NOTIFICATIONS.route) notificationsScrollState.requestScrollToItem(0)
+		} else selectedTab = tabRoute
+	}
+
 	Scaffold(bottomBar = {
 		if (windowWidthSizeClass == WindowWidthSizeClass.Compact) {
-			DashboardNavBar(selectedTab) {
-				selectedTab = it
-			}
+			DashboardNavBar(selectedTab, onTabPressed)
 		}
 	}, topBar = {
 		if (windowWidthSizeClass == WindowWidthSizeClass.Compact) DashboardTopBar(
 			currentProfileName = "@${activeProfile.username}",
 			onAccountPickerShow = { showAccountPicker = true },
-			scrollBehavior = scrollBehavior
+			scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 		)
 	}, floatingActionButton = {
 		PostFAB(onClick = { navToCompose(null) })
@@ -101,12 +109,13 @@ fun DashboardRoute(
 				.consumeWindowInsets(contentPadding),
 		) {
 			if (windowWidthSizeClass != WindowWidthSizeClass.Compact) {
-				DashboardNavRail(selectedTab = selectedTab, onTabSelected = {
-					selectedTab = it
-				}, onAccountPickerShow = { showAccountPicker = true })
+				DashboardNavRail(
+					selectedTab = selectedTab,
+					onTabSelected = onTabPressed,
+					onAccountPickerShow = { showAccountPicker = true })
 			}
-			if (selectedTab == HOME.route) HomeScreen()
-			if (selectedTab == NOTIFICATIONS.route) NotificationsScreen()
+			if (selectedTab == HOME.route) HomeScreen(scrollState = homeScrollState)
+			if (selectedTab == NOTIFICATIONS.route) NotificationsScreen(scrollState = notificationsScrollState)
 			if (selectedTab == SEARCH.route) Text("Search screen")
 
 			AccountPicker(

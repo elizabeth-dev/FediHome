@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,11 +26,13 @@ import sh.elizabeth.fedihome.ui.composable.SlimPostCard
 @Composable
 fun HomeScreen(
 	homeViewModel: HomeViewModel = hiltViewModel(),
+	scrollState: LazyListState,
 ) {
 	val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
 	HomeScreen(
 		uiState = uiState,
+		scrollState = scrollState,
 		onRefresh = homeViewModel::refreshTimeline,
 		onVotePoll = homeViewModel::votePoll,
 		onAddFavorite = homeViewModel::addFavorite,
@@ -42,6 +45,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreen(
 	uiState: HomeUiState,
+	scrollState: LazyListState,
 	onRefresh: (String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
@@ -72,7 +76,10 @@ fun HomeScreen(
 				Text(text = "No posts yet!")
 			}
 
-			is HomeUiState.HasPosts -> LazyColumn(Modifier.fillMaxSize()) {
+			is HomeUiState.HasPosts -> LazyColumn(
+				modifier = Modifier.fillMaxSize(),
+				state = scrollState
+			) {
 				items(uiState.posts) { post ->
 					SlimPostCard(
 						post = post,

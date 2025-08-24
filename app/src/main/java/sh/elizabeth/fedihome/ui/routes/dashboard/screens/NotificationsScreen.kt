@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,11 +27,13 @@ import sh.elizabeth.fedihome.ui.composable.NotificationCard
 @Composable
 fun NotificationsScreen(
 	notificationsViewModel: NotificationsViewModel = hiltViewModel(),
+	scrollState: LazyListState,
 ) {
 	val uiState by notificationsViewModel.uiState.collectAsStateWithLifecycle()
 
 	NotificationsScreen(
 		uiState = uiState,
+		scrollState = scrollState,
 		onRefresh = notificationsViewModel::refreshNotifications,
 		onVotePoll = notificationsViewModel::votePoll,
 		onAddFavorite = notificationsViewModel::addFavorite,
@@ -43,6 +46,7 @@ fun NotificationsScreen(
 @Composable
 fun NotificationsScreen(
 	uiState: NotificationsUiState,
+	scrollState: LazyListState,
 	onRefresh: (profileId: String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 	onAddFavorite: (String, String) -> Unit,
@@ -73,7 +77,7 @@ fun NotificationsScreen(
 			}
 
 			is NotificationsUiState.HasNotifications -> {
-				LazyColumn(Modifier.fillMaxSize()) {
+				LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
 					items(uiState.notifications) { notification ->
 						NotificationCard(
 							notification = notification,
