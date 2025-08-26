@@ -22,16 +22,19 @@ class NotificationLocalDataSource @Inject constructor(private val appDatabase: A
 						createdAt = notification.createdAt,
 						type = notification.type,
 						reaction = notification.reaction,
+						reactionEmoji = notification.reactionEmoji?.fullEmojiId,
 						profileId = notification.profile?.id,
-						postId = notification.post?.id
+						postId = notification.post?.id,
 					)
 				)
 			}
 		}
 
 	fun getNotificationsFlow(forAccount: String): Flow<List<Notification>> =
-		appDatabase.notificationQueries.getNotificationByAccount(forAccount).asFlow()
-			.mapToList(Dispatchers.IO).map {
+		appDatabase.notificationQueries.getNotificationByAccount(forAccount)
+			.asFlow()
+			.mapToList(Dispatchers.IO)
+			.map {
 				val postIds = it.flatMap { listOf(it.postId, it.postId_) }
 				val profileIds = it.flatMap { listOf(it.profileId, it.profileId_, it.profileId__) }
 

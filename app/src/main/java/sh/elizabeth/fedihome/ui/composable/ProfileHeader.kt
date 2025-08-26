@@ -125,7 +125,8 @@ fun ProfileHeader(profile: Profile) {
 							emojis = profile.emojis,
 							emojiSize = 30.sp,
 							style = MaterialTheme.typography.headlineSmall,
-							allowClickable = false
+							allowClickable = false,
+							instance = profile.instance
 						)
 						Text(
 							"@${profile.username}",

@@ -48,7 +48,7 @@ fun EnrichedText(
 	minLines: Int = 1,
 	style: TextStyle = LocalTextStyle.current,
 	color: Color = Color.Unspecified,
-	instance: String? = null,
+	instance: String,
 	allowClickable: Boolean = true,
 ) {
 	val ctx = LocalContext.current
@@ -140,6 +140,7 @@ fun EnrichedText(
 		minLines = minLines,
 		style = style,
 		color = color,
+
 		inlineContent = emojis.filter { it.key.endsWith("@$instance") }.map { (key, emoji) ->
 			key.split('@').first() to InlineTextContent(
 				placeholder = Placeholder(
@@ -150,7 +151,7 @@ fun EnrichedText(
 			) {
 				AsyncImage(
 					model = emoji.url,
-					contentDescription = key,
+					contentDescription = emoji.shortcode,
 					modifier = Modifier.size(_emojiSize)
 				)
 			}

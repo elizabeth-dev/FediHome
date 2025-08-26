@@ -7,9 +7,11 @@ CREATE TABLE NotificationEntity (
     createdAt INTEGER AS Instant NOT NULL,
     type TEXT AS NotificationType NOT NULL,
     reaction TEXT,
+    reactionEmoji TEXT,
     profileId TEXT,
     postId TEXT,
-    FOREIGN KEY (postId) REFERENCES PostEntity(postId)
+    FOREIGN KEY (postId) REFERENCES PostEntity(postId),
+    FOREIGN KEY (reactionEmoji) REFERENCES EmojiEntity(emojiId)
 );
 
 CREATE INDEX notiication_forAccount ON NotificationEntity(forAccount);
@@ -22,5 +24,6 @@ SELECT * FROM NotificationEntity
 LEFT JOIN ProfileEntity ON NotificationEntity.profileId = ProfileEntity.profileId
 LEFT JOIN PostEntity ON NotificationEntity.postId = PostEntity.postId
 LEFT JOIN ProfileEntity AS PostProfile ON PostEntity.authorId = PostProfile.profileId
+LEFT JOIN EmojiEntity ON NotificationEntity.reactionEmoji = EmojiEntity.emojiId
 
 WHERE forAccount = ? ORDER BY NotificationEntity.createdAt DESC;

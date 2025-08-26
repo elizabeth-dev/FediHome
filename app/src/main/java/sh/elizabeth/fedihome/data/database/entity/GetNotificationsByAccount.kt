@@ -3,6 +3,7 @@ package sh.elizabeth.fedihome.data.database.entity
 import sh.elizabeth.fedihome.GetEmojisForPosts
 import sh.elizabeth.fedihome.GetEmojisForProfiles
 import sh.elizabeth.fedihome.GetNotificationByAccount
+import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.model.Notification
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.Profile
@@ -20,6 +21,12 @@ fun GetNotificationByAccount.toDomain(
 		createdAt = createdAt,
 		type = type,
 		reaction = reaction,
+		reactionEmoji = if (emojiId != null && instance__ != null && shortcode != null && url != null) Emoji(
+			fullEmojiId = emojiId,
+			instance = instance__,
+			shortcode = shortcode,
+			url = url,
+		) else null,
 		profile = if (profileId_ != null) Profile(
 			id = profileId_,
 			name = name!!,

@@ -78,6 +78,7 @@ fun Notification.toDomain(fetchedFromInstance: String, forAccount: String) = sh.
 	type = type.toDomain(),
 	post = note?.toDomain(fetchedFromInstance),
 	reaction = reaction,
+	reactionEmoji = null, // TODO: find where to get emoji
 	profile = user?.toDomain(fetchedFromInstance)
 )
 

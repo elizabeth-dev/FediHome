@@ -13,7 +13,6 @@ import sh.elizabeth.fedihome.data.datasource.NotificationRemoteDataSource
 import sh.elizabeth.fedihome.model.unwrapProfiles
 import sh.elizabeth.fedihome.model.unwrapQuotes
 import sh.elizabeth.fedihome.util.InstanceEndpointTypeToken
-import sh.elizabeth.fedihome.util.SupportedInstances
 import javax.inject.Inject
 
 class NotificationRepository @Inject constructor(
@@ -43,24 +42,23 @@ class NotificationRepository @Inject constructor(
 		)
 
 		val notificationRes = notificationRemoteDataSource.getNotifications(
-            forAccount = activeAccount,
-            instance = instanceData.instance,
-            endpoint = instanceData.endpoint,
-            instanceType = instanceData.instanceType,
-            token = instanceData.token
+			forAccount = activeAccount,
+			instance = instanceData.instance,
+			endpoint = instanceData.endpoint,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token
 		)
 
 		val posts = notificationRes.mapNotNull { it.post }.flatMap {
 			it.unwrapQuotes()
 		}.toSet()
-		val profiles =
-			posts.flatMap { it.unwrapProfiles() }
-				.plus(notificationRes.mapNotNull { it.profile })
-				.toSet()
-		val emojis =
-			posts.flatMap { it.emojis.values }
-				.plus(profiles.flatMap { it.emojis.values })
-				.toSet()
+		val profiles = posts.flatMap { it.unwrapProfiles() }
+			.plus(notificationRes.mapNotNull { it.profile })
+			.toSet()
+		val emojis = posts.flatMap { it.emojis.values }
+			.plus(profiles.flatMap { it.emojis.values })
+			.plus(notificationRes.mapNotNull { it.reactionEmoji })
+			.toSet()
 
 		val postEmojiCrossRefs = posts.flatMap { post ->
 			post.emojis.values.map { emoji ->
@@ -76,17 +74,16 @@ class NotificationRepository @Inject constructor(
 		}
 
 		coroutineScope {
-			val emojiRef =
-				async { emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray()) }
+			val emojiRef = async { emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray()) }
 
 			profileRepository.insertOrReplace(*profiles.toTypedArray())
 			postRepository.insertOrReplace(*posts.toTypedArray())
 
+			emojiRef.await()
+
 			val notificationRef = async {
 				notificationLocalDataSource.insertOrReplace(*notificationRes.toTypedArray())
 			}
-
-			emojiRef.await()
 
 			val postEmojiRef =
 				async { postRepository.insertOrReplaceEmojiCrossRef(*postEmojiCrossRefs.toTypedArray()) }

@@ -131,7 +131,8 @@ fun ProfilePreview(modifier: Modifier = Modifier, profile: Profile) {
 							emojis = profile.emojis,
 							emojiSize = 30.sp,
 							style = MaterialTheme.typography.headlineSmall,
-							allowClickable = false
+							allowClickable = false,
+							instance = profile.instance
 						)
 						Text(
 							"@${profile.username}", style = MaterialTheme.typography.bodyLarge.copy(
@@ -145,6 +146,7 @@ fun ProfilePreview(modifier: Modifier = Modifier, profile: Profile) {
 						text = profile.description,
 						emojis = profile.emojis,
 						style = MaterialTheme.typography.bodyLarge,
+						instance = profile.instance
 					)
 				}
 			}

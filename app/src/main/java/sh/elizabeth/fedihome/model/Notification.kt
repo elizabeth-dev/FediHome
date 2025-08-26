@@ -10,12 +10,14 @@ data class Notification(
 	val profile: Profile?, // TODO: the notifications we support should always have a profile
 	val post: Post?,
 	val reaction: String?,
+	val reactionEmoji: Emoji?
 )
 
 enum class NotificationType {
 	POST,
 	MENTION,
 	REPOST,
+	FAVORITE,
 	REACTION,
 	FOLLOW,
 	FOLLOW_REQ,

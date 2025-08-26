@@ -48,7 +48,8 @@ fun TopDisclaimer(
 				emojiSize = 21.sp,
 				style = MaterialTheme.typography.bodyMedium,
 				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-				allowClickable = false
+				allowClickable = false,
+				instance = "", // TODO: instance
 			)
 		}
 	}

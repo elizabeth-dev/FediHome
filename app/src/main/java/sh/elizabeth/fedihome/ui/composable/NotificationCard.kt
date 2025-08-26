@@ -24,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import sh.elizabeth.fedihome.mock.followNotification
 import sh.elizabeth.fedihome.mock.mentionNotification
 import sh.elizabeth.fedihome.mock.reactionNotification
@@ -35,6 +37,7 @@ import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 fun EmbeddedNotificationContext(notification: Notification) {
 	val text = when (notification.type) {
 		NotificationType.REACTION -> "${notification.profile?.name} reacted to your post"
+		NotificationType.FAVORITE -> "${notification.profile?.name} favorited your post"
 		NotificationType.REPOST -> "${notification.profile?.name} reposted your post"
 		NotificationType.FOLLOW -> "${notification.profile?.name} followed you"
 		NotificationType.FOLLOW_REQ -> "${notification.profile?.name} requested to follow you"
@@ -46,7 +49,7 @@ fun EmbeddedNotificationContext(notification: Notification) {
 	}
 
 	val icon = when (notification.type) {
-		NotificationType.REACTION -> Icons.Rounded.Star
+		NotificationType.REACTION, NotificationType.FAVORITE -> Icons.Rounded.Star
 		NotificationType.REPOST -> Icons.Rounded.Repeat
 		NotificationType.FOLLOW -> Icons.Rounded.PersonAdd
 		NotificationType.FOLLOW_REQ -> Icons.Rounded.PersonOutline
@@ -61,21 +64,40 @@ fun EmbeddedNotificationContext(notification: Notification) {
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
 	) {
-		Icon(
-			imageVector = icon,
-			contentDescription = "foo",
-			modifier = Modifier
-				.padding(end = 8.dp)
-				.size(24.dp)
-		)
+		if (notification.reactionEmoji != null) {
+			AsyncImage(
+				model = notification.reactionEmoji.url,
+				contentDescription = notification.reactionEmoji.shortcode,
+				modifier = Modifier
+					.size(32.dp)
+					.padding(end = 8.dp)
+			)
+		} else if (!notification.reaction.isNullOrBlank()) {
+			Text(
+				text = notification.reaction, fontSize = 18.sp, // TODO: harmonize icon sizes
+				modifier = Modifier.padding(end = 8.dp)
+			)
+		} else {
+			Icon(
+				imageVector = icon,
+				contentDescription = "foo",
+				modifier = Modifier
+					.padding(end = 8.dp)
+					.size(24.dp)
+			)
+		}
 		if (notification.type != NotificationType.POLL_ENDED && notification.type != NotificationType.POLL_VOTE) BlurHashAvatar(
 			modifier = Modifier.padding(end = 8.dp),
 			imageUrl = notification.profile?.avatarUrl,
 			imageBlur = notification.profile?.avatarBlur,
-			imageSize = 24.dp
+			imageSize = 24.dp,
+			roundingRadius = 8f
 		)
-		Text(
-			text = text, style = MaterialTheme.typography.bodyLarge
+		EnrichedText(
+			text = text,
+			style = MaterialTheme.typography.bodyLarge,
+			emojis = notification.profile?.emojis ?: emptyMap(),
+			instance = notification.profile?.instance ?: "",
 		)
 	}
 }
@@ -90,6 +112,7 @@ fun NotificationCard(
 ) {
 	val isEmbeddedPost = arrayOf(
 		NotificationType.REACTION,
+		NotificationType.FAVORITE,
 		NotificationType.REPOST,
 		NotificationType.EDIT,
 		NotificationType.POLL_ENDED,

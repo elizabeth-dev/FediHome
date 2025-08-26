@@ -2,7 +2,9 @@ package sh.elizabeth.fedihome.api.mastodon.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import okhttp3.internal.indexOfControlOrNonAscii
 import sh.elizabeth.fedihome.util.InstantAsString
+import sh.elizabeth.fedihome.model.Notification as DomainNotification
 import sh.elizabeth.fedihome.model.NotificationType as DomainNotificationType
 
 @Serializable
@@ -22,6 +24,9 @@ enum class NotificationType {
 	@SerialName("favourite")
 	FAVOURITE,
 
+	@SerialName("reaction")
+	REACTION,
+
 	@SerialName("poll")
 	POLL,
 
@@ -39,17 +44,36 @@ data class Notification(
 	val type: NotificationType,
 	val account: Profile,
 	val status: Post?,
+	// From Iceshrimp.NET
+	val emoji: String? = null,
+	@SerialName("emoji_url") val emojiUrl: String? = null,
 )
 
-fun Notification.toDomain(fetchedFromInstance: String, forAccount: String) = sh.elizabeth.fedihome.model.Notification(
-	id = "$id@$fetchedFromInstance",
-	createdAt = createdAt,
-	forAccount = forAccount,
-	type = type.toDomain(),
-	post = status?.toDomain(fetchedFromInstance),
-	reaction = "⭐", // FIXME: put correct reaction emoji here
-	profile = account.toDomain(fetchedFromInstance)
-)
+fun Notification.toDomain(fetchedFromInstance: String, forAccount: String): DomainNotification {
+	val trimmedEmoji = emoji?.trim(':')
+	val emojiContainsInstance = trimmedEmoji?.contains('@') ?: false
+
+	return DomainNotification(
+		id = "$id@$fetchedFromInstance",
+		createdAt = createdAt,
+		forAccount = forAccount,
+		type = type.toDomain(),
+		post = status?.toDomain(fetchedFromInstance),
+		profile = account.toDomain(fetchedFromInstance),
+		reaction = if (trimmedEmoji == null) null else if (emojiContainsInstance || trimmedEmoji.indexOfControlOrNonAscii() != -1) trimmedEmoji else "${trimmedEmoji}@$fetchedFromInstance",
+		reactionEmoji = if (trimmedEmoji != null && emojiUrl != null) {
+			sh.elizabeth.fedihome.model.Emoji(
+				fullEmojiId = if (emojiContainsInstance) trimmedEmoji else "$trimmedEmoji@$fetchedFromInstance",
+				instance = if (emojiContainsInstance) trimmedEmoji.split('@')
+					.last() else fetchedFromInstance,
+				shortcode = trimmedEmoji.split('@').first(),
+				url = emojiUrl
+			)
+		} else {
+			null
+		}
+	)
+}
 
 fun NotificationType.toDomain() = when (this) {
 	NotificationType.STATUS -> DomainNotificationType.POST
@@ -57,7 +81,8 @@ fun NotificationType.toDomain() = when (this) {
 	NotificationType.FOLLOW_REQ -> DomainNotificationType.FOLLOW_REQ
 	NotificationType.MENTION -> DomainNotificationType.MENTION
 	NotificationType.POLL -> DomainNotificationType.POLL_ENDED
-	NotificationType.FAVOURITE -> DomainNotificationType.REACTION
+	NotificationType.FAVOURITE -> DomainNotificationType.FAVORITE
+	NotificationType.REACTION -> DomainNotificationType.REACTION
 	NotificationType.REBLOG -> DomainNotificationType.REPOST
 	NotificationType.UPDATE -> DomainNotificationType.EDIT
 }
