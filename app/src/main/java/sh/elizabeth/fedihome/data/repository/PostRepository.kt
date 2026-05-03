@@ -150,39 +150,67 @@ class PostRepository @Inject constructor(
 		)
 	}
 
-	suspend fun deleteReaction(
-		activeAccount: String,
-		postId: String,
+	suspend fun removeReaction(
+		activeAccount: String, postId: String, reaction: String
 	) {
 		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
-		val posts = postRemoteDataSource.deleteReaction(
-			instanceData.endpoint,
-			instanceData.instance,
-			instanceData.instanceType,
-			instanceData.token,
-			postId.split('@').first()
+		val post = postRemoteDataSource.removeReaction(
+			endpoint = instanceData.endpoint,
+			instance = instanceData.instance,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			postId = postId.split('@').first(),
+			reaction = reaction.split('@').first()
 		).unwrapQuotes()
 
-		handleInsertPosts(posts)
+		handleInsertPosts(post)
 	}
 
 	suspend fun createReaction(
 		activeAccount: String,
 		postId: String,
-		emojiShortcode: String,
+		reaction: String,
 	) {
 		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
-		val posts = postRemoteDataSource.createReaction(
-			instanceData.endpoint,
-			instanceData.instance,
-			instanceData.instanceType,
-			instanceData.token,
-			postId.split('@').first(),
-			emojiShortcode
+		val post = postRemoteDataSource.createReaction(
+			endpoint = instanceData.endpoint,
+			instance = instanceData.instance,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			postId = postId.split('@').first(),
+			reaction = reaction.split('@').first()
 		).unwrapQuotes()
 
-		handleInsertPosts(posts)
+		handleInsertPosts(post)
+	}
+
+	suspend fun createFavorite(activeAccount: String, postId: String) {
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
+
+		val post = postRemoteDataSource.createFavorite(
+			endpoint = instanceData.endpoint,
+			instance = instanceData.instance,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			postId = postId.split('@').first(),
+		).unwrapQuotes()
+
+		handleInsertPosts(post)
+	}
+
+	suspend fun removeFavorite(activeAccount: String, postId: String) {
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
+
+		val post = postRemoteDataSource.removeFavorite(
+			endpoint = instanceData.endpoint,
+			instance = instanceData.instance,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			postId = postId.split('@').first(),
+		).unwrapQuotes()
+
+		handleInsertPosts(post)
 	}
 }

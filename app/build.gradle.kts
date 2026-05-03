@@ -15,6 +15,11 @@ android {
 	buildToolsVersion = "37.0.0"
 	ndkVersion = "26.1.10909125"
 
+	sourceSets {
+		getByName("debug").kotlin.directories.add("build/generated/sqldelight/code/AppDatabase/debug")
+		getByName("release").kotlin.directories.add("build/generated/sqldelight/code/AppDatabase/release")
+	}
+
 	defaultConfig {
 		applicationId = "sh.elizabeth.fedihome"
 		minSdk = 24
@@ -66,28 +71,20 @@ androidComponents {
 //			kotlin.srcDir(layout.buildDirectory.dir("generated/source/proto/${it.name}/kotlin"))
 //		}
 //	}
-//	onVariants(selector().all()) { variant ->
-//		afterEvaluate {
-//			val capName = variant.name.replaceFirstChar { it.uppercase() }
-//			tasks.getByName<SourceTask>("ksp${capName}Kotlin") {
-//				setSource(
-//					tasks.getByName("generate${capName}AppDatabaseInterface").outputs
-//				)
-//			}
-//		}
-//	}
 }
 
-//afterEvaluate {
-//	tasks.named("kspDebugKotlin").configure {
-//		dependsOn(
-//			"generateDebugProto"
-//		)
-//	}
-//	tasks.named("kspReleaseKotlin").configure {
-//		dependsOn("generateReleaseProto")
-//	}
-//}
+afterEvaluate {
+	tasks.named("kspDebugKotlin").configure {
+		dependsOn(
+			"generateDebugProto", "generateDebugAppDatabaseInterface"
+		)
+	}
+	tasks.named("kspReleaseKotlin").configure {
+		dependsOn(
+			"generateReleaseProto", "generateReleaseAppDatabaseInterface"
+		)
+	}
+}
 
 protobuf {
 	protoc {
@@ -107,8 +104,9 @@ protobuf {
 
 sqldelight {
 	databases {
-		create("AppDatabase") {
+		register("AppDatabase") {
 			packageName.set("sh.elizabeth.fedihome.data.database")
+
 		}
 	}
 }
@@ -139,7 +137,7 @@ dependencies {
 
 	implementation("com.google.dagger:hilt-android:2.59.2")
 	ksp("com.google.dagger:hilt-compiler:2.59.2")
-//	ksp("androidx.hilt:hilt-compiler:1.3.0")
+	ksp("androidx.hilt:hilt-compiler:1.3.0")
 	implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
 
 	implementation("androidx.datastore:datastore:1.2.1")
@@ -183,8 +181,7 @@ dependencies {
 	implementation("com.google.firebase:firebase-messaging")
 
 	// Work Manager (used for firebase messaging)
-	val work_version = "2.11.2"
-	implementation("androidx.work:work-runtime-ktx:$work_version")
+	implementation("androidx.work:work-runtime-ktx:2.11.2")
 	implementation("androidx.hilt:hilt-work:1.3.0")
 
 }

@@ -77,7 +77,7 @@ fun GetNotificationByAccount.toDomain(
 			quote = null,
 			poll = poll?.toDomain(),
 			reactions = reactions ?: emptyMap(),
-			myReaction = myReaction,
+			myReactions = myReactions ?: emptyList(),
 			favorites = favoriteCount!!,
 			favorited = favorited!!,
 			attachments = attachments?.map(AttachmentEntity::toDomain) ?: emptyList(),

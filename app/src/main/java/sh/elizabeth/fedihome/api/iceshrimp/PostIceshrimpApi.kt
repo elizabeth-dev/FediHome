@@ -77,7 +77,7 @@ class PostIceshrimpApi @Inject constructor(private val httpClient: HttpClient) {
 		}
 	}
 
-	suspend fun deleteReaction(endpoint: String, token: String, postId: String) {
+	suspend fun removeReaction(endpoint: String, token: String, postId: String) {
 		httpClient.post(
 			"https://$endpoint/api/notes/reactions/delete"
 		) {

@@ -64,7 +64,7 @@ class LoginOAuthViewModel @Inject constructor(
 	fun getLoginUrl(instance: String) {
 		_uiState.update { it.copy(isLoading = true) }
 		viewModelScope.launch {
-			val oauthUrl = authRepository.prepareOAuth(instance)
+			val oauthUrl = authRepository.prepareOAuth(instance.trim())
 			_uiState.update { it.copy(oauthUrl = oauthUrl) }
 		}
 	}

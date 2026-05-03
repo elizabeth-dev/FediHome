@@ -42,14 +42,11 @@ private data class HomeViewModelState(
 	fun toUiState(posts: List<Post>?, activeAccount: String = ""): HomeUiState =
 		if (posts.isNullOrEmpty()) {
 			HomeUiState.NoPosts(
-				isLoading = isLoading,
-				activeAccount = activeAccount
+				isLoading = isLoading, activeAccount = activeAccount
 			)
 		} else {
 			HomeUiState.HasPosts(
-				posts = posts,
-				isLoading = isLoading,
-				activeAccount = activeAccount
+				posts = posts, isLoading = isLoading, activeAccount = activeAccount
 			)
 		}
 
@@ -66,17 +63,14 @@ class HomeViewModel @Inject constructor(
 	private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private val timeline =
-		authRepository.activeAccount.flatMapLatest {
-			timelineRepository.getTimeline(
-				it
-			)
-		}.distinctUntilChanged()
+	private val timeline = authRepository.activeAccount.flatMapLatest {
+		timelineRepository.getTimeline(
+			it
+		)
+	}.distinctUntilChanged()
 
 	val uiState = combine(
-		viewModelState,
-		authRepository.activeAccount,
-		timeline
+		viewModelState, authRepository.activeAccount, timeline
 	) { state, activeAccount, posts ->
 		state.toUiState(posts, activeAccount)
 	}.stateIn(
@@ -99,15 +93,21 @@ class HomeViewModel @Inject constructor(
 		}
 	}
 
-	fun addFavorite(activeAccount: String, postId: String) {
+	fun removeFavorite(activeAccount: String, postId: String) {
 		viewModelScope.launch {
-			postRepository.createReaction(activeAccount, postId, "⭐")
+			postRepository.removeFavorite(activeAccount, postId)
 		}
 	}
 
-	fun removeReaction(activeAccount: String, postId: String) {
+	fun addFavorite(activeAccount: String, postId: String) {
 		viewModelScope.launch {
-			postRepository.deleteReaction(activeAccount, postId)
+			postRepository.createFavorite(activeAccount, postId)
+		}
+	}
+
+	fun removeReaction(activeAccount: String, postId: String, reaction: String) {
+		viewModelScope.launch {
+			postRepository.removeReaction(activeAccount, postId, reaction)
 		}
 	}
 

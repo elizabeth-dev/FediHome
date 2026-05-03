@@ -13,7 +13,7 @@ data class Post(
 	val quote: Post?,
 	val poll: Poll?,
 	val reactions: Map<String, Int>,
-	val myReaction: String?,
+	val myReactions: List<String>,
 	val favorites: Long,
 	val favorited: Boolean,
 	val emojis: Map<String, Emoji>,

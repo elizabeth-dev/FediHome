@@ -1,7 +1,6 @@
 package sh.elizabeth.fedihome.ui.routes.login.oauth
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,9 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 import sh.elizabeth.fedihome.util.openLinkInCustomTab
 
@@ -50,7 +51,7 @@ fun LoginOAuthScreen(
 	val (instance, setInstance) = remember { mutableStateOf("") }
 
 	if (uiState.oauthUrl != null) {
-		openLinkInCustomTab(Uri.parse(uiState.oauthUrl), context)
+		openLinkInCustomTab(uiState.oauthUrl.toUri(), context)
 	}
 
 	if (uiState.successfulLogin) {
@@ -90,12 +91,14 @@ fun LoginOAuthScreen(
 						label = { Text("Instance") },
 						singleLine = true,
 						keyboardOptions = KeyboardOptions(
-							imeAction = ImeAction.Go,
-							keyboardType = KeyboardType.Uri
+							capitalization = KeyboardCapitalization.None,
+							autoCorrectEnabled = false,
+							keyboardType = KeyboardType.Uri,
+							imeAction = ImeAction.Go
 						),
 						keyboardActions = KeyboardActions(onGo = {
 							onLogin(instance)
-						})
+						}),
 					)
 					Spacer(Modifier.size(padding))
 					Button(modifier = Modifier.align(Alignment.End),

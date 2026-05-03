@@ -89,7 +89,7 @@ fun Post.toEntity() = PostEntity(
 	text = text,
 	authorId = author.id,
 	quoteId = quote?.id,
-	myReaction = myReaction,
+	myReactions = myReactions,
 	reactions = reactions,
 	poll = if (poll != null) PollEntity(
 		id = poll.id, choices = poll.choices.map {

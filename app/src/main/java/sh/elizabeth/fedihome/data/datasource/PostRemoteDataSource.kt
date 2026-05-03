@@ -5,6 +5,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import sh.elizabeth.fedihome.api.iceshrimp.PostIceshrimpApi
 import sh.elizabeth.fedihome.api.iceshrimp.model.toDomain
+import sh.elizabeth.fedihome.api.iceshrimpnet.PostIceshrimpNetApi
 import sh.elizabeth.fedihome.api.mastodon.PostMastodonApi
 import sh.elizabeth.fedihome.api.mastodon.model.toDomain
 import sh.elizabeth.fedihome.api.sharkey.PostSharkeyApi
@@ -18,6 +19,7 @@ class PostRemoteDataSource @Inject constructor(
 	private val postIceshrimpApi: PostIceshrimpApi,
 	private val postSharkeyApi: PostSharkeyApi,
 	private val postMastodonApi: PostMastodonApi,
+	private val postIceshrimpNetApi: PostIceshrimpNetApi,
 ) {
 	suspend fun createPost(
 		instance: String,
@@ -35,9 +37,7 @@ class PostRemoteDataSource @Inject constructor(
 		).createdNote.toDomain(instance)
 
 		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.createPost(
-			endpoint = endpoint,
-			token = token,
-			newPost = newPost
+			endpoint = endpoint, token = token, newPost = newPost
 		).toDomain(instance)
 
 	}
@@ -58,9 +58,7 @@ class PostRemoteDataSource @Inject constructor(
 		).toDomain(instance)
 
 		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.fetchPost(
-			endpoint = endpoint,
-			token = token,
-			postId = postId
+			endpoint = endpoint, token = token, postId = postId
 		).toDomain(instance)
 	}
 
@@ -109,15 +107,16 @@ class PostRemoteDataSource @Inject constructor(
 		)
 	}
 
-	suspend fun deleteReaction(
+	suspend fun removeReaction(
 		endpoint: String,
 		instance: String,
 		instanceType: SupportedInstances,
 		token: String,
 		postId: String,
+		reaction: String,
 	): Post = when (instanceType) {
 		SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> coroutineScope {
-			postIceshrimpApi.deleteReaction(
+			postIceshrimpApi.removeReaction(
 				endpoint = endpoint, token = token, postId = postId
 			)
 
@@ -132,11 +131,11 @@ class PostRemoteDataSource @Inject constructor(
 			).toDomain(instance)
 		}
 
-		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.deleteFavorite(
-			endpoint = endpoint,
-			token = token,
-			postId = postId
+		SupportedInstances.ICESHRIMPNET -> postIceshrimpNetApi.removeReaction(
+			endpoint = endpoint, token = token, postId = postId, reaction = reaction
 		).toDomain(instance)
+
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON -> throw NotImplementedError()
 	}
 
 	suspend fun createReaction(
@@ -145,11 +144,41 @@ class PostRemoteDataSource @Inject constructor(
 		instanceType: SupportedInstances,
 		token: String,
 		postId: String,
-		emojiShortcode: String,
+		reaction: String,
 	): Post = when (instanceType) {
 		SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> coroutineScope {
 			postIceshrimpApi.createReaction(
-				endpoint = endpoint, token = token, postId = postId, emojiShortcode = emojiShortcode
+				endpoint = endpoint, token = token, postId = postId, emojiShortcode = reaction
+			)
+
+			if (instanceType == SupportedInstances.SHARKEY) {
+				return@coroutineScope postSharkeyApi.fetchPost(
+					endpoint = endpoint, token = token, postId = postId
+				).toDomain(instance)
+			}
+
+			return@coroutineScope postIceshrimpApi.fetchPost(
+				endpoint = endpoint, token = token, postId = postId
+			).toDomain(instance)
+		}
+
+		SupportedInstances.ICESHRIMPNET -> postIceshrimpNetApi.createReaction(
+			endpoint = endpoint, token = token, postId = postId, reaction = reaction
+		).toDomain(instance)
+
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON -> throw NotImplementedError()
+	}
+
+	suspend fun createFavorite(
+		endpoint: String,
+		instance: String,
+		instanceType: SupportedInstances,
+		token: String,
+		postId: String,
+	): Post = when (instanceType) {
+		SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> coroutineScope {
+			postIceshrimpApi.createReaction(
+				endpoint = endpoint, token = token, postId = postId, emojiShortcode = "⭐"
 			)
 
 			if (instanceType == SupportedInstances.SHARKEY) {
@@ -164,6 +193,35 @@ class PostRemoteDataSource @Inject constructor(
 		}
 
 		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.createFavorite(
+			endpoint = endpoint, token = token, postId = postId
+		).toDomain(instance)
+	}
+
+
+	suspend fun removeFavorite(
+		endpoint: String,
+		instance: String,
+		instanceType: SupportedInstances,
+		token: String,
+		postId: String,
+	): Post = when (instanceType) {
+		SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> coroutineScope {
+			postIceshrimpApi.removeReaction(
+				endpoint = endpoint, token = token, postId = postId
+			)
+
+			if (instanceType == SupportedInstances.SHARKEY) {
+				return@coroutineScope postSharkeyApi.fetchPost(
+					endpoint = endpoint, token = token, postId = postId
+				).toDomain(instance)
+			}
+
+			return@coroutineScope postIceshrimpApi.fetchPost(
+				endpoint = endpoint, token = token, postId = postId
+			).toDomain(instance)
+		}
+
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.removeFavorite(
 			endpoint = endpoint, token = token, postId = postId
 		).toDomain(instance)
 	}

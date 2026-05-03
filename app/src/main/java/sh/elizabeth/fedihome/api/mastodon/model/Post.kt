@@ -2,9 +2,9 @@ package sh.elizabeth.fedihome.api.mastodon.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import okhttp3.internal.indexOfControlOrNonAscii
 import sh.elizabeth.fedihome.model.PollChoice
 import sh.elizabeth.fedihome.util.InstantAsString
+import sh.elizabeth.fedihome.util.containsEmoji
 import sh.elizabeth.fedihome.model.Poll as DomainPoll
 import sh.elizabeth.fedihome.model.Post as DomainPost
 
@@ -65,11 +65,13 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			poll = reblog.poll?.toDomain(),
 			reactions = reblog.reactions?.associate {
 				Pair(
-					if (it.name.contains('@') || it.name.indexOfControlOrNonAscii() != -1) it.name else "${it.name}@$fetchedFromInstance",
+					if (it.name.contains('@') || it.name.containsEmoji()) it.name else "${it.name}@$fetchedFromInstance",
 					it.count
 				)
 			} ?: emptyMap(),
-			myReaction = reblog.reactions?.firstOrNull { it.me }?.name,
+			myReactions = reblog.reactions?.filter { it.me }
+				?.map { if (it.name.contains('@') || it.name.containsEmoji()) it.name else "${it.name}@$fetchedFromInstance" }
+				?: emptyList(),
 			emojis = reblog.emojis.associate {
 				Pair(
 					"${it.shortcode}@$originalPostInstance", it.toDomain(originalPostInstance)
@@ -108,22 +110,25 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		poll = poll?.toDomain(),
 		reactions = reactions?.associate {
 			Pair(
-				if (it.name.contains('@') || it.name.indexOfControlOrNonAscii() != -1) it.name else "${it.name}@$fetchedFromInstance",
+				if (it.name.contains('@') || it.name.containsEmoji()) it.name else "${it.name}@$fetchedFromInstance",
 				it.count
 			)
 		} ?: emptyMap(),
-		myReaction = reactions?.firstOrNull { it.me }?.name,
+		myReactions = reactions?.filter { it.me }
+			?.map { if (it.name.contains('@') || it.name.containsEmoji()) it.name else "${it.name}@$fetchedFromInstance" }
+			?: emptyList(),
 		emojis = emojis.associate {
 			Pair(
 				"${it.shortcode}@$originalPostInstance", it.toDomain(originalPostInstance)
 			)
-		}.plus(reactions?.filter { !it.url.isNullOrBlank() || !it.staticUrl.isNullOrBlank() }
-			?.associate {
-				Pair(
-					if (it.name.contains('@')) it.name else "${it.name}@$fetchedFromInstance",
-					it.toEmojiDomain(fetchedFromInstance)
-				)
-			} ?: emptyMap()),
+		}
+			.plus(reactions?.filter { !it.url.isNullOrBlank() || !it.staticUrl.isNullOrBlank() }
+				?.associate {
+					Pair(
+						if (it.name.contains('@')) it.name else "${it.name}@$fetchedFromInstance",
+						it.toEmojiDomain(fetchedFromInstance)
+					)
+				} ?: emptyMap()),
 		favorites = favouritesCount,
 		favorited = favourited,
 		mentionLinksMap = mentions.associate {

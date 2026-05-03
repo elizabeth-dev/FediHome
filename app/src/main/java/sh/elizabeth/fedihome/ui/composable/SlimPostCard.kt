@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Message
-import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material.icons.rounded.Repeat
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -37,8 +37,9 @@ fun SlimPostCard(
 	onVotePoll: (choices: List<Int>) -> Unit,
 	showDivider: Boolean = true,
 	onAddFavorite: (postId: String) -> Unit,
-	onRemoveReaction: (postId: String) -> Unit,
+	onRemoveFavorite: (postId: String) -> Unit,
 	onAddReaction: (postId: String, reaction: String) -> Unit,
+	onRemoveReaction: (postId: String, reaction: String) -> Unit,
 	disablePostClick: Boolean = false,
 ) { // TODO: Check if it's better to pass individual props
 	val navToPost = localNavToPost.current
@@ -103,7 +104,7 @@ fun SlimPostCard(
 						ReactionButton(
 							icon = reaction.key,
 							count = reaction.value,
-							selected = post.myReaction == reaction.key,
+							selected = post.myReactions.contains(reaction.key),
 							emojis = post.emojis,
 						)
 					}
@@ -115,7 +116,7 @@ fun SlimPostCard(
 					start = 4.dp, end = 4.dp
 				)
 			) { // TODO: No padding in the bottom makes the buttons ripple touch the divider
-				IconButton(onClick = { onReply(post.id) }) {
+				IconButton(onClick = { onReply(post.id) }) { // Reply button
 					Icon(
 						Icons.AutoMirrored.Outlined.Message,
 						contentDescription = "Reply",
@@ -125,25 +126,25 @@ fun SlimPostCard(
 
 				Spacer(modifier = Modifier.weight(1f))
 
-				IconButton(onClick = { /*TODO*/ }) {
+				IconButton(onClick = { /*TODO*/ }) { // Boost button
 					Icon(
 						Icons.Rounded.Repeat,
 						contentDescription = "Repost",
 						tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 					)
 				}
-				IconButton(onClick = {
-					if (post.myReaction == null) onAddFavorite(post.id) else onRemoveReaction(
+				IconButton(onClick = { // Fav button
+					if (!post.favorited) onAddFavorite(post.id) else onRemoveFavorite(
 						post.id
 					)
 				}) {
-					if (post.myReaction == null) Icon(
+					if (!post.favorited) Icon(
 						Icons.Rounded.StarBorder,
 						contentDescription = "Star",
 						tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 					)
 					else Icon(
-						Icons.Rounded.Remove,
+						Icons.Rounded.Star,
 						contentDescription = "Starred",
 						tint = MaterialTheme.colorScheme.primary
 					)
@@ -160,7 +161,7 @@ fun SlimPostCard(
 @Composable
 private fun AttachmentGrid(attachments: List<Attachment>) {
 	Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-		attachments.map {
+		attachments.forEach {
 			BlurHashImage(
 				imageUrl = it.url,
 				imageBlur = it.blurhash,
@@ -178,7 +179,8 @@ fun SlimPostCardPreview() {
 			post = defaultPost,
 			onVotePoll = { },
 			onAddFavorite = {},
-			onRemoveReaction = {},
+			onRemoveFavorite = {},
+			onRemoveReaction = { _, _ -> },
 			onAddReaction = { _, _ -> })
 	}
 }

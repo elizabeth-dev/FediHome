@@ -79,9 +79,9 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 					':'
 				) else it.key
 			},
-			myReaction = renote.myReaction.let {
+			myReactions = listOfNotNull(renote.myReaction.let {
 				if (it != null && it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
-			},
+			}),
 
 			// TODO: handle favorites in Sharkey
 			favorites = 0,
@@ -105,9 +105,9 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 				':'
 			) else it.key
 		},
-		myReaction = myReaction.let {
+		myReactions = listOfNotNull(myReaction.let {
 			if (it != null && it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
-		},
+		}),
 
 		// TODO: handle favorites in Sharkey
 		favorites = 0,

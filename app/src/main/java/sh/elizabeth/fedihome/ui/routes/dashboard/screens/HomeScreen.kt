@@ -19,7 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.fedihome.ui.composable.SlimPostCard
 
@@ -36,6 +36,7 @@ fun HomeScreen(
 		onRefresh = homeViewModel::refreshTimeline,
 		onVotePoll = homeViewModel::votePoll,
 		onAddFavorite = homeViewModel::addFavorite,
+		onRemoveFavorite = homeViewModel::removeFavorite,
 		onRemoveReaction = homeViewModel::removeReaction,
 		onAddReaction = homeViewModel::addReaction
 	)
@@ -49,8 +50,9 @@ fun HomeScreen(
 	onRefresh: (String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
 	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
-	onRemoveReaction: (activeAccount: String, postId: String) -> Unit,
+	onRemoveFavorite: (activeAccount: String, postId: String) -> Unit,
 	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
+	onRemoveReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
 ) {
 	val pullRefreshState =
 		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
@@ -77,8 +79,7 @@ fun HomeScreen(
 			}
 
 			is HomeUiState.HasPosts -> LazyColumn(
-				modifier = Modifier.fillMaxSize(),
-				state = scrollState
+				modifier = Modifier.fillMaxSize(), state = scrollState
 			) {
 				items(uiState.posts) { post ->
 					SlimPostCard(
@@ -89,12 +90,18 @@ fun HomeScreen(
 							)
 						},
 						onAddFavorite = { onAddFavorite(uiState.activeAccount, it) },
-						onRemoveReaction = { onRemoveReaction(uiState.activeAccount, it) },
+						onRemoveFavorite = { onRemoveFavorite(uiState.activeAccount, it) },
 						onAddReaction = { postId, reaction ->
 							onAddReaction(
 								uiState.activeAccount, postId, reaction
 							)
-						})
+						},
+						onRemoveReaction = { postId, reaction ->
+							onRemoveReaction(
+								uiState.activeAccount, postId, reaction
+							)
+						},
+					)
 				}
 			}
 		}

@@ -119,15 +119,21 @@ class ProfileViewModel @Inject constructor(
 		}
 	}
 
-	fun addFavorite(activeAccount: String, postId: String) {
+	fun removeFavorite(activeAccount: String, postId: String) {
 		viewModelScope.launch {
-			postRepository.createReaction(activeAccount, postId, "⭐")
+			postRepository.removeFavorite(activeAccount, postId)
 		}
 	}
 
-	fun removeReaction(activeAccount: String, postId: String) {
+	fun addFavorite(activeAccount: String, postId: String) {
 		viewModelScope.launch {
-			postRepository.deleteReaction(activeAccount, postId)
+			postRepository.createFavorite(activeAccount, postId)
+		}
+	}
+
+	fun removeReaction(activeAccount: String, postId: String, reaction: String) {
+		viewModelScope.launch {
+			postRepository.removeReaction(activeAccount, postId, reaction)
 		}
 	}
 

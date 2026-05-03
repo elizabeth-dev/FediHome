@@ -57,8 +57,7 @@ class PostViewModel @Inject constructor(
 	authRepository: AuthRepository,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-	private val postId =
-		savedStateHandle.toRoute<MainDestinations.POST>().postId
+	private val postId = savedStateHandle.toRoute<MainDestinations.POST>().postId
 
 	private val viewModelState =
 		MutableStateFlow(PostViewModelState(isLoading = true, postId = postId))
@@ -83,15 +82,21 @@ class PostViewModel @Inject constructor(
 		}
 	}
 
-	fun addFavorite(activeAccount: String, postId: String) {
+	fun removeFavorite(activeAccount: String, postId: String) {
 		viewModelScope.launch {
-			postRepository.createReaction(activeAccount, postId, "⭐")
+			postRepository.removeFavorite(activeAccount, postId)
 		}
 	}
 
-	fun removeReaction(activeAccount: String, postId: String) {
+	fun addFavorite(activeAccount: String, postId: String) {
 		viewModelScope.launch {
-			postRepository.deleteReaction(activeAccount, postId)
+			postRepository.createFavorite(activeAccount, postId)
+		}
+	}
+
+	fun removeReaction(activeAccount: String, postId: String, reaction: String) {
+		viewModelScope.launch {
+			postRepository.removeReaction(activeAccount, postId, reaction)
 		}
 	}
 

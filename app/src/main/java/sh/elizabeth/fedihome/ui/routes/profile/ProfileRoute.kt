@@ -16,7 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.fedihome.mock.defaultPost
 import sh.elizabeth.fedihome.mock.defaultProfile
@@ -35,8 +35,9 @@ fun ProfileRoute(
 		onRefresh = profileViewModel::refreshProfile,
 		onVotePoll = profileViewModel::votePoll,
 		onAddFavorite = profileViewModel::addFavorite,
-		onRemoveReaction = profileViewModel::removeReaction,
+		onRemoveFavorite = profileViewModel::removeFavorite,
 		onAddReaction = profileViewModel::addReaction,
+		onRemoveReaction = profileViewModel::removeReaction,
 	)
 }
 
@@ -47,9 +48,10 @@ fun ProfileRoute(
 	navBack: () -> Unit,
 	onRefresh: (activeAccount: String, profileTag: String, profileId: String?) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	onAddFavorite: (String, String) -> Unit,
-	onRemoveReaction: (String, String) -> Unit,
-	onAddReaction: (String, String, String) -> Unit,
+	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
+	onRemoveFavorite: (activeAccount: String, postId: String) -> Unit,
+	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
+	onRemoveReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
 ) {
 	LaunchedEffect(
 		key1 = uiState.profileTag,
@@ -86,8 +88,9 @@ fun ProfileRoute(
 			onRefresh = onRefresh,
 			contentPadding = contentPadding,
 			onVotePoll = onVotePoll,
-			onAddReaction = onAddReaction,
 			onAddFavorite = onAddFavorite,
+			onRemoveFavorite = onRemoveFavorite,
+			onAddReaction = onAddReaction,
 			onRemoveReaction = onRemoveReaction,
 		)
 	}
@@ -108,7 +111,8 @@ fun ProfileRoutePreview() {
 			onRefresh = { _, _, _ -> },
 			onVotePoll = { _, _, _, _ -> },
 			onAddFavorite = { _, _ -> },
-			onRemoveReaction = { _, _ -> },
+			onRemoveFavorite = { _, _ -> },
+			onRemoveReaction = { _, _, _ -> },
 			onAddReaction = { _, _, _ -> })
 	}
 }

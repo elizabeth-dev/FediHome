@@ -22,7 +22,7 @@ val defaultPost = Post(
 		poll = defaultPoll,
 		emojis = emptyMap(),
 		reactions = emptyMap(),
-		myReaction = null,
+		myReactions = emptyList(),
 		favorites = 3L,
 		favorited = false,
 		attachments = emptyList()
@@ -30,8 +30,13 @@ val defaultPost = Post(
 	repostedBy = defaultProfile,
 	poll = defaultPoll,
 	emojis = emptyMap(),
-	reactions = emptyMap(),
-	myReaction = null,
+	reactions = mapOf(
+		"👍" to 3,
+		"👎" to 1,
+		"😂" to 5,
+		"🎉" to 2,
+	),
+	myReactions = listOf("👍"),
 	favorites = 3L,
 	favorited = true,
 	attachments = emptyList()

@@ -1,6 +1,7 @@
 package sh.elizabeth.fedihome.ui.composable
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -37,6 +38,8 @@ fun ReactionButton(
 	Row(
 		modifier = Modifier
 			.clip(RoundedCornerShape(4.dp))
+			.clickable(
+				enabled = true, onClickLabel = "foo", onClick = {})
 			.background(
 				if (selected) MaterialTheme.colorScheme.primaryContainer
 				else MaterialTheme.colorScheme.surface

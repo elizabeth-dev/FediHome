@@ -3,6 +3,7 @@ package sh.elizabeth.fedihome.api.iceshrimp.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import sh.elizabeth.fedihome.util.InstantAsString
+import sh.elizabeth.fedihome.util.containsEmoji
 import sh.elizabeth.fedihome.model.Poll as DomainPoll
 import sh.elizabeth.fedihome.model.PollChoice as DomainPollChoice
 import sh.elizabeth.fedihome.model.Post as DomainPost
@@ -83,8 +84,10 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 					':'
 				) else it.key
 			},
-			myReaction = renote.myReaction.let {
-				if (it != null && it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
+			myReactions = listOfNotNull(renote.myReaction).map {
+				if (it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
+			}.map {
+				if (it.contains('@') || it.containsEmoji()) it else "$it@$fetchedFromInstance"
 			},
 			// TODO: handle favorites in Iceshrimp
 			favorites = 0,
@@ -109,8 +112,10 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 				':'
 			) else it.key
 		},
-		myReaction = myReaction.let {
-			if (it != null && it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
+		myReactions = listOfNotNull(myReaction).map {
+			if (it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
+		}.map {
+			if (it.contains('@') || it.containsEmoji()) it else "$it@$fetchedFromInstance"
 		},
 		// TODO: handle favorites in Iceshrimp
 		favorites = 0,

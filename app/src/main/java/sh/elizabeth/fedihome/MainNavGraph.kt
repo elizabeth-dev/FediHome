@@ -20,9 +20,9 @@ import sh.elizabeth.fedihome.util.APP_LOGIN_OAUTH_PATH
 
 const val TOKEN_PARAM = "token"
 
-val localNavToCompose = compositionLocalOf<(String?) -> Unit> { error("No navToCompose provided") }
-val localNavToPost = compositionLocalOf<(String) -> Unit> { error("No navToPost provided") }
-val localNavToProfile = compositionLocalOf<(String) -> Unit> { error("No navToProfile provided") }
+val localNavToCompose = compositionLocalOf<(String?) -> Unit>(defaultFactory = { {} })
+val localNavToPost = compositionLocalOf<(String) -> Unit>(defaultFactory = { {} })
+val localNavToProfile = compositionLocalOf<(String) -> Unit>(defaultFactory = { {} })
 
 @Composable
 fun MainNavGraph(

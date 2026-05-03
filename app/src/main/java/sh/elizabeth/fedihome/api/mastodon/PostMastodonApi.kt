@@ -55,7 +55,7 @@ class PostMastodonApi @Inject constructor(private val httpClient: HttpClient) {
 			bearerAuth(token)
 		}.body()
 
-	suspend fun deleteFavorite(endpoint: String, token: String, postId: String): Post =
+	suspend fun removeFavorite(endpoint: String, token: String, postId: String): Post =
 		httpClient.post(
 			"https://$endpoint/api/v1/statuses/$postId/unfavourite"
 		) {

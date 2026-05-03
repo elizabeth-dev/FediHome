@@ -88,6 +88,18 @@ val attachmentEntityListAdapter = object : ColumnAdapter<List<AttachmentEntity>,
 	}
 }
 
+val stringListAdapter = object : ColumnAdapter<List<String>, String> {
+	override fun decode(databaseValue: String): List<String> {
+		val type = object : TypeToken<List<String>>() {}.type
+		return Gson().fromJson(databaseValue, type)
+	}
+
+	override fun encode(value: List<String>): String {
+		val type = object : TypeToken<List<String>>() {}.type
+		return Gson().toJson(value, type)
+	}
+}
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -121,7 +133,8 @@ object DatabaseModule {
 			updatedAtAdapter = instantAdapter,
 			reactionsAdapter = mapAdapter,
 			mentionLinksAdapter = mapStringStringAdapter,
-			attachmentsAdapter = attachmentEntityListAdapter
+			attachmentsAdapter = attachmentEntityListAdapter,
+			myReactionsAdapter = stringListAdapter
 		),
 		ProfileEntityAdapter = ProfileEntity.Adapter(
 			fieldsAdapter = profileFieldEntityListAdapter, createdAtAdapter = instantAdapter

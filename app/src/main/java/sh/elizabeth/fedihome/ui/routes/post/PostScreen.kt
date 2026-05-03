@@ -29,9 +29,10 @@ fun PostScreen(
 	contentPadding: PaddingValues,
 	onPostRefresh: (activeAccount: String, postId: String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	onAddFavorite: (String, String) -> Unit,
-	onRemoveReaction: (String, String) -> Unit,
-	onAddReaction: (String, String, String) -> Unit,
+	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
+	onRemoveFavorite: (activeAccount: String, postId: String) -> Unit,
+	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
+	onRemoveReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
 ) {
 	val pullRefreshState = rememberPullRefreshState(
 		uiState.isLoading, { onPostRefresh(uiState.activeAccount, uiState.postId) })
@@ -69,9 +70,14 @@ fun PostScreen(
 							)
 						},
 						onAddFavorite = { onAddFavorite(uiState.activeAccount, it) },
-						onRemoveReaction = { onRemoveReaction(uiState.activeAccount, it) },
+						onRemoveFavorite = { onRemoveFavorite(uiState.activeAccount, it) },
 						onAddReaction = { postId, reaction ->
 							onAddReaction(
+								uiState.activeAccount, postId, reaction
+							)
+						},
+						onRemoveReaction = { postId, reaction ->
+							onRemoveReaction(
 								uiState.activeAccount, postId, reaction
 							)
 						},

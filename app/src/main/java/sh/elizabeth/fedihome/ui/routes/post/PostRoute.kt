@@ -14,7 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.fedihome.mock.defaultPost
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
@@ -32,8 +32,9 @@ fun PostRoute(
 		onPostRefresh = postViewModel::refreshPost,
 		onVotePoll = postViewModel::votePoll,
 		onAddFavorite = postViewModel::addFavorite,
-		onRemoveReaction = postViewModel::removeReaction,
+		onRemoveFavorite = postViewModel::removeFavorite,
 		onAddReaction = postViewModel::addReaction,
+		onRemoveReaction = postViewModel::removeReaction,
 	)
 }
 
@@ -44,9 +45,10 @@ fun PostRoute(
 	navBack: () -> Unit,
 	onPostRefresh: (activeAccount: String, postId: String) -> Unit,
 	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	onAddFavorite: (String, String) -> Unit,
-	onRemoveReaction: (String, String) -> Unit,
-	onAddReaction: (String, String, String) -> Unit,
+	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
+	onRemoveFavorite: (activeAccount: String, postId: String) -> Unit,
+	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
+	onRemoveReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
 ) {
 	LaunchedEffect(key1 = uiState.activeAccount, key2 = uiState.postId) {
 		if (uiState.activeAccount.isNotBlank()) onPostRefresh(
@@ -75,8 +77,9 @@ fun PostRoute(
 			contentPadding = contentPadding,
 			onVotePoll = onVotePoll,
 			onAddFavorite = onAddFavorite,
-			onRemoveReaction = onRemoveReaction,
+			onRemoveFavorite = onRemoveFavorite,
 			onAddReaction = onAddReaction,
+			onRemoveReaction = onRemoveReaction,
 		)
 
 	}
@@ -95,7 +98,8 @@ fun PostRoutePreview() {
 			onPostRefresh = { _, _ -> },
 			onVotePoll = { _, _, _, _ -> },
 			onAddFavorite = { _, _ -> },
-			onRemoveReaction = { _, _ -> },
+			onRemoveFavorite = { _, _ -> },
+			onRemoveReaction = { _, _, _ -> },
 			onAddReaction = { _, _, _ -> })
 	}
 }

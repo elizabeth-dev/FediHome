@@ -17,7 +17,7 @@ CREATE TABLE PostEntity (
     quoteId TEXT,
     poll TEXT AS PollEntity,
     reactions TEXT AS Map<String, Int>,
-    myReaction TEXT,
+    myReactions TEXT AS List<String>,
     favoriteCount INTEGER NOT NULL,
     favorited INTEGER AS Boolean NOT NULL,
     mentionLinks TEXT AS Map<String, String>,

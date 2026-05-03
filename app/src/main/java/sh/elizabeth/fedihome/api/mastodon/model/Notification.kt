@@ -2,8 +2,8 @@ package sh.elizabeth.fedihome.api.mastodon.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import okhttp3.internal.indexOfControlOrNonAscii
 import sh.elizabeth.fedihome.util.InstantAsString
+import sh.elizabeth.fedihome.util.containsEmoji
 import sh.elizabeth.fedihome.model.Notification as DomainNotification
 import sh.elizabeth.fedihome.model.NotificationType as DomainNotificationType
 
@@ -60,7 +60,7 @@ fun Notification.toDomain(fetchedFromInstance: String, forAccount: String): Doma
 		type = type.toDomain(),
 		post = status?.toDomain(fetchedFromInstance),
 		profile = account.toDomain(fetchedFromInstance),
-		reaction = if (trimmedEmoji == null) null else if (emojiContainsInstance || trimmedEmoji.indexOfControlOrNonAscii() != -1) trimmedEmoji else "${trimmedEmoji}@$fetchedFromInstance",
+		reaction = if (trimmedEmoji == null) null else if (emojiContainsInstance || trimmedEmoji.containsEmoji()) trimmedEmoji else "${trimmedEmoji}@$fetchedFromInstance",
 		reactionEmoji = if (trimmedEmoji != null && emojiUrl != null) {
 			sh.elizabeth.fedihome.model.Emoji(
 				fullEmojiId = if (emojiContainsInstance) trimmedEmoji else "$trimmedEmoji@$fetchedFromInstance",
