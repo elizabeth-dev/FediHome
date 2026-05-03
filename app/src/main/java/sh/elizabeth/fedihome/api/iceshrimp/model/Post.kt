@@ -74,7 +74,8 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			text = renote.text,
 			cw = renote.cw,
 			author = renote.user.toDomain(fetchedFromInstance),
-			repostedBy = user.toDomain(fetchedFromInstance),
+			boostedBy = user.toDomain(fetchedFromInstance),
+			boosted = renote.isRenoted ?: false,
 			quote = renote.renote?.toDomain(fetchedFromInstance),
 			poll = renote.poll?.toDomain(),
 			emojis = renote.emojis.plus(renote.reactionEmojis)
@@ -102,7 +103,8 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		text = text,
 		cw = cw,
 		author = user.toDomain(fetchedFromInstance),
-		repostedBy = null,
+		boostedBy = null,
+		boosted = isRenoted ?: false,
 		quote = renote?.toDomain(fetchedFromInstance),
 		poll = poll?.toDomain(),
 		emojis = emojis.plus(reactionEmojis)

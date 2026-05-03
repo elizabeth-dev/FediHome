@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -20,6 +21,7 @@ import sh.elizabeth.fedihome.domain.RefreshProfileAndPostsUseCase
 import sh.elizabeth.fedihome.domain.VotePollUseCase
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.Profile
+import sh.elizabeth.fedihome.util.viewmodel.PostHandlingViewModel
 import javax.inject.Inject
 
 sealed interface ProfileUiState {
@@ -67,13 +69,16 @@ private data class ProfileViewModelState(
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-	private val votePollUseCase: VotePollUseCase,
+	override val votePollUseCase: VotePollUseCase,
 	private val refreshProfileAndPostsUseCase: RefreshProfileAndPostsUseCase,
 	private val profileRepository: ProfileRepository,
-	private val postRepository: PostRepository,
+	override val postRepository: PostRepository,
 	authRepository: AuthRepository,
 	savedStateHandle: SavedStateHandle,
-) : ViewModel() {
+) : PostHandlingViewModel, ViewModel() {
+	override val coroutineHandlingScope: CoroutineScope
+		get() = viewModelScope
+
 	private val profileTag = savedStateHandle.toRoute<MainDestinations.PROFILE>().profileTag
 
 	private val viewModelState = MutableStateFlow(
@@ -110,36 +115,6 @@ class ProfileViewModel @Inject constructor(
 			viewModelState.update {
 				it.copy(isLoading = false)
 			}
-		}
-	}
-
-	fun votePoll(activeAccount: String, postId: String, pollId: String?, choices: List<Int>) {
-		viewModelScope.launch {
-			votePollUseCase(activeAccount, postId, pollId, choices)
-		}
-	}
-
-	fun removeFavorite(activeAccount: String, postId: String) {
-		viewModelScope.launch {
-			postRepository.removeFavorite(activeAccount, postId)
-		}
-	}
-
-	fun addFavorite(activeAccount: String, postId: String) {
-		viewModelScope.launch {
-			postRepository.createFavorite(activeAccount, postId)
-		}
-	}
-
-	fun removeReaction(activeAccount: String, postId: String, reaction: String) {
-		viewModelScope.launch {
-			postRepository.removeReaction(activeAccount, postId, reaction)
-		}
-	}
-
-	fun addReaction(activeAccount: String, postId: String, reaction: String) {
-		viewModelScope.launch {
-			postRepository.createReaction(activeAccount, postId, reaction)
 		}
 	}
 }

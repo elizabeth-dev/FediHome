@@ -15,6 +15,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,6 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.fedihome.ui.composable.SlimPostCard
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddBoost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddFavorite
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddReaction
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveBoost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveFavorite
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveReaction
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnVotePoll
 
 @Composable
 fun HomeScreen(
@@ -30,16 +38,45 @@ fun HomeScreen(
 ) {
 	val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
-	HomeScreen(
-		uiState = uiState,
-		scrollState = scrollState,
-		onRefresh = homeViewModel::refreshTimeline,
-		onVotePoll = homeViewModel::votePoll,
-		onAddFavorite = homeViewModel::addFavorite,
-		onRemoveFavorite = homeViewModel::removeFavorite,
-		onRemoveReaction = homeViewModel::removeReaction,
-		onAddReaction = homeViewModel::addReaction
-	)
+	CompositionLocalProvider(localOnVotePoll provides { postId, pollId, choices ->
+		homeViewModel.votePoll(
+			activeAccount = uiState.activeAccount,
+			postId = postId,
+			pollId = pollId,
+			choices = choices
+		)
+	}, localOnAddFavorite provides {
+		homeViewModel.addFavorite(
+			activeAccount = uiState.activeAccount, postId = it
+		)
+	}, localOnRemoveFavorite provides {
+		homeViewModel.removeFavorite(
+			activeAccount = uiState.activeAccount, postId = it
+		)
+	}, localOnAddReaction provides { postId, reaction ->
+		homeViewModel.addReaction(
+			activeAccount = uiState.activeAccount, postId = postId, reaction = reaction
+		)
+	}, localOnRemoveReaction provides { postId, reaction ->
+		homeViewModel.removeReaction(
+			activeAccount = uiState.activeAccount, postId = postId, reaction = reaction
+		)
+	}, localOnAddBoost provides { postId ->
+		homeViewModel.addBoost(
+			activeAccount = uiState.activeAccount, postId = postId
+		)
+	}, localOnRemoveBoost provides { postId ->
+		homeViewModel.removeBoost(
+			activeAccount = uiState.activeAccount, postId = postId
+		)
+	}) {
+		HomeScreen(
+			uiState = uiState,
+			scrollState = scrollState,
+			onRefresh = homeViewModel::refreshTimeline,
+		)
+	}
+
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -48,11 +85,6 @@ fun HomeScreen(
 	uiState: HomeUiState,
 	scrollState: LazyListState,
 	onRefresh: (String) -> Unit,
-	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
-	onRemoveFavorite: (activeAccount: String, postId: String) -> Unit,
-	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
-	onRemoveReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
 ) {
 	val pullRefreshState =
 		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
@@ -84,23 +116,6 @@ fun HomeScreen(
 				items(uiState.posts) { post ->
 					SlimPostCard(
 						post = post,
-						onVotePoll = {
-							onVotePoll(
-								uiState.activeAccount, post.id, post.poll?.id, it
-							)
-						},
-						onAddFavorite = { onAddFavorite(uiState.activeAccount, it) },
-						onRemoveFavorite = { onRemoveFavorite(uiState.activeAccount, it) },
-						onAddReaction = { postId, reaction ->
-							onAddReaction(
-								uiState.activeAccount, postId, reaction
-							)
-						},
-						onRemoveReaction = { postId, reaction ->
-							onRemoveReaction(
-								uiState.activeAccount, postId, reaction
-							)
-						},
 					)
 				}
 			}

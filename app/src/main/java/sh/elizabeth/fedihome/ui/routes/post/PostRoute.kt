@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextOverflow
@@ -17,6 +18,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.fedihome.mock.defaultPost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddBoost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddFavorite
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddReaction
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveBoost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveFavorite
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveReaction
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnVotePoll
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 
 @Composable
@@ -26,16 +34,44 @@ fun PostRoute(
 ) {
 	val uiState by postViewModel.uiState.collectAsStateWithLifecycle()
 
-	PostRoute(
-		uiState = uiState,
-		navBack = navBack,
-		onPostRefresh = postViewModel::refreshPost,
-		onVotePoll = postViewModel::votePoll,
-		onAddFavorite = postViewModel::addFavorite,
-		onRemoveFavorite = postViewModel::removeFavorite,
-		onAddReaction = postViewModel::addReaction,
-		onRemoveReaction = postViewModel::removeReaction,
-	)
+	CompositionLocalProvider(localOnVotePoll provides { postId, pollId, choices ->
+		postViewModel.votePoll(
+			activeAccount = uiState.activeAccount,
+			postId = postId,
+			pollId = pollId,
+			choices = choices
+		)
+	}, localOnAddFavorite provides {
+		postViewModel.addFavorite(
+			activeAccount = uiState.activeAccount, postId = it
+		)
+	}, localOnRemoveFavorite provides {
+		postViewModel.removeFavorite(
+			activeAccount = uiState.activeAccount, postId = it
+		)
+	}, localOnAddReaction provides { postId, reaction ->
+		postViewModel.addReaction(
+			activeAccount = uiState.activeAccount, postId = postId, reaction = reaction
+		)
+	}, localOnRemoveReaction provides { postId, reaction ->
+		postViewModel.removeReaction(
+			activeAccount = uiState.activeAccount, postId = postId, reaction = reaction
+		)
+	}, localOnAddBoost provides { postId ->
+		postViewModel.addBoost(
+			activeAccount = uiState.activeAccount, postId = postId
+		)
+	}, localOnRemoveBoost provides { postId ->
+		postViewModel.removeBoost(
+			activeAccount = uiState.activeAccount, postId = postId
+		)
+	}) {
+		PostRoute(
+			uiState = uiState,
+			navBack = navBack,
+			onPostRefresh = postViewModel::refreshPost,
+		)
+	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,11 +80,6 @@ fun PostRoute(
 	uiState: PostUiState,
 	navBack: () -> Unit,
 	onPostRefresh: (activeAccount: String, postId: String) -> Unit,
-	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
-	onRemoveFavorite: (activeAccount: String, postId: String) -> Unit,
-	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
-	onRemoveReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
 ) {
 	LaunchedEffect(key1 = uiState.activeAccount, key2 = uiState.postId) {
 		if (uiState.activeAccount.isNotBlank()) onPostRefresh(
@@ -75,11 +106,6 @@ fun PostRoute(
 			uiState = uiState,
 			onPostRefresh = onPostRefresh,
 			contentPadding = contentPadding,
-			onVotePoll = onVotePoll,
-			onAddFavorite = onAddFavorite,
-			onRemoveFavorite = onRemoveFavorite,
-			onAddReaction = onAddReaction,
-			onRemoveReaction = onRemoveReaction,
 		)
 
 	}
@@ -93,13 +119,6 @@ fun PostRoutePreview() {
 		PostRoute(
 			uiState = PostUiState.HasPost(
 				postId = "foo", post = defaultPost, activeAccount = "foo", isLoading = false
-		),
-			navBack = {},
-			onPostRefresh = { _, _ -> },
-			onVotePoll = { _, _, _, _ -> },
-			onAddFavorite = { _, _ -> },
-			onRemoveFavorite = { _, _ -> },
-			onRemoveReaction = { _, _, _ -> },
-			onAddReaction = { _, _, _ -> })
+			), navBack = {}, onPostRefresh = { _, _ -> })
 	}
 }

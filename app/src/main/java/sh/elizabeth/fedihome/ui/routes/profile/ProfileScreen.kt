@@ -33,11 +33,6 @@ fun ProfileScreen(
 	uiState: ProfileUiState,
 	contentPadding: PaddingValues,
 	onRefresh: (activeAccount: String, profileTag: String, profileId: String?) -> Unit,
-	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
-	onRemoveFavorite: (activeAccount: String, postId: String) -> Unit,
-	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
-	onRemoveReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
 ) {
 	val navToProfile = localNavToProfile.current
 	val pullRefreshState = rememberPullRefreshState(
@@ -81,24 +76,8 @@ fun ProfileScreen(
 					if (uiState.posts != null) items(uiState.posts) { post ->
 						SlimPostCard(
 							post = post,
-							onVotePoll = {
-								onVotePoll(uiState.activeAccount, post.id, post.poll?.id, it)
-							},
-							onAddFavorite = { onAddFavorite(uiState.activeAccount, it) },
-							onRemoveFavorite = { onRemoveFavorite(uiState.activeAccount, it) },
-							onAddReaction = { postId, reaction ->
-								onAddReaction(
-									uiState.activeAccount, postId, reaction
-								)
-							},
-							onRemoveReaction = { postId, reaction ->
-								onRemoveReaction(
-									uiState.activeAccount,
-									postId,
-									reaction
-								)
-							},
-						)
+
+							)
 					}
 				}
 			}

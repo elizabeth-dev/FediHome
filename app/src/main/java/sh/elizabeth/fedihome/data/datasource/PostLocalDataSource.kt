@@ -100,6 +100,7 @@ fun Post.toEntity() = PostEntity(
 	) else null,
 	favorited = favorited,
 	favoriteCount = favorites,
+	boosted = boosted,
 	mentionLinks = mentionLinksMap,
 	attachments = attachments.map {
 		AttachmentEntity(

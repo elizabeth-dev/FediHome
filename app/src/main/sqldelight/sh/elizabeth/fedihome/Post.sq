@@ -20,6 +20,7 @@ CREATE TABLE PostEntity (
     myReactions TEXT AS List<String>,
     favoriteCount INTEGER NOT NULL,
     favorited INTEGER AS Boolean NOT NULL,
+    boosted INTEGER AS Boolean NOT NULL,
     mentionLinks TEXT AS Map<String, String>,
     attachments TEXT AS List<AttachmentEntity>,
     FOREIGN KEY (authorId) REFERENCES ProfileEntity(profileId),

@@ -61,6 +61,23 @@ class PostMastodonApi @Inject constructor(private val httpClient: HttpClient) {
 		) {
 			bearerAuth(token)
 		}.body()
+
+	// TODO: implement body with visibility and schedule
+	suspend fun createBoost(endpoint: String, token: String, postId: String): Post =
+		httpClient.post(
+			"https://$endpoint/api/v1/statuses/$postId/reblog"
+		) {
+			bearerAuth(token)
+		}.body()
+
+
+	suspend fun removeBoost(endpoint: String, token: String, postId: String): Post =
+		httpClient.post(
+			"https://$endpoint/api/v1/statuses/$postId/unreblog"
+		) {
+			bearerAuth(token)
+		}.body()
+
 }
 
 // TODO: Implement missing fields

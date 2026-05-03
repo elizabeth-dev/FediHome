@@ -213,4 +213,32 @@ class PostRepository @Inject constructor(
 
 		handleInsertPosts(post)
 	}
+
+	suspend fun createBoost(activeAccount: String, postId: String) {
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
+
+		val post = postRemoteDataSource.createBoost(
+			endpoint = instanceData.endpoint,
+			instance = instanceData.instance,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			postId = postId.split('@').first(),
+		).unwrapQuotes()
+
+		handleInsertPosts(post)
+	}
+
+	suspend fun removeBoost(activeAccount: String, postId: String) {
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
+
+		val post = postRemoteDataSource.removeBoost(
+			endpoint = instanceData.endpoint,
+			instance = instanceData.instance,
+			instanceType = instanceData.instanceType,
+			token = instanceData.token,
+			postId = postId.split('@').first(),
+		).unwrapQuotes()
+
+		handleInsertPosts(post)
+	}
 }

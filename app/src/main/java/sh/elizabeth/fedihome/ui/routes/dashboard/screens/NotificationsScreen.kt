@@ -16,6 +16,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,6 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.fedihome.ui.composable.NotificationCard
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddBoost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddFavorite
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddReaction
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveBoost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveFavorite
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveReaction
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnVotePoll
 
 @Composable
 fun NotificationsScreen(
@@ -31,16 +39,44 @@ fun NotificationsScreen(
 ) {
 	val uiState by notificationsViewModel.uiState.collectAsStateWithLifecycle()
 
-	NotificationsScreen(
-		uiState = uiState,
-		scrollState = scrollState,
-		onRefresh = notificationsViewModel::refreshNotifications,
-		onVotePoll = notificationsViewModel::votePoll,
-		onAddFavorite = notificationsViewModel::addFavorite,
-		onRemoveFavorite = notificationsViewModel::removeFavorite,
-		onAddReaction = notificationsViewModel::addReaction,
-		onRemoveReaction = notificationsViewModel::removeReaction,
-	)
+	CompositionLocalProvider(localOnVotePoll provides { postId, pollId, choices ->
+		notificationsViewModel.votePoll(
+			activeAccount = uiState.activeAccount,
+			postId = postId,
+			pollId = pollId,
+			choices = choices
+		)
+	}, localOnAddFavorite provides {
+		notificationsViewModel.addFavorite(
+			activeAccount = uiState.activeAccount, postId = it
+		)
+	}, localOnRemoveFavorite provides {
+		notificationsViewModel.removeFavorite(
+			activeAccount = uiState.activeAccount, postId = it
+		)
+	}, localOnAddReaction provides { postId, reaction ->
+		notificationsViewModel.addReaction(
+			activeAccount = uiState.activeAccount, postId = postId, reaction = reaction
+		)
+	}, localOnRemoveReaction provides { postId, reaction ->
+		notificationsViewModel.removeReaction(
+			activeAccount = uiState.activeAccount, postId = postId, reaction = reaction
+		)
+	}, localOnAddBoost provides { postId ->
+		notificationsViewModel.addBoost(
+			activeAccount = uiState.activeAccount, postId = postId
+		)
+	}, localOnRemoveBoost provides { postId ->
+		notificationsViewModel.removeBoost(
+			activeAccount = uiState.activeAccount, postId = postId
+		)
+	}) {
+		NotificationsScreen(
+			uiState = uiState,
+			scrollState = scrollState,
+			onRefresh = notificationsViewModel::refreshNotifications,
+		)
+	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -49,11 +85,6 @@ fun NotificationsScreen(
 	uiState: NotificationsUiState,
 	scrollState: LazyListState,
 	onRefresh: (profileId: String) -> Unit,
-	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
-	onRemoveFavorite: (activeAccount: String, postId: String) -> Unit,
-	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
-	onRemoveReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
 ) {
 	val pullRefreshState =
 		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
@@ -83,26 +114,6 @@ fun NotificationsScreen(
 					items(uiState.notifications) { notification ->
 						NotificationCard(
 							notification = notification,
-							onVotePoll = {
-								onVotePoll(
-									uiState.activeAccount,
-									notification.post?.id!!,
-									notification.post.poll?.id,
-									it
-								)
-							},
-							onAddFavorite = { onAddFavorite(uiState.activeAccount, it) },
-							onRemoveFavorite = { onRemoveFavorite(uiState.activeAccount, it) },
-							onAddReaction = { postId, reaction ->
-								onAddReaction(
-									uiState.activeAccount, postId, reaction
-								)
-							},
-							onRemoveReaction = { postId, reaction ->
-								onRemoveReaction(
-									uiState.activeAccount, postId, reaction
-								)
-							},
 						)
 					}
 				}

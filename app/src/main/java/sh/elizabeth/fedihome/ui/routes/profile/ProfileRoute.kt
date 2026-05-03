@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import sh.elizabeth.fedihome.mock.defaultPost
 import sh.elizabeth.fedihome.mock.defaultProfile
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddBoost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddFavorite
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddReaction
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveBoost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveFavorite
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveReaction
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnVotePoll
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 
 @Composable
@@ -29,16 +37,44 @@ fun ProfileRoute(
 ) {
 	val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
 
-	ProfileRoute(
-		uiState = uiState,
-		navBack = navBack,
-		onRefresh = profileViewModel::refreshProfile,
-		onVotePoll = profileViewModel::votePoll,
-		onAddFavorite = profileViewModel::addFavorite,
-		onRemoveFavorite = profileViewModel::removeFavorite,
-		onAddReaction = profileViewModel::addReaction,
-		onRemoveReaction = profileViewModel::removeReaction,
-	)
+	CompositionLocalProvider(localOnVotePoll provides { postId, pollId, choices ->
+		profileViewModel.votePoll(
+			activeAccount = uiState.activeAccount,
+			postId = postId,
+			pollId = pollId,
+			choices = choices
+		)
+	}, localOnAddFavorite provides {
+		profileViewModel.addFavorite(
+			activeAccount = uiState.activeAccount, postId = it
+		)
+	}, localOnRemoveFavorite provides {
+		profileViewModel.removeFavorite(
+			activeAccount = uiState.activeAccount, postId = it
+		)
+	}, localOnAddReaction provides { postId, reaction ->
+		profileViewModel.addReaction(
+			activeAccount = uiState.activeAccount, postId = postId, reaction = reaction
+		)
+	}, localOnRemoveReaction provides { postId, reaction ->
+		profileViewModel.removeReaction(
+			activeAccount = uiState.activeAccount, postId = postId, reaction = reaction
+		)
+	}, localOnAddBoost provides { postId ->
+		profileViewModel.addBoost(
+			activeAccount = uiState.activeAccount, postId = postId
+		)
+	}, localOnRemoveBoost provides { postId ->
+		profileViewModel.removeBoost(
+			activeAccount = uiState.activeAccount, postId = postId
+		)
+	}) {
+		ProfileRoute(
+			uiState = uiState,
+			navBack = navBack,
+			onRefresh = profileViewModel::refreshProfile,
+		)
+	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,11 +83,6 @@ fun ProfileRoute(
 	uiState: ProfileUiState,
 	navBack: () -> Unit,
 	onRefresh: (activeAccount: String, profileTag: String, profileId: String?) -> Unit,
-	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
-	onRemoveFavorite: (activeAccount: String, postId: String) -> Unit,
-	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
-	onRemoveReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
 ) {
 	LaunchedEffect(
 		key1 = uiState.profileTag,
@@ -87,11 +118,6 @@ fun ProfileRoute(
 			uiState = uiState,
 			onRefresh = onRefresh,
 			contentPadding = contentPadding,
-			onVotePoll = onVotePoll,
-			onAddFavorite = onAddFavorite,
-			onRemoveFavorite = onRemoveFavorite,
-			onAddReaction = onAddReaction,
-			onRemoveReaction = onRemoveReaction,
 		)
 	}
 }
@@ -104,15 +130,11 @@ fun ProfileRoutePreview() {
 		ProfileRoute(
 			uiState = ProfileUiState.HasProfile(
 				profileTag = "foo", profile = defaultProfile, posts = listOf(
-				defaultPost
-			), activeAccount = "foo", isLoading = false
-		),
+					defaultPost
+				), activeAccount = "foo", isLoading = false
+			),
 			navBack = {},
 			onRefresh = { _, _, _ -> },
-			onVotePoll = { _, _, _, _ -> },
-			onAddFavorite = { _, _ -> },
-			onRemoveFavorite = { _, _ -> },
-			onRemoveReaction = { _, _, _ -> },
-			onAddReaction = { _, _, _ -> })
+		)
 	}
 }

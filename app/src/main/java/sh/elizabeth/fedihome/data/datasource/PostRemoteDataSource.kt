@@ -135,7 +135,7 @@ class PostRemoteDataSource @Inject constructor(
 			endpoint = endpoint, token = token, postId = postId, reaction = reaction
 		).toDomain(instance)
 
-		SupportedInstances.GLITCH, SupportedInstances.MASTODON -> throw NotImplementedError()
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON -> throw IllegalStateException()
 	}
 
 	suspend fun createReaction(
@@ -166,7 +166,7 @@ class PostRemoteDataSource @Inject constructor(
 			endpoint = endpoint, token = token, postId = postId, reaction = reaction
 		).toDomain(instance)
 
-		SupportedInstances.GLITCH, SupportedInstances.MASTODON -> throw NotImplementedError()
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON -> throw IllegalStateException()
 	}
 
 	suspend fun createFavorite(
@@ -225,4 +225,34 @@ class PostRemoteDataSource @Inject constructor(
 			endpoint = endpoint, token = token, postId = postId
 		).toDomain(instance)
 	}
+
+	suspend fun createBoost(
+		endpoint: String,
+		instance: String,
+		instanceType: SupportedInstances,
+		token: String,
+		postId: String,
+	): Post = when (instanceType) {
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.createBoost(
+			endpoint = endpoint, token = token, postId = postId
+		).toDomain(instance)
+
+		SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> throw NotImplementedError()
+	}
+
+
+	suspend fun removeBoost(
+		endpoint: String,
+		instance: String,
+		instanceType: SupportedInstances,
+		token: String,
+		postId: String,
+	): Post = when (instanceType) {
+		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> postMastodonApi.removeBoost(
+			endpoint = endpoint, token = token, postId = postId
+		).toDomain(instance)
+
+		SupportedInstances.ICESHRIMP, SupportedInstances.SHARKEY -> throw NotImplementedError()
+	}
+
 }

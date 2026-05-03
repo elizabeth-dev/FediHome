@@ -3,6 +3,7 @@ package sh.elizabeth.fedihome.ui.routes.dashboard.screens
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,6 +18,7 @@ import sh.elizabeth.fedihome.data.repository.NotificationRepository
 import sh.elizabeth.fedihome.data.repository.PostRepository
 import sh.elizabeth.fedihome.domain.VotePollUseCase
 import sh.elizabeth.fedihome.model.Notification
+import sh.elizabeth.fedihome.util.viewmodel.PostHandlingViewModel
 import javax.inject.Inject
 
 sealed interface NotificationsUiState {
@@ -39,17 +41,14 @@ private data class NotificationsViewModelState(
 	val isLoading: Boolean = false,
 ) {
 	fun toUiState(
-        notifications: List<Notification>?, activeAccount: String = "",
-    ): NotificationsUiState = if (notifications.isNullOrEmpty()) {
+		notifications: List<Notification>?, activeAccount: String = "",
+	): NotificationsUiState = if (notifications.isNullOrEmpty()) {
 		NotificationsUiState.NoNotifications(
-			isLoading = isLoading,
-			activeAccount = activeAccount
+			isLoading = isLoading, activeAccount = activeAccount
 		)
 	} else {
 		NotificationsUiState.HasNotifications(
-			notifications = notifications,
-			isLoading = isLoading,
-			activeAccount = activeAccount
+			notifications = notifications, isLoading = isLoading, activeAccount = activeAccount
 		)
 	}
 
@@ -59,20 +58,20 @@ private data class NotificationsViewModelState(
 class NotificationsViewModel @Inject constructor(
 	authRepository: AuthRepository,
 	private val notificationRepository: NotificationRepository,
-	private val votePollUseCase: VotePollUseCase,
-	private val postRepository: PostRepository,
-) : ViewModel() {
-	private val viewModelState =
-		MutableStateFlow(NotificationsViewModelState(isLoading = true))
+	override val votePollUseCase: VotePollUseCase,
+	override val postRepository: PostRepository,
+) : PostHandlingViewModel, ViewModel() {
+	override val coroutineHandlingScope: CoroutineScope
+		get() = viewModelScope
+
+	private val viewModelState = MutableStateFlow(NotificationsViewModelState(isLoading = true))
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private val notifications =
-		authRepository.activeAccount.flatMapLatest {
-			notificationRepository.getNotificationsFlow(
-				it
-			)
-		}
-			.distinctUntilChanged()
+	private val notifications = authRepository.activeAccount.flatMapLatest {
+		notificationRepository.getNotificationsFlow(
+			it
+		)
+	}.distinctUntilChanged()
 
 	val uiState = combine(
 		viewModelState,
@@ -94,38 +93,4 @@ class NotificationsViewModel @Inject constructor(
 		}
 	}
 
-	fun votePoll(
-        profileIdentifier: String,
-        postId: String,
-        pollId: String?,
-        choices: List<Int>,
-    ) {
-		viewModelScope.launch {
-			votePollUseCase(profileIdentifier, postId, pollId, choices)
-		}
-	}
-
-	fun removeFavorite(activeAccount: String, postId: String) {
-		viewModelScope.launch {
-			postRepository.removeFavorite(activeAccount, postId)
-		}
-	}
-
-	fun addFavorite(activeAccount: String, postId: String) {
-		viewModelScope.launch {
-			postRepository.createFavorite(activeAccount, postId)
-		}
-	}
-
-	fun removeReaction(activeAccount: String, postId: String, reaction: String) {
-		viewModelScope.launch {
-			postRepository.removeReaction(activeAccount, postId, reaction)
-		}
-	}
-
-	fun addReaction(activeAccount: String, postId: String, reaction: String) {
-		viewModelScope.launch {
-			postRepository.createReaction(activeAccount, postId, reaction)
-		}
-	}
 }

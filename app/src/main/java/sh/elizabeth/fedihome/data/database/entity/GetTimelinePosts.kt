@@ -37,7 +37,7 @@ fun GetTimelinePosts.toPostDomain(
 			headerBlur = headerBlur,
 			emojis = profileEmojis,
 		),
-		repostedBy = if (profileId_ != null) Profile(
+		boostedBy = if (profileId_ != null) Profile(
 			id = profileId_,
 			username = username_!!,
 			instance = instance_!!,
@@ -56,6 +56,7 @@ fun GetTimelinePosts.toPostDomain(
 			headerBlur = headerBlur_,
 			emojis = profileEmojis,
 		) else null,
+		boosted = boosted,
 		quote = if (postId__ != null && profileId__ != null) Post(
 			id = postId__,
 			createdAt = createdAt___,
@@ -81,7 +82,8 @@ fun GetTimelinePosts.toPostDomain(
 				headerBlur = headerBlur__,
 				emojis = profileEmojis,
 			),
-			repostedBy = null,
+			boostedBy = null,
+			boosted = boosted_!!,
 			quote = null,
 			poll = poll_?.toDomain(),
 			emojis = postEmojis,

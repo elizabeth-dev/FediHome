@@ -9,7 +9,8 @@ data class Post(
 	val cw: String?,
 	val text: String?,
 	val author: Profile,
-	val repostedBy: Profile?,
+	val boostedBy: Profile?,
+	val boosted: Boolean,
 	val quote: Post?,
 	val poll: Poll?,
 	val reactions: Map<String, Int>,
@@ -32,7 +33,7 @@ fun Post.unwrapQuotes(): List<Post> {
 }
 
 fun Post.unwrapProfiles(): List<Profile> =
-	if (repostedBy == null) listOf(author) else listOf(author, repostedBy)
+	if (boostedBy == null) listOf(author) else listOf(author, boostedBy)
 
 data class Poll(
 	val id: String?,

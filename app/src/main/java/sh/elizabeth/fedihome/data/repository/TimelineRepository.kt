@@ -81,7 +81,7 @@ class TimelineRepository @Inject constructor(
 			timelineLocalDataSource.insert(
 				profileIdentifier, *posts.map {
 					TimelinePost(
-						postId = it.id, repostedById = it.repostedBy?.id
+						postId = it.id, repostedById = it.boostedBy?.id
 					)
 				}.reversed().toTypedArray()
 			)

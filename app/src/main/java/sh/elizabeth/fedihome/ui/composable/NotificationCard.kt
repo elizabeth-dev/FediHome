@@ -105,11 +105,6 @@ fun EmbeddedNotificationContext(notification: Notification) {
 @Composable
 fun NotificationCard(
 	notification: Notification,
-	onVotePoll: (choices: List<Int>) -> Unit,
-	onAddFavorite: (postId: String) -> Unit,
-	onRemoveFavorite: (postId: String) -> Unit,
-	onAddReaction: (postId: String, reaction: String) -> Unit,
-	onRemoveReaction: (postId: String, reaction: String) -> Unit,
 ) {
 	val isEmbeddedPost = arrayOf(
 		NotificationType.REACTION,
@@ -138,12 +133,7 @@ fun NotificationCard(
 		} else if (notification.post != null) {
 			SlimPostCard(
 				post = notification.post,
-				onVotePoll = onVotePoll,
 				showDivider = false,
-				onAddFavorite = onAddFavorite,
-				onRemoveFavorite = onRemoveFavorite,
-				onAddReaction = onAddReaction,
-				onRemoveReaction = onRemoveReaction,
 			)
 		} else if (notification.profile != null) {
 			EmbeddedNotificationContext(notification = notification)
@@ -162,7 +152,7 @@ fun NotificationCard(
 @Composable
 fun NotificationCardMentionPreview() {
 	FediHomeTheme {
-		NotificationCard(mentionNotification, {}, {}, {}, { _, _ -> }, { _, _ -> })
+		NotificationCard(mentionNotification)
 	}
 }
 
@@ -170,7 +160,7 @@ fun NotificationCardMentionPreview() {
 @Composable
 fun NotificationCardReactionPreview() {
 	FediHomeTheme {
-		NotificationCard(reactionNotification, {}, {}, {}, { _, _ -> }, { _, _ -> })
+		NotificationCard(reactionNotification)
 	}
 }
 
@@ -178,6 +168,6 @@ fun NotificationCardReactionPreview() {
 @Composable
 fun NotificationCardFollowPreview() {
 	FediHomeTheme {
-		NotificationCard(followNotification, {}, {}, {}, { _, _ -> }, { _, _ -> })
+		NotificationCard(followNotification)
 	}
 }

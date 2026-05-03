@@ -29,22 +29,31 @@ import sh.elizabeth.fedihome.localNavToProfile
 import sh.elizabeth.fedihome.mock.defaultPost
 import sh.elizabeth.fedihome.model.Attachment
 import sh.elizabeth.fedihome.model.Post
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddBoost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddFavorite
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddReaction
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveBoost
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveFavorite
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveReaction
+import sh.elizabeth.fedihome.ui.compositionlocals.localOnVotePoll
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 
 @Composable
 fun SlimPostCard(
 	post: Post,
-	onVotePoll: (choices: List<Int>) -> Unit,
 	showDivider: Boolean = true,
-	onAddFavorite: (postId: String) -> Unit,
-	onRemoveFavorite: (postId: String) -> Unit,
-	onAddReaction: (postId: String, reaction: String) -> Unit,
-	onRemoveReaction: (postId: String, reaction: String) -> Unit,
 	disablePostClick: Boolean = false,
-) { // TODO: Check if it's better to pass individual props
+) {
 	val navToPost = localNavToPost.current
 	val navToProfile = localNavToProfile.current
 	val onReply = localNavToCompose.current
+	val onVotePoll = localOnVotePoll.current
+	val onAddFavorite = localOnAddFavorite.current
+	val onRemoveFavorite = localOnRemoveFavorite.current
+	val onRemoveReaction = localOnRemoveReaction.current
+	val onAddReaction = localOnAddReaction.current
+	val onBoost = localOnAddBoost.current
+	val onUnboost = localOnRemoveBoost.current
 
 	Surface(
 		modifier = Modifier.fillMaxWidth(),
@@ -58,11 +67,11 @@ fun SlimPostCard(
 				verticalArrangement = Arrangement.spacedBy(8.dp)
 			) {// TODO: Adapt padding for WindowSizeClass https://m3.material.io/foundations/layout/applying-layout/medium
 
-				if (post.repostedBy != null) TopDisclaimer(
+				if (post.boostedBy != null) TopDisclaimer(
 					icon = Icons.Rounded.Repeat,
 					iconDescription = "Repost",
-					text = "Reposted by ${post.repostedBy.name}",
-					emojis = post.repostedBy.emojis
+					text = "Reposted by ${post.boostedBy.name}",
+					emojis = post.boostedBy.emojis
 				)
 
 				SlimProfileSummary(
@@ -86,7 +95,9 @@ fun SlimPostCard(
 
 				if (post.attachments.isNotEmpty()) AttachmentGrid(attachments = post.attachments)
 
-				if (post.poll != null) PollDisplay(poll = post.poll) { onVotePoll(it) }
+				if (post.poll != null) PollDisplay(poll = post.poll) {
+					onVotePoll(post.id, post.poll.id, it)
+				}
 
 				if (post.quote != null) PostPreview(
 					modifier = Modifier
@@ -126,7 +137,9 @@ fun SlimPostCard(
 
 				Spacer(modifier = Modifier.weight(1f))
 
-				IconButton(onClick = { /*TODO*/ }) { // Boost button
+				IconButton(onClick = {
+					if (!post.boosted) onBoost(post.id) else onUnboost(post.id)
+				}) { // Boost button
 					Icon(
 						Icons.Rounded.Repeat,
 						contentDescription = "Repost",
@@ -177,10 +190,6 @@ fun SlimPostCardPreview() {
 	FediHomeTheme {
 		SlimPostCard(
 			post = defaultPost,
-			onVotePoll = { },
-			onAddFavorite = {},
-			onRemoveFavorite = {},
-			onRemoveReaction = { _, _ -> },
-			onAddReaction = { _, _ -> })
+		)
 	}
 }

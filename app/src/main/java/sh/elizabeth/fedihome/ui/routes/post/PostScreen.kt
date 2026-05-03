@@ -28,11 +28,6 @@ fun PostScreen(
 	uiState: PostUiState,
 	contentPadding: PaddingValues,
 	onPostRefresh: (activeAccount: String, postId: String) -> Unit,
-	onVotePoll: (activeAccount: String, postId: String, pollId: String?, List<Int>) -> Unit,
-	onAddFavorite: (activeAccount: String, postId: String) -> Unit,
-	onRemoveFavorite: (activeAccount: String, postId: String) -> Unit,
-	onAddReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
-	onRemoveReaction: (activeAccount: String, postId: String, reaction: String) -> Unit,
 ) {
 	val pullRefreshState = rememberPullRefreshState(
 		uiState.isLoading, { onPostRefresh(uiState.activeAccount, uiState.postId) })
@@ -64,23 +59,6 @@ fun PostScreen(
 				Surface {
 					SlimPostCard(
 						post = uiState.post,
-						onVotePoll = {
-							onVotePoll(
-								uiState.activeAccount, uiState.post.id, uiState.post.poll?.id, it
-							)
-						},
-						onAddFavorite = { onAddFavorite(uiState.activeAccount, it) },
-						onRemoveFavorite = { onRemoveFavorite(uiState.activeAccount, it) },
-						onAddReaction = { postId, reaction ->
-							onAddReaction(
-								uiState.activeAccount, postId, reaction
-							)
-						},
-						onRemoveReaction = { postId, reaction ->
-							onRemoveReaction(
-								uiState.activeAccount, postId, reaction
-							)
-						},
 						disablePostClick = true
 					)
 				}
