@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import sh.elizabeth.fedihome.localNavToPost
 import sh.elizabeth.fedihome.localNavToProfile
 import sh.elizabeth.fedihome.mock.defaultPost
 import sh.elizabeth.fedihome.model.Post
@@ -30,7 +31,7 @@ fun PostPreview(
 	post: Post,
 ) {
 	val navToProfile = localNavToProfile.current
-	val navToPost = localNavToProfile.current
+	val navToPost = localNavToPost.current
 
 	Surface(
 		modifier = modifier.border(

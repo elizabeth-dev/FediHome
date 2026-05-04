@@ -34,7 +34,10 @@ enum class NotificationType {
 	FOLLOW_REQ,
 
 	@SerialName("update")
-	UPDATE
+	UPDATE,
+
+	@SerialName("bite")
+	BITE
 }
 
 @Serializable
@@ -85,4 +88,5 @@ fun NotificationType.toDomain() = when (this) {
 	NotificationType.REACTION -> DomainNotificationType.REACTION
 	NotificationType.REBLOG -> DomainNotificationType.REPOST
 	NotificationType.UPDATE -> DomainNotificationType.EDIT
+	NotificationType.BITE -> DomainNotificationType.BITE
 }

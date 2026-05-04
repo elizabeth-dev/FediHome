@@ -63,7 +63,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			boostedBy = account.toDomain(fetchedFromInstance),
 			boosted = reblog.reblogged,
 			boosts = reblog.reblogsCount,
-			quote = null,
+			quote = reblog.quote?.toDomain(fetchedFromInstance),
 			poll = reblog.poll?.toDomain(),
 			reactions = reblog.reactions?.associate {
 				Pair(
@@ -110,7 +110,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		boostedBy = null,
 		boosted = reblogged,
 		boosts = reblogsCount,
-		quote = null,
+		quote = quote?.toDomain(fetchedFromInstance),
 		poll = poll?.toDomain(),
 		reactions = reactions?.associate {
 			Pair(

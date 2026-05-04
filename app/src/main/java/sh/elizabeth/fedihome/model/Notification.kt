@@ -26,6 +26,7 @@ enum class NotificationType {
 	EDIT,
 	QUOTE,
 	FOLLOW_ACCEPTED,
+	BITE,
 	UNKNOWN,
 }
 

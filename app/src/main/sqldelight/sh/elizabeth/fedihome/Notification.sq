@@ -25,5 +25,7 @@ LEFT JOIN ProfileEntity ON NotificationEntity.profileId = ProfileEntity.profileI
 LEFT JOIN PostEntity ON NotificationEntity.postId = PostEntity.postId
 LEFT JOIN ProfileEntity AS PostProfile ON PostEntity.authorId = PostProfile.profileId
 LEFT JOIN EmojiEntity ON NotificationEntity.reactionEmoji = EmojiEntity.emojiId
+LEFT JOIN PostEntity AS Quote ON PostEntity.quoteId = Quote.postId
+LEFT JOIN ProfileEntity AS QuoteProfile ON Quote.authorId = QuoteProfile.profileId
 
 WHERE forAccount = ? ORDER BY NotificationEntity.createdAt DESC;

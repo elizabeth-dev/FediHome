@@ -1,19 +1,14 @@
 package sh.elizabeth.fedihome.ui.composable
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Poll
-import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.Notifications
-import androidx.compose.material.icons.rounded.PersonAdd
-import androidx.compose.material.icons.rounded.PersonOutline
-import androidx.compose.material.icons.rounded.Repeat
-import androidx.compose.material.icons.rounded.Star
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,10 +17,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import sh.elizabeth.fedihome.R
 import sh.elizabeth.fedihome.mock.followNotification
 import sh.elizabeth.fedihome.mock.mentionNotification
 import sh.elizabeth.fedihome.mock.reactionNotification
@@ -45,59 +43,78 @@ fun EmbeddedNotificationContext(notification: Notification) {
 		NotificationType.POLL_ENDED -> "See the results of this poll"
 		NotificationType.EDIT -> "${notification.profile?.name} edited"
 		NotificationType.FOLLOW_ACCEPTED -> "${notification.profile?.name} accepted your follow request"
+		NotificationType.QUOTE -> "${notification.profile?.name} quoted your post"
+		NotificationType.BITE -> if (notification.post != null) "${notification.profile?.name} bit your post" else "${notification.profile?.name} bit you"
 		else -> ""
 	}
 
 	val icon = when (notification.type) {
-		NotificationType.REACTION, NotificationType.FAVORITE -> Icons.Rounded.Star
-		NotificationType.REPOST -> Icons.Rounded.Repeat
-		NotificationType.FOLLOW -> Icons.Rounded.PersonAdd
-		NotificationType.FOLLOW_REQ -> Icons.Rounded.PersonOutline
-		NotificationType.POLL_VOTE -> Icons.Outlined.Poll
-		NotificationType.POLL_ENDED -> Icons.Outlined.Poll
-		NotificationType.EDIT -> Icons.Rounded.Edit
-		NotificationType.FOLLOW_ACCEPTED -> Icons.Rounded.PersonAdd
-		else -> Icons.Rounded.Notifications
+		NotificationType.REACTION, NotificationType.FAVORITE -> painterResource(R.drawable.icon_star)
+		NotificationType.REPOST -> painterResource(R.drawable.icon_repeat)
+		NotificationType.FOLLOW -> painterResource(R.drawable.icon_person_add)
+		NotificationType.FOLLOW_REQ -> painterResource(R.drawable.icon_outline_person)
+		NotificationType.POLL_VOTE -> painterResource(R.drawable.icon_outline_insert_chart)
+		NotificationType.POLL_ENDED -> painterResource(R.drawable.icon_outline_insert_chart)
+		NotificationType.EDIT -> painterResource(R.drawable.icon_edit)
+		NotificationType.FOLLOW_ACCEPTED -> painterResource(R.drawable.icon_person_add)
+		NotificationType.QUOTE -> painterResource(R.drawable.icon_format_quote)
+		NotificationType.BITE -> painterResource(R.drawable.icon_outline_dentistry)
+
+		else -> painterResource(R.drawable.icon_notifications)
 	}
 
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
 	) {
-		if (notification.reactionEmoji != null) {
-			AsyncImage(
-				model = notification.reactionEmoji.url,
-				contentDescription = notification.reactionEmoji.shortcode,
-				modifier = Modifier
-					.size(32.dp)
-					.padding(end = 8.dp)
+		if (notification.type != NotificationType.POLL_ENDED && notification.type != NotificationType.POLL_VOTE) Box(
+			modifier = Modifier.padding(end = 8.dp), contentAlignment = Alignment.BottomEnd
+		) {
+			BlurHashAvatar(
+				modifier = Modifier.padding(end = 4.dp, bottom = 4.dp),
+				imageUrl = notification.profile?.avatarUrl,
+				imageBlur = notification.profile?.avatarBlur,
+				imageSize = 32.dp,
+				roundingRadius = 8f
 			)
-		} else if (!notification.reaction.isNullOrBlank()) {
-			Text(
-				text = notification.reaction, fontSize = 18.sp, // TODO: harmonize icon sizes
-				modifier = Modifier.padding(end = 8.dp)
-			)
-		} else {
-			Icon(
-				imageVector = icon,
-				contentDescription = "foo",
-				modifier = Modifier
-					.padding(end = 8.dp)
-					.size(24.dp)
-			)
+
+			if (notification.reactionEmoji != null) {
+				AsyncImage(
+					model = notification.reactionEmoji.url,
+					contentDescription = notification.reactionEmoji.shortcode,
+					modifier = Modifier.size(18.dp)
+				)
+			} else if (!notification.reaction.isNullOrBlank()) {
+				Text(
+					text = notification.reaction,
+					color = MaterialTheme.colorScheme.onPrimaryContainer,
+					fontSize = 14.sp, // TODO: harmonize icon sizes
+					lineHeight = 14.sp
+				)
+			} else {
+				Box(
+					modifier = Modifier
+						.clip(
+							CircleShape
+						)
+						.background(MaterialTheme.colorScheme.primaryContainer)
+						.padding(1.dp)
+				) {
+					Icon(
+						painter = icon,
+						contentDescription = "foo",
+						tint = MaterialTheme.colorScheme.onPrimaryContainer,
+						modifier = Modifier.size(16.dp)
+					)
+				}
+			}
 		}
-		if (notification.type != NotificationType.POLL_ENDED && notification.type != NotificationType.POLL_VOTE) BlurHashAvatar(
-			modifier = Modifier.padding(end = 8.dp),
-			imageUrl = notification.profile?.avatarUrl,
-			imageBlur = notification.profile?.avatarBlur,
-			imageSize = 24.dp,
-			roundingRadius = 8f
-		)
 		EnrichedText(
 			text = text,
 			style = MaterialTheme.typography.bodyLarge,
 			emojis = notification.profile?.emojis ?: emptyMap(),
 			instance = notification.profile?.instance ?: "",
+			modifier = Modifier.padding(bottom = 4.dp)
 		)
 	}
 }
@@ -112,7 +129,8 @@ fun NotificationCard(
 		NotificationType.REPOST,
 		NotificationType.EDIT,
 		NotificationType.POLL_ENDED,
-		NotificationType.POLL_VOTE
+		NotificationType.POLL_VOTE,
+		NotificationType.BITE
 	).contains(notification.type)
 
 	Surface(

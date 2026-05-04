@@ -31,21 +31,30 @@ class NotificationLocalDataSource @Inject constructor(private val appDatabase: A
 		}
 
 	fun getNotificationsFlow(forAccount: String): Flow<List<Notification>> =
-		appDatabase.notificationQueries.getNotificationByAccount(forAccount)
+		appDatabase.notificationQueries
+			.getNotificationByAccount(forAccount)
 			.asFlow()
 			.mapToList(Dispatchers.IO)
-			.map {
-				val postIds = it.flatMap { listOf(it.postId, it.postId_) }
-				val profileIds = it.flatMap { listOf(it.profileId, it.profileId_, it.profileId__) }
+			.map { notifications ->
+				val postIds = notifications.flatMap { setOf(it.postId, it.postId_, it.postId__) }
+				val profileIds =
+					notifications.flatMap {
+						setOf(
+							it.profileId,
+							it.profileId_,
+							it.profileId__,
+							it.profileId___
+						)
+					}
 
 				// TODO: see if we can incorporate emojis in main query
 				val postEmojis = appDatabase.postQueries.getEmojisForPosts(postIds).executeAsList()
 				val profileEmojis =
 					appDatabase.profileQueries.getEmojisForProfiles(profileIds).executeAsList()
-				it.map {
+				notifications.map {
 					it.toDomain(
-						postEmojis.filter { postEmoji -> postEmoji.postId == it.postId },
-						profileEmojis.filter { profileEmoji -> profileEmoji.profileId == it.profileId || profileEmoji.profileId == it.authorId })
+						postEmojis.filter { postEmoji -> postEmoji.postId == it.postId || postEmoji.postId == it.postId__ },
+						profileEmojis.filter { profileEmoji -> profileEmoji.profileId == it.profileId || profileEmoji.profileId == it.authorId || profileEmoji.profileId == it.authorId_ })
 				}
 			}
 

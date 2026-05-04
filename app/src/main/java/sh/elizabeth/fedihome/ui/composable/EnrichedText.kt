@@ -129,7 +129,7 @@ fun EnrichedText(
 		text = AnnotatedString.fromHtml(
 			htmlString = text.replace(
 				Regex(":(?<emoji>[\\w-]+):"), "<emoji>:$1:</emoji>"
-			),
+			).replace(Regex("<span class=\"quote-inline\">.*</span>"), ""),
 			linkStyles = linkStyles,
 			linkInteractionListener = linkInteractionListener,
 		).trim() as AnnotatedString,
