@@ -76,6 +76,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			author = renote.user.toDomain(fetchedFromInstance),
 			boostedBy = user.toDomain(fetchedFromInstance),
 			boosted = renote.isRenoted ?: false,
+			boosts = renote.renoteCount.toLong(),
 			quote = renote.renote?.toDomain(fetchedFromInstance),
 			poll = renote.poll?.toDomain(),
 			emojis = renote.emojis.plus(renote.reactionEmojis)
@@ -91,8 +92,8 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 				if (it.contains('@') || it.containsEmoji()) it else "$it@$fetchedFromInstance"
 			},
 			// TODO: handle favorites in Iceshrimp
-			favorites = 0,
-			favorited = false,
+			favorites = renote.reactions.size.toLong(),
+			favorited = renote.myReaction != null,
 			attachments = files.map(File::toDomain)
 		)
 	}
@@ -105,6 +106,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		author = user.toDomain(fetchedFromInstance),
 		boostedBy = null,
 		boosted = isRenoted ?: false,
+		boosts = renoteCount.toLong(),
 		quote = renote?.toDomain(fetchedFromInstance),
 		poll = poll?.toDomain(),
 		emojis = emojis.plus(reactionEmojis)
@@ -120,8 +122,8 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 			if (it.contains('@') || it.containsEmoji()) it else "$it@$fetchedFromInstance"
 		},
 		// TODO: handle favorites in Iceshrimp
-		favorites = 0,
-		favorited = false,
+		favorites = reactions.size.toLong(),
+		favorited = myReaction != null,
 		attachments = files.map(File::toDomain)
 	)
 }

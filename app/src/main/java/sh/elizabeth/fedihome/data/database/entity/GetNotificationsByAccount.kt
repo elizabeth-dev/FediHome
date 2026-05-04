@@ -75,6 +75,7 @@ fun GetNotificationByAccount.toDomain(
 			emojis = postEmojis,
 			boostedBy = null,
 			boosted = boosted!!,
+			boosts = boostsCount!!,
 			quote = null,
 			poll = poll?.toDomain(),
 			reactions = reactions ?: emptyMap(),

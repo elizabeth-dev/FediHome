@@ -20,6 +20,7 @@ val defaultPost = Post(
 		quote = null,
 		boostedBy = null,
 		boosted = false,
+		boosts = 3,
 		poll = defaultPoll,
 		emojis = emptyMap(),
 		reactions = emptyMap(),
@@ -30,6 +31,7 @@ val defaultPost = Post(
 	),
 	boostedBy = defaultProfile,
 	boosted = true,
+	boosts = 5,
 	poll = defaultPoll,
 	emojis = emptyMap(),
 	reactions = mapOf(
@@ -40,6 +42,6 @@ val defaultPost = Post(
 	),
 	myReactions = listOf("👍"),
 	favorites = 3L,
-	favorited = true,
+	favorited = false,
 	attachments = emptyList()
 )

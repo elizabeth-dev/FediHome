@@ -13,8 +13,6 @@ import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -124,47 +122,49 @@ fun SlimPostCard(
 
 			Row(
 				Modifier.padding(
-					start = 4.dp, end = 4.dp
-				)
+					horizontal = 8.dp, vertical = 8.dp
+				),
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) { // TODO: No padding in the bottom makes the buttons ripple touch the divider
-				IconButton(onClick = { onReply(post.id) }) { // Reply button
-					Icon(
-						Icons.AutoMirrored.Outlined.Message,
-						contentDescription = "Reply",
-						tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-					)
-				}
+				InteractionButton(
+					icons = InteractionButtonIcons(
+						unSelectedIcon = Icons.AutoMirrored.Outlined.Message,
+						unSelectedIconDescription = "Reply"
+					), onClick = { onReply(post.id) }, onClickLabel = "Reply"
+				)
 
 				Spacer(modifier = Modifier.weight(1f))
 
-				IconButton(onClick = {
-					if (!post.boosted) onBoost(post.id) else onUnboost(post.id)
-				}) { // Boost button
-					Icon(
-						Icons.Rounded.Repeat,
-						contentDescription = "Repost",
-						tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-					)
-				}
-				IconButton(onClick = { // Fav button
-					if (!post.favorited) onAddFavorite(post.id) else onRemoveFavorite(
-						post.id
-					)
-				}) {
-					if (!post.favorited) Icon(
-						Icons.Rounded.StarBorder,
-						contentDescription = "Star",
-						tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-					)
-					else Icon(
-						Icons.Rounded.Star,
-						contentDescription = "Starred",
-						tint = MaterialTheme.colorScheme.primary
-					)
-					if (post.reactions.isNotEmpty()) Text(text = post.reactions.values.reduce { acc, i -> acc + i }
-						.toString())
-				}
+				InteractionButton(
+					count = post.boosts,
+					selected = post.boosted,
+					icons = InteractionButtonIcons(
+						selectedIcon = Icons.Rounded.Repeat,
+						selectedIconDescription = "Boosted",
+						unSelectedIcon = Icons.Rounded.Repeat,
+						unSelectedIconDescription = "Boost"
+					),
+					onClickLabel = if (!post.boosted) "Boost" else "Unboost",
+					onClick = { if (!post.boosted) onBoost(post.id) else onUnboost(post.id) }
 
+				)
+				InteractionButton(
+					// Fav button
+					count = post.favorites,
+					selected = post.favorited,
+					icons = InteractionButtonIcons(
+						selectedIcon = Icons.Rounded.Star,
+						selectedIconDescription = "Favorited",
+						unSelectedIcon = Icons.Rounded.StarBorder,
+						unSelectedIconDescription = "Favorite"
+					),
+					onClickLabel = if (!post.favorited) "Favorite" else "Unfavorite",
+					onClick = {
+						if (!post.favorited) onAddFavorite(post.id) else onRemoveFavorite(
+							post.id
+						)
+					})
 			}
 			if (showDivider) HorizontalDivider(thickness = 1.dp)
 		}
@@ -183,8 +183,13 @@ private fun AttachmentGrid(attachments: List<Attachment>) {
 	}
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Preview(showBackground = true)
+@Preview(
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true,
+	name = "Dark",
+	group = "SlimPostCard"
+)
+@Preview(showBackground = true, name = "Light", group = "SlimPostCard")
 @Composable
 fun SlimPostCardPreview() {
 	FediHomeTheme {

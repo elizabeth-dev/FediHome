@@ -101,6 +101,7 @@ fun Post.toEntity() = PostEntity(
 	favorited = favorited,
 	favoriteCount = favorites,
 	boosted = boosted,
+	boostsCount = boosts,
 	mentionLinks = mentionLinksMap,
 	attachments = attachments.map {
 		AttachmentEntity(

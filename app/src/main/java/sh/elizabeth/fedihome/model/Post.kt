@@ -11,6 +11,7 @@ data class Post(
 	val author: Profile,
 	val boostedBy: Profile?,
 	val boosted: Boolean,
+	val boosts: Long,
 	val quote: Post?,
 	val poll: Poll?,
 	val reactions: Map<String, Int>,

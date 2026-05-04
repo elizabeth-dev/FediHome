@@ -41,6 +41,7 @@ fun GetPostByAuthor.toPostDomain(
 		),
 		boostedBy = null,
 		boosted = boosted,
+		boosts = boostsCount,
 		quote = if (postId_ != null && profileId_ != null) Post(
 			id = postId_,
 			createdAt = createdAt__,
@@ -68,6 +69,7 @@ fun GetPostByAuthor.toPostDomain(
 			),
 			boostedBy = null,
 			boosted = boosted_!!,
+			boosts = boostsCount_!!,
 			quote = null,
 			poll = poll_?.toDomain(),
 			emojis = postEmojis,

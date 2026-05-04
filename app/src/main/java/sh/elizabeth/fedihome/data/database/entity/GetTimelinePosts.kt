@@ -57,6 +57,7 @@ fun GetTimelinePosts.toPostDomain(
 			emojis = profileEmojis,
 		) else null,
 		boosted = boosted,
+		boosts = boostsCount,
 		quote = if (postId__ != null && profileId__ != null) Post(
 			id = postId__,
 			createdAt = createdAt___,
@@ -84,6 +85,7 @@ fun GetTimelinePosts.toPostDomain(
 			),
 			boostedBy = null,
 			boosted = boosted_!!,
+			boosts = boostsCount_!!,
 			quote = null,
 			poll = poll_?.toDomain(),
 			emojis = postEmojis,

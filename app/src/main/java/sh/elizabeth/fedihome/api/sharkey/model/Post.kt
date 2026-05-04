@@ -72,6 +72,7 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 			author = renote.user.toDomain(fetchedFromInstance),
 			boostedBy = user.toDomain(fetchedFromInstance),
 			boosted = false,
+			boosts = renote.renoteCount.toLong(),
 			quote = renote.renote?.toDomain(fetchedFromInstance),
 			poll = renote.poll?.toDomain(),
 			emojis = renote.emojis.plus(renote.reactionEmojis).toDomainMap(fetchedFromInstance),
@@ -85,8 +86,8 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 			}),
 
 			// TODO: handle favorites in Sharkey
-			favorites = 0,
-			favorited = false,
+			favorites = renote.reactions.size.toLong(),
+			favorited = renote.myReaction != null,
 			attachments = files.map(File::toDomain)
 		)
 	}
@@ -99,6 +100,7 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 		author = user.toDomain(fetchedFromInstance),
 		boostedBy = null,
 		boosted = false,
+		boosts = renoteCount.toLong(),
 		quote = renote?.toDomain(fetchedFromInstance),
 		poll = poll?.toDomain(),
 		emojis = emojis.plus(reactionEmojis).toDomainMap(fetchedFromInstance),
@@ -112,8 +114,8 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 		}),
 
 		// TODO: handle favorites in Sharkey
-		favorites = 0,
-		favorited = false,
+		favorites = reactions.size.toLong(),
+		favorited = myReaction != null,
 		attachments = files.map(File::toDomain)
 	)
 }
