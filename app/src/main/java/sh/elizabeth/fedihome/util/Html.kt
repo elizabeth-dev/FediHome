@@ -5,6 +5,7 @@ package sh.elizabeth.fedihome.util
 import android.text.Editable
 import android.text.Html.TagHandler
 import android.text.Spanned
+import android.text.style.TypefaceSpan
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.AnnotationSpan
 import androidx.compose.ui.text.LinkInteractionListener
@@ -21,18 +22,21 @@ private const val ContentHandlerReplacementTag = "ContentHandlerReplacementTag"
 
 // https://stackoverflow.com/questions/78937193/how-to-access-a-kotlin-private-top-level-property-in-the-unnamed-main-file
 val INLINE_CONTENT_TAG: String =
-	Class.forName("androidx.compose.foundation.text.InlineTextContentKt")
-		.getDeclaredField("INLINE_CONTENT_TAG").apply { isAccessible = true }
+	Class
+		.forName("androidx.compose.foundation.text.InlineTextContentKt")
+		.getDeclaredField("INLINE_CONTENT_TAG")
+		.apply { isAccessible = true }
 		.get(null /* because a top-level property is static */) as String
 
 val origTagHandler: TagHandler =
-	Class.forName("androidx.compose.ui.text.Html_androidKt")
-		.getDeclaredField("TagHandler").apply { isAccessible = true }
+	Class
+		.forName("androidx.compose.ui.text.Html_androidKt")
+		.getDeclaredField("TagHandler")
+		.apply { isAccessible = true }
 		.get(null /* because a top-level property is static */) as TagHandler
 
 val toAnnotatedString: Method =
-	Class.forName("androidx.compose.ui.text.Html_androidKt")
-		.getDeclaredMethod(
+	Class.forName("androidx.compose.ui.text.Html_androidKt").getDeclaredMethod(
 			"toAnnotatedString",
 			Spanned::class.java,
 			TextLinkStyles::class.java,
@@ -40,7 +44,8 @@ val toAnnotatedString: Method =
 		).apply { isAccessible = true }
 
 val annotationSpanConstructor =
-	Class.forName("androidx.compose.ui.text.AnnotationSpan")
+	Class
+		.forName("androidx.compose.ui.text.AnnotationSpan")
 		.getDeclaredConstructor(String::class.java, String::class.java)
 		.apply { isAccessible = true }
 
@@ -48,10 +53,12 @@ val AccessibleAnnotationSpan =
 	Class<AnnotationSpan>.forName("androidx.compose.ui.text.AnnotationSpan")
 
 const val EMOJI_TAG = "emoji"
+const val PRE_TAG = "pre"
+const val CODE_TAG = "pre"
 
 private val EmojiTagHandler = object : TagHandler {
 	override fun handleTag(
-		opening: Boolean, tag: String?, output: Editable?, xmlReader: XMLReader?
+		opening: Boolean, tag: String?, output: Editable?, xmlReader: XMLReader?,
 	) {
 		if (!tag.equals(EMOJI_TAG) || output == null) return origTagHandler.handleTag(
 			opening, tag, output, xmlReader
@@ -63,9 +70,12 @@ private val EmojiTagHandler = object : TagHandler {
 					EMOJI_TAG, ""
 				), output.length, output.length, Spanned.SPAN_MARK_MARK
 			)
-		} else {
-			output.getSpans(0, output.length, AccessibleAnnotationSpan)
-				.filter { output.getSpanFlags(it) == Spanned.SPAN_MARK_MARK }.fastForEach {
+		}
+		else {
+			output
+				.getSpans(0, output.length, AccessibleAnnotationSpan)
+				.filter { output.getSpanFlags(it) == Spanned.SPAN_MARK_MARK }
+				.fastForEach {
 					val start = output.getSpanStart(it)
 					val end = output.length
 					output.removeSpan(it)
@@ -83,6 +93,78 @@ private val EmojiTagHandler = object : TagHandler {
 	}
 }
 
+private val PreTagHandler = object : TagHandler {
+	override fun handleTag(
+		opening: Boolean, tag: String?, output: Editable?, xmlReader: XMLReader?,
+	) {
+		if (!tag.equals(PRE_TAG) || output == null) return EmojiTagHandler.handleTag(
+			opening, tag, output, xmlReader
+		)
+
+		if (opening) {
+			output.setSpan(
+				annotationSpanConstructor.newInstance(
+					PRE_TAG, ""
+				), output.length, output.length, Spanned.SPAN_MARK_MARK
+			)
+		}
+		else {
+			output
+				.getSpans(0, output.length, AccessibleAnnotationSpan)
+				.filter { output.getSpanFlags(it) == Spanned.SPAN_MARK_MARK }
+				.fastForEach {
+					val start = output.getSpanStart(it)
+					val end = output.length
+					output.removeSpan(it)
+					if (start != end) {
+						output.setSpan(
+							TypefaceSpan("monospace"), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+						)
+					}
+				}
+		}
+
+	}
+}
+
+private val CodeTagHandler = object : TagHandler {
+	override fun handleTag(
+		opening: Boolean, tag: String?, output: Editable?, xmlReader: XMLReader?,
+	) {
+		if (!tag.equals(CODE_TAG) || output == null) return PreTagHandler.handleTag(
+			opening, tag, output, xmlReader
+		)
+
+		if (opening) {
+			output.append("\n")
+			output.setSpan(
+				annotationSpanConstructor.newInstance(
+					CODE_TAG, ""
+				), output.length, output.length, Spanned.SPAN_MARK_MARK
+			)
+		}
+		else {
+			output
+				.getSpans(0, output.length, AccessibleAnnotationSpan)
+				.filter { output.getSpanFlags(it) == Spanned.SPAN_MARK_MARK }
+				.fastForEach {
+					val start = output.getSpanStart(it)
+					val end = output.length
+					output.removeSpan(it)
+//					if (start != end) {
+//						output.setSpan(
+//							BackgroundColorSpan(Color.DKGRAY),
+//							start,
+//							end,
+//							Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+//						)
+//					}
+				}
+		}
+
+	}
+}
+
 fun AnnotatedString.Companion.fromHtml(
 	htmlString: String,
 	linkStyles: TextLinkStyles? = null,
@@ -91,7 +173,7 @@ fun AnnotatedString.Companion.fromHtml(
 	// Check ContentHandlerReplacementTag kdoc for more details
 	val stringToParse = "<$ContentHandlerReplacementTag />$htmlString"
 	val spanned = stringToParse.parseAsHtml(
-		HtmlCompat.FROM_HTML_MODE_COMPACT, null, EmojiTagHandler
+		HtmlCompat.FROM_HTML_MODE_COMPACT, null, CodeTagHandler
 	)
 
 	return toAnnotatedString(

@@ -65,12 +65,14 @@ fun EnrichedText(
 				val linkMapping = mentionLinksMap?.get(link.url)
 				if (linkMapping != null) {
 					navToProfileTag(linkMapping)
-				} else {
+				}
+				else {
 					openLinkInBrowser(link.url.toUri(), ctx)
 				}
 			}
 		}
-	} else null
+	}
+	else null
 
 	Text(
 		/*		text = buildAnnotatedString {
@@ -140,7 +142,6 @@ fun EnrichedText(
 		minLines = minLines,
 		style = style,
 		color = color,
-
 		inlineContent = emojis.filter { it.key.endsWith("@$instance") }.map { (key, emoji) ->
 			key.split('@').first() to InlineTextContent(
 				placeholder = Placeholder(
