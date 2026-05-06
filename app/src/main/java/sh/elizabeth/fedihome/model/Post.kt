@@ -9,7 +9,6 @@ data class Post(
 	val cw: String?,
 	val text: String?,
 	val author: Profile,
-	val boostedBy: Profile?,
 	val boosted: Boolean,
 	val boosts: Long,
 	val boostedPost: Post? = null,
@@ -37,7 +36,7 @@ private fun Post._unwrapPosts(): List<Post> {
 	return posts
 }
 
-fun Post.unwrapProfiles(): List<Profile> = listOfNotNull(author, boostedBy).distinctBy(Profile::id)
+fun Post.unwrapProfiles(): List<Profile> = listOf(author)
 
 data class Poll(
 	val id: String?,

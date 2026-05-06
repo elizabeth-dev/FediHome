@@ -39,7 +39,6 @@ fun GetPostById.toPostDomain(
 			headerBlur = headerBlur,
 			emojis = profileEmojis,
 		),
-		boostedBy = null,
 		boosted = boosted,
 		boosts = boostsCount,
 		boostedPost = if (postId__ != null && profileId__ != null) Post(
@@ -67,7 +66,6 @@ fun GetPostById.toPostDomain(
 				headerBlur = headerBlur__,
 				emojis = profileEmojis,
 			),
-			boostedBy = null,
 			boosted = boosted__!!,
 			boosts = boostsCount__!!,
 			quote = null,
@@ -105,7 +103,6 @@ fun GetPostById.toPostDomain(
 				headerBlur = headerBlur_,
 				emojis = profileEmojis,
 			),
-			boostedBy = null,
 			boosted = boosted_!!,
 			boosts = boostsCount_!!,
 			quote = null,

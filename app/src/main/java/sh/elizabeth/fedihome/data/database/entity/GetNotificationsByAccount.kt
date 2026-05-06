@@ -73,7 +73,6 @@ fun GetNotificationByAccount.toDomain(
 				emojis = profileEmojis,
 			),
 			emojis = postEmojis,
-			boostedBy = null,
 			boosted = boosted!!,
 			boosts = boostsCount!!,
 			quote = if (postId__ != null && profileId___ != null) Post(
@@ -103,7 +102,6 @@ fun GetNotificationByAccount.toDomain(
 					emojis = profileEmojis,
 				),
 				emojis = postEmojis,
-				boostedBy = null,
 				boosted = boosted_!!,
 				boosts = boostsCount_!!,
 				quote = null,

@@ -57,7 +57,6 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		text = content,
 		cw = spoilerText,
 		author = account.toDomain(fetchedFromInstance),
-		boostedBy = null,
 		boosted = reblogged,
 		boosts = reblogsCount,
 		quote = quote?.toDomain(fetchedFromInstance),

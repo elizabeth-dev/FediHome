@@ -18,7 +18,6 @@ val defaultPost = Post(
 		text = "bar",
 		author = defaultProfile,
 		quote = null,
-		boostedBy = null,
 		boosted = false,
 		boosts = 3,
 		poll = defaultPoll,
@@ -29,7 +28,6 @@ val defaultPost = Post(
 		favorited = false,
 		attachments = emptyList()
 	),
-	boostedBy = defaultProfile,
 	boosted = true,
 	boosts = 5,
 	poll = defaultPoll,

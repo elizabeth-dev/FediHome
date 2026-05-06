@@ -66,7 +66,7 @@ LEFT JOIN ProfileEntity AS QuoteProfile ON Quote.authorId = QuoteProfile.profile
 LEFT JOIN PostEntity AS BoostedPost ON PostEntity.boostedPostId = BoostedPost.postId
 LEFT JOIN ProfileEntity AS BoostedPostProfile ON BoostedPost.authorId = BoostedPostProfile.profileId
 
-WHERE PostEntity.authorId = :authorId || BoostedPost.authorId = :authorId
+WHERE PostEntity.authorId = :authorId
 ORDER BY PostEntity.createdAt DESC;
 
 getEmojisForPosts:
