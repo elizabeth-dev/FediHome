@@ -8,7 +8,7 @@ import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
 
 fun GetTimelinePosts.toPostDomain(
-	postEmojiList: List<GetEmojisForPosts>, profileEmojiList: List<GetEmojisForProfiles>
+	postEmojiList: List<GetEmojisForPosts>, profileEmojiList: List<GetEmojisForProfiles>,
 ): Post {
 	val postEmojis = postEmojiList.associate { it.emojiId to it.toDomain() }
 	val profileEmojis = profileEmojiList.associate { it.emojiId to it.toDomain() }
@@ -55,9 +55,49 @@ fun GetTimelinePosts.toPostDomain(
 			headerUrl = headerUrl_,
 			headerBlur = headerBlur_,
 			emojis = profileEmojis,
-		) else null,
+		)
+		else null,
 		boosted = boosted,
 		boosts = boostsCount,
+		boostedPost = if (postId___ != null && profileId__ != null) Post(
+			id = postId___,
+			createdAt = createdAt____,
+			updatedAt = updatedAt__,
+			cw = cw__,
+			text = text__,
+			author = Profile(
+				id = profileId__,
+				username = username__!!,
+				instance = instance__!!,
+				name = name__,
+				description = description__,
+				following = following__,
+				followers = followers__,
+				postCount = postCount__,
+				createdAt = createdAt__,
+				fields = fields__!!.map {
+					ProfileField(name = it.name, value = it.value)
+				},
+				avatarUrl = avatarUrl__,
+				avatarBlur = avatarBlur__,
+				headerUrl = headerUrl__,
+				headerBlur = headerBlur__,
+				emojis = profileEmojis,
+			),
+			boostedBy = null,
+			boosted = boosted__!!,
+			boosts = boostsCount__!!,
+			quote = null,
+			poll = poll__?.toDomain(),
+			emojis = postEmojis,
+			reactions = reactions__ ?: emptyMap(),
+			myReactions = myReactions__ ?: emptyList(),
+			favorites = favoriteCount__!!,
+			favorited = favorited__!!,
+			mentionLinksMap = mentionLinks__,
+			attachments = attachments__?.map(AttachmentEntity::toDomain) ?: emptyList(),
+		)
+		else null,
 		quote = if (postId__ != null && profileId__ != null) Post(
 			id = postId__,
 			createdAt = createdAt___,
@@ -95,7 +135,8 @@ fun GetTimelinePosts.toPostDomain(
 			favorited = favorited_!!,
 			mentionLinksMap = mentionLinks_,
 			attachments = attachments_?.map(AttachmentEntity::toDomain) ?: emptyList(),
-		) else null,
+		)
+		else null,
 		poll = poll?.toDomain(),
 		emojis = postEmojis,
 		reactions = reactions ?: emptyMap(),

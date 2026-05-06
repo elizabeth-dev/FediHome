@@ -12,6 +12,7 @@ data class Post(
 	val boostedBy: Profile?,
 	val boosted: Boolean,
 	val boosts: Long,
+	val boostedPost: Post? = null,
 	val quote: Post?,
 	val poll: Poll?,
 	val reactions: Map<String, Int>,
@@ -23,18 +24,20 @@ data class Post(
 	val attachments: List<Attachment>,
 )
 
-fun Post.unwrapQuotes(): List<Post> {
-	val quotes = mutableListOf(this)
-	var currentQuote = quote
-	while (currentQuote != null) {
-		quotes.add(0, currentQuote)
-		currentQuote = currentQuote.quote
-	}
-	return quotes
+fun Post.unwrapPosts(): List<Post> {
+	return _unwrapPosts().distinctBy(Post::id).reversed()
 }
 
-fun Post.unwrapProfiles(): List<Profile> =
-	if (boostedBy == null) listOf(author) else listOf(author, boostedBy)
+private fun Post._unwrapPosts(): List<Post> {
+	val posts = mutableListOf(this)
+
+	if (quote != null) posts.addAll(quote._unwrapPosts())
+	if (boostedPost != null) posts.addAll(boostedPost._unwrapPosts())
+
+	return posts
+}
+
+fun Post.unwrapProfiles(): List<Profile> = listOfNotNull(author, boostedBy).distinctBy(Profile::id)
 
 data class Poll(
 	val id: String?,
@@ -51,7 +54,7 @@ data class Attachment(
 	val description: String?,
 	val type: AttachmentType,
 	val url: String,
-	val blurhash: String?
+	val blurhash: String?,
 )
 
 enum class AttachmentType {

@@ -39,10 +39,13 @@ class PostLocalDataSource @Inject constructor(private val appDatabase: AppDataba
 			if (it == null) return@map null
 
 			// TODO: see if we can incorporate emojis in main query
-			val postEmojis = appDatabase.postQueries.getEmojisForPosts(listOf(postId, it.postId_))
-				.executeAsList()
+			val postEmojis =
+				appDatabase.postQueries
+					.getEmojisForPosts(listOf(postId, it.postId_))
+					.executeAsList()
 			val profileEmojis =
-				appDatabase.profileQueries.getEmojisForProfiles(listOf(it.profileId, it.profileId_))
+				appDatabase.profileQueries
+					.getEmojisForProfiles(listOf(it.profileId, it.profileId_))
 					.executeAsList()
 
 			it.toPostDomain(
@@ -53,10 +56,13 @@ class PostLocalDataSource @Inject constructor(private val appDatabase: AppDataba
 	fun getPostSingle(postId: String): Post? =
 		appDatabase.postQueries.getPostById(postId).executeAsOneOrNull()?.let {
 			// TODO: see if we can incorporate emojis in main query
-			val postEmojis = appDatabase.postQueries.getEmojisForPosts(listOf(postId, it.postId_))
-				.executeAsList()
+			val postEmojis =
+				appDatabase.postQueries
+					.getEmojisForPosts(listOf(postId, it.postId_))
+					.executeAsList()
 			val profileEmojis =
-				appDatabase.profileQueries.getEmojisForProfiles(listOf(it.profileId, it.profileId_))
+				appDatabase.profileQueries
+					.getEmojisForProfiles(listOf(it.profileId, it.profileId_))
 					.executeAsList()
 
 			it.toPostDomain(
@@ -64,19 +70,26 @@ class PostLocalDataSource @Inject constructor(private val appDatabase: AppDataba
 				profileEmojis.filter { profileEmoji -> profileEmoji.profileId == it.authorId || profileEmoji.profileId == it.authorId_ })
 		}
 
-	fun getPostsByProfile(profileId: String) =
-		appDatabase.postQueries.getPostByAuthor(profileId).asFlow().mapToList(Dispatchers.IO).map {
-			val postIds = it.flatMap { listOf(it.postId, it.postId_) }
-			val profileIds = it.flatMap { listOf(it.profileId, it.profileId_) }
+	fun getPostsByProfile(profileId: String) = appDatabase.postQueries
+		.getPostByAuthor(authorId = profileId)
+		.asFlow()
+		.mapToList(Dispatchers.IO)
+		.map { posts ->
+			val postIds = posts.flatMap { setOfNotNull(it.postId, it.postId_, it.postId__) }
+			val profileIds =
+				posts.flatMap { setOfNotNull(it.profileId, it.profileId_, it.profileId__) }
 
 			// TODO: see if we can incorporate emojis in main query
 			val postEmojis = appDatabase.postQueries.getEmojisForPosts(postIds).executeAsList()
 			val profileEmojis =
 				appDatabase.profileQueries.getEmojisForProfiles(profileIds).executeAsList()
-			it.map { post ->
-				post.toPostDomain(
-					postEmojis.filter { postEmoji -> postEmoji.postId == post.postId || postEmoji.postId == post.postId_ },
-					profileEmojis.filter { profileEmoji -> profileEmoji.profileId == post.authorId || profileEmoji.profileId == post.authorId_ })
+
+			posts.map { post ->
+				post.toPostDomain(postEmojis.filter { postEmoji ->
+					postIds.contains(postEmoji.postId)
+				}, profileEmojis.filter { profileEmoji ->
+					profileIds.contains(profileEmoji.profileId)
+				})
 			}
 		}
 }
@@ -97,11 +110,13 @@ fun Post.toEntity() = PostEntity(
 				text = it.text, votes = it.votes, isVoted = it.isVoted
 			)
 		}, expiresAt = poll.expiresAt, multiple = poll.multiple
-	) else null,
+	)
+	else null,
 	favorited = favorited,
 	favoriteCount = favorites,
 	boosted = boosted,
 	boostsCount = boosts,
+	boostedPostId = boostedPost?.id,
 	mentionLinks = mentionLinksMap,
 	attachments = attachments.map {
 		AttachmentEntity(

@@ -8,11 +8,11 @@ import sh.elizabeth.fedihome.data.database.AppDatabase
 import sh.elizabeth.fedihome.data.datasource.EmojiLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.TimelineLocalDataSource
-import sh.elizabeth.fedihome.data.datasource.TimelinePost
 import sh.elizabeth.fedihome.data.datasource.TimelineRemoteDataSource
+import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.model.Post
+import sh.elizabeth.fedihome.model.unwrapPosts
 import sh.elizabeth.fedihome.model.unwrapProfiles
-import sh.elizabeth.fedihome.model.unwrapQuotes
 import sh.elizabeth.fedihome.util.InstanceEndpointTypeToken
 import javax.inject.Inject
 
@@ -52,13 +52,15 @@ class TimelineRepository @Inject constructor(
 			instanceType = instanceData.instanceType,
 			token = instanceData.token
 		)
-		val unWrappedPosts = posts.flatMap { it.unwrapQuotes() }
-		val profiles = unWrappedPosts.flatMap { it.unwrapProfiles() }.toSet()
+		val unwrappedPosts = posts.flatMap { it.unwrapPosts() }
+		val profiles = unwrappedPosts.flatMap { it.unwrapProfiles() }
 		val emojis =
-			unWrappedPosts.flatMap { it.emojis.values }.plus(profiles.flatMap { it.emojis.values })
-				.toSet()
+			unwrappedPosts
+				.flatMap { it.emojis.values }
+				.plus(profiles.flatMap { it.emojis.values })
+				.distinctBy(Emoji::fullEmojiId)
 
-		val postEmojiCrossRefs = unWrappedPosts.flatMap { post ->
+		val postEmojiCrossRefs = unwrappedPosts.flatMap { post ->
 			post.emojis.values.map { emoji ->
 				PostEmojiCrossRef(postId = post.id, emojiId = emoji.fullEmojiId)
 			}
@@ -76,13 +78,11 @@ class TimelineRepository @Inject constructor(
 			emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray())
 
 			profileRepository.insertOrReplace(*profiles.toTypedArray())
-			postRepository.insertOrReplace(*unWrappedPosts.toTypedArray())
+			postRepository.insertOrReplace(*unwrappedPosts.toTypedArray())
 
 			timelineLocalDataSource.insert(
 				profileIdentifier, *posts.map {
-					TimelinePost(
-						postId = it.id, repostedById = it.boostedBy?.id
-					)
+					it.id
 				}.reversed().toTypedArray()
 			)
 

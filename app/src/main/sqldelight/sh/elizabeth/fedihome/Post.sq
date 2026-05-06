@@ -2,10 +2,10 @@ import java.time.Instant;
 import kotlin.Boolean;
 import kotlin.Int;
 import kotlin.String;
-import kotlin.collections.Map;
 import kotlin.collections.List;
-import sh.elizabeth.fedihome.data.database.entity.PollEntity;
+import kotlin.collections.Map;
 import sh.elizabeth.fedihome.data.database.entity.AttachmentEntity;
+import sh.elizabeth.fedihome.data.database.entity.PollEntity;
 
 CREATE TABLE PostEntity (
     postId TEXT PRIMARY KEY NOT NULL,
@@ -22,10 +22,12 @@ CREATE TABLE PostEntity (
     favorited INTEGER AS Boolean NOT NULL,
     boostsCount INTEGER NOT NULL,
     boosted INTEGER AS Boolean NOT NULL,
+    boostedPostId TEXT,
     mentionLinks TEXT AS Map<String, String>,
     attachments TEXT AS List<AttachmentEntity>,
     FOREIGN KEY (authorId) REFERENCES ProfileEntity(profileId),
-    FOREIGN KEY (quoteId) REFERENCES PostEntity(postId)
+    FOREIGN KEY (quoteId) REFERENCES PostEntity(postId),
+    FOREIGN KEY (boostedPostId) REFERENCES PostEntity(postId)
 );
 
 CREATE TABLE PostEmojiCrossRef (
@@ -50,6 +52,8 @@ SELECT * FROM PostEntity
 JOIN ProfileEntity ON PostEntity.authorId = ProfileEntity.profileId
 LEFT JOIN PostEntity AS Quote ON PostEntity.quoteId = Quote.postId
 LEFT JOIN ProfileEntity AS QuoteProfile ON Quote.authorId = QuoteProfile.profileId
+LEFT JOIN PostEntity AS BoostedPost ON PostEntity.boostedPostId = BoostedPost.postId
+LEFT JOIN ProfileEntity AS BoostedPostProfile ON BoostedPost.authorId = BoostedPostProfile.profileId
 
 WHERE PostEntity.postId = ?;
 
@@ -59,8 +63,10 @@ SELECT * FROM PostEntity
 JOIN ProfileEntity ON PostEntity.authorId = ProfileEntity.profileId
 LEFT JOIN PostEntity AS Quote ON PostEntity.quoteId = Quote.postId
 LEFT JOIN ProfileEntity AS QuoteProfile ON Quote.authorId = QuoteProfile.profileId
+LEFT JOIN PostEntity AS BoostedPost ON PostEntity.boostedPostId = BoostedPost.postId
+LEFT JOIN ProfileEntity AS BoostedPostProfile ON BoostedPost.authorId = BoostedPostProfile.profileId
 
-WHERE PostEntity.authorId = ?
+WHERE PostEntity.authorId = :authorId || BoostedPost.authorId = :authorId
 ORDER BY PostEntity.createdAt DESC;
 
 getEmojisForPosts:

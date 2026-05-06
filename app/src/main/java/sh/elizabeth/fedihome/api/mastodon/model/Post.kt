@@ -48,56 +48,6 @@ data class Post(
 )
 
 fun Post.toDomain(fetchedFromInstance: String): DomainPost {
-
-	if (reblog != null) {
-		val originalPostInstance =
-			reblog.account.acct.split('@').getOrElse(1) { fetchedFromInstance }
-
-		return DomainPost(
-			id = "${reblog.id}@$fetchedFromInstance",
-			createdAt = reblog.createdAt,
-			updatedAt = reblog.editedAt,
-			text = reblog.content,
-			cw = reblog.spoilerText,
-			author = reblog.account.toDomain(fetchedFromInstance),
-			boostedBy = account.toDomain(fetchedFromInstance),
-			boosted = reblog.reblogged,
-			boosts = reblog.reblogsCount,
-			quote = reblog.quote?.toDomain(fetchedFromInstance),
-			poll = reblog.poll?.toDomain(),
-			reactions = reblog.reactions?.associate {
-				Pair(
-					if (it.name.contains('@') || it.name.containsEmoji()) it.name else "${it.name}@$fetchedFromInstance",
-					it.count
-				)
-			} ?: emptyMap(),
-			myReactions = reblog.reactions?.filter { it.me }
-				?.map { if (it.name.contains('@') || it.name.containsEmoji()) it.name else "${it.name}@$fetchedFromInstance" }
-				?: emptyList(),
-			emojis = reblog.emojis.associate {
-				Pair(
-					"${it.shortcode}@$originalPostInstance", it.toDomain(originalPostInstance)
-				)
-			}
-				.plus(reblog.reactions?.filter { !it.url.isNullOrBlank() || !it.staticUrl.isNullOrBlank() }
-					?.associate {
-						Pair(
-							if (it.name.contains('@')) it.name else "${it.name}@$fetchedFromInstance",
-							it.toEmojiDomain(fetchedFromInstance)
-						)
-					} ?: emptyMap()),
-			favorites = reblog.favouritesCount,
-			favorited = reblog.favourited,
-			mentionLinksMap = reblog.mentions.associate {
-				Pair(
-					it.url,
-					if (it.acct.contains('@')) it.acct else "${it.acct}@$fetchedFromInstance"
-				)
-			},
-			attachments = reblog.mediaAttachments.map(Media::toDomain)
-		)
-	}
-
 	val originalPostInstance = account.acct.split('@').getOrElse(1) { fetchedFromInstance }
 
 	return DomainPost(
@@ -140,7 +90,8 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 				it.url, if (it.acct.contains('@')) it.acct else "${it.acct}@$fetchedFromInstance"
 			)
 		},
-		attachments = mediaAttachments.map(Media::toDomain)
+		attachments = mediaAttachments.map(Media::toDomain),
+		boostedPost = reblog?.toDomain(fetchedFromInstance),
 	)
 }
 

@@ -10,8 +10,8 @@ import sh.elizabeth.fedihome.data.datasource.EmojiLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.NotificationLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.NotificationRemoteDataSource
+import sh.elizabeth.fedihome.model.unwrapPosts
 import sh.elizabeth.fedihome.model.unwrapProfiles
-import sh.elizabeth.fedihome.model.unwrapQuotes
 import sh.elizabeth.fedihome.util.InstanceEndpointTypeToken
 import javax.inject.Inject
 
@@ -50,7 +50,7 @@ class NotificationRepository @Inject constructor(
 		)
 
 		val posts = notificationRes.mapNotNull { it.post }.flatMap {
-			it.unwrapQuotes()
+			it.unwrapPosts()
 		}.toSet()
 		val profiles = posts.flatMap { it.unwrapProfiles() }
 			.plus(notificationRes.mapNotNull { it.profile })

@@ -10,10 +10,12 @@ import sh.elizabeth.fedihome.data.datasource.EmojiLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.PostLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.PostRemoteDataSource
+import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.PostDraft
+import sh.elizabeth.fedihome.model.Profile
+import sh.elizabeth.fedihome.model.unwrapPosts
 import sh.elizabeth.fedihome.model.unwrapProfiles
-import sh.elizabeth.fedihome.model.unwrapQuotes
 import sh.elizabeth.fedihome.util.InstanceEndpointTypeToken
 import javax.inject.Inject
 
@@ -53,7 +55,7 @@ class PostRepository @Inject constructor(
 			instanceType = instanceData.instanceType,
 			token = instanceData.token,
 			newPost = newPost
-		).unwrapQuotes()
+		).unwrapPosts()
 
 		handleInsertPosts(posts)
 	}
@@ -65,9 +67,15 @@ class PostRepository @Inject constructor(
 	fun getPostsByProfileFlow(profileId: String) = postLocalDataSource.getPostsByProfile(profileId)
 
 	private suspend fun handleInsertPosts(posts: List<Post>) {
-		val profiles = posts.flatMap { it.unwrapProfiles() }.toSet()
+		val profiles = posts.flatMap { it.unwrapProfiles() }.distinctBy(Profile::id)
 		val emojis =
-			posts.flatMap { it.emojis.values }.plus(profiles.flatMap { it.emojis.values }).toSet()
+			posts
+				.flatMap { it.emojis.values }
+				.plus(profiles.flatMap { it.emojis.values })
+				.distinctBy(
+					Emoji::fullEmojiId
+				)
+
 		val postEmojiCrossRefs = posts.flatMap { post ->
 			post.emojis.values.map { emoji ->
 				PostEmojiCrossRef(
@@ -112,7 +120,7 @@ class PostRepository @Inject constructor(
 			instanceType = instanceData.instanceType,
 			token = instanceData.token,
 			postId = postId.split('@').first()
-		).unwrapQuotes()
+		).unwrapPosts()
 
 		handleInsertPosts(posts)
 	}
@@ -129,7 +137,7 @@ class PostRepository @Inject constructor(
 			instanceType = instanceData.instanceType,
 			token = instanceData.token,
 			profileId = profileId.split('@').first()
-		).flatMap { it.unwrapQuotes() }
+		).flatMap { it.unwrapPosts() }
 
 		handleInsertPosts(posts)
 	}
@@ -151,7 +159,7 @@ class PostRepository @Inject constructor(
 	}
 
 	suspend fun removeReaction(
-		activeAccount: String, postId: String, reaction: String
+		activeAccount: String, postId: String, reaction: String,
 	) {
 		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
@@ -162,7 +170,7 @@ class PostRepository @Inject constructor(
 			token = instanceData.token,
 			postId = postId.split('@').first(),
 			reaction = reaction.split('@').first()
-		).unwrapQuotes()
+		).unwrapPosts()
 
 		handleInsertPosts(post)
 	}
@@ -181,7 +189,7 @@ class PostRepository @Inject constructor(
 			token = instanceData.token,
 			postId = postId.split('@').first(),
 			reaction = reaction.split('@').first()
-		).unwrapQuotes()
+		).unwrapPosts()
 
 		handleInsertPosts(post)
 	}
@@ -195,7 +203,7 @@ class PostRepository @Inject constructor(
 			instanceType = instanceData.instanceType,
 			token = instanceData.token,
 			postId = postId.split('@').first(),
-		).unwrapQuotes()
+		).unwrapPosts()
 
 		handleInsertPosts(post)
 	}
@@ -209,7 +217,7 @@ class PostRepository @Inject constructor(
 			instanceType = instanceData.instanceType,
 			token = instanceData.token,
 			postId = postId.split('@').first(),
-		).unwrapQuotes()
+		).unwrapPosts()
 
 		handleInsertPosts(post)
 	}
@@ -223,7 +231,7 @@ class PostRepository @Inject constructor(
 			instanceType = instanceData.instanceType,
 			token = instanceData.token,
 			postId = postId.split('@').first(),
-		).unwrapQuotes()
+		).unwrapPosts()
 
 		handleInsertPosts(post)
 	}
@@ -237,7 +245,7 @@ class PostRepository @Inject constructor(
 			instanceType = instanceData.instanceType,
 			token = instanceData.token,
 			postId = postId.split('@').first(),
-		).unwrapQuotes()
+		).unwrapPosts()
 
 		handleInsertPosts(post)
 	}

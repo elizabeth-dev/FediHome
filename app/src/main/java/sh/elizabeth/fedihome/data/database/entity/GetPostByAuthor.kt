@@ -9,7 +9,7 @@ import sh.elizabeth.fedihome.model.ProfileField
 
 fun GetPostByAuthor.toPostDomain(
 	postEmojiList: List<GetEmojisForPosts>,
-	profileEmojiList: List<GetEmojisForProfiles>
+	profileEmojiList: List<GetEmojisForProfiles>,
 ): Post {
 	val postEmojis = postEmojiList.associate { it.emojiId to it.toDomain() }
 	val profileEmojis = profileEmojiList.associate { it.emojiId to it.toDomain() }
@@ -42,6 +42,44 @@ fun GetPostByAuthor.toPostDomain(
 		boostedBy = null,
 		boosted = boosted,
 		boosts = boostsCount,
+		boostedPost = if (postId__ != null && profileId__ != null) Post(
+			id = postId__,
+			createdAt = createdAt___,
+			updatedAt = updatedAt__,
+			cw = cw__,
+			text = text__,
+			author = Profile(
+				id = profileId__,
+				username = username__!!,
+				instance = instance__!!,
+				name = name__,
+				description = description__,
+				following = following__,
+				followers = followers__,
+				postCount = postCount__,
+				createdAt = createdAt__,
+				fields = fields__!!.map {
+					ProfileField(name = it.name, value = it.value)
+				},
+				avatarUrl = avatarUrl__,
+				avatarBlur = avatarBlur__,
+				headerUrl = headerUrl__,
+				headerBlur = headerBlur__,
+				emojis = profileEmojis,
+			),
+			boostedBy = null,
+			boosted = boosted__!!,
+			boosts = boostsCount__!!,
+			quote = null,
+			poll = poll__?.toDomain(),
+			emojis = postEmojis,
+			reactions = reactions__ ?: emptyMap(),
+			myReactions = myReactions__ ?: emptyList(),
+			favorites = favoriteCount__!!,
+			favorited = favorited__!!,
+			attachments = attachments__?.map(AttachmentEntity::toDomain) ?: emptyList(),
+		)
+		else null,
 		quote = if (postId_ != null && profileId_ != null) Post(
 			id = postId_,
 			createdAt = createdAt__,
@@ -78,7 +116,8 @@ fun GetPostByAuthor.toPostDomain(
 			favorites = favoriteCount_!!,
 			favorited = favorited_!!,
 			attachments = attachments_?.map(AttachmentEntity::toDomain) ?: emptyList(),
-		) else null,
+		)
+		else null,
 		poll = poll?.toDomain(),
 		emojis = postEmojis,
 		reactions = reactions ?: emptyMap(),
