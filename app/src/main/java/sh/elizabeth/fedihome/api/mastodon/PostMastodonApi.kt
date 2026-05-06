@@ -85,7 +85,7 @@ fun PostDraft.toCreatePost() = CreatePostRequest(
 	status = text,
 	visibility = visibility.toMastodon(),
 	cw = cw,
-	replyId = replyId,
+	replyId = replyId?.split('@')?.first(),
 	localOnly = localOnly
 )
 

@@ -6,7 +6,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import sh.elizabeth.fedihome.MainDestinations
 import sh.elizabeth.fedihome.data.repository.AuthRepository
@@ -39,16 +45,13 @@ class ComposeViewModel @Inject constructor(
 	@OptIn(ExperimentalCoroutinesApi::class)
 	val uiState = combine(
 		authRepository.internalData.flatMapLatest { authData ->
-			profileRepository.getMultipleByIdsFlow(authData.accounts.keys.toList())
-				.map {
+			profileRepository.getMultipleByIdsFlow(authData.accounts.keys.toList()).map {
 				Pair(authData.activeAccount, it)
 			}
 
-		},
-		_uiState
+		}, _uiState
 	) { profilesData, uiState ->
-		val replyTo =
-			savedStateHandle.toRoute<MainDestinations.COMPOSE>().replyTo
+		val replyTo = savedStateHandle.toRoute<MainDestinations.COMPOSE>().replyTo
 
 		uiState.copy(
 			activeAccount = profilesData.first,
@@ -58,7 +61,7 @@ class ComposeViewModel @Inject constructor(
 		)
 	}.stateIn(viewModelScope, SharingStarted.Eagerly, _uiState.value)
 
-	fun sendPost(text: String, contentWarning: String?) {
+	fun sendPost(text: String, contentWarning: String?, replyTo: String?) {
 		viewModelScope.launch {
 			authRepository.activeAccount.first().let {
 				createPostUseCase(
@@ -70,7 +73,7 @@ class ComposeViewModel @Inject constructor(
 						localOnly = false,
 						channelId = null,
 						renoteId = null,
-						replyId = null
+						replyId = replyTo
 					)
 				)
 			}

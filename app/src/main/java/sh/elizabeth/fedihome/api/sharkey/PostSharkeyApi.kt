@@ -54,7 +54,7 @@ fun PostDraft.toCreatePost() = CreatePostRequest(
 	visibility = visibility.toIceshrimp(),
 	visibleUserIds = visibleUserIds,
 	localOnly = localOnly,
-	replyId = replyId,
+	replyId = replyId?.split('@')?.first(),
 	renoteId = renoteId,
 	channelId = channelId,
 )

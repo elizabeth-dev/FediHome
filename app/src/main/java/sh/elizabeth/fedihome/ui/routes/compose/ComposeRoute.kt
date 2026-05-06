@@ -11,7 +11,7 @@ fun ComposeRoute(composeViewModel: ComposeViewModel = hiltViewModel(), onFinish:
 	ComposeRoute(
 		uiState = uiState,
 		onSendPost = { text, cw ->
-			composeViewModel.sendPost(text, cw)
+			composeViewModel.sendPost(text, cw, uiState.replyTo?.id)
 			onFinish()
 		},
 		onClose = onFinish,
