@@ -151,23 +151,26 @@ fun ProfileHeader(profile: Profile) {
 					}
 
 					Row(
-						Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
+						Modifier
+							.fillMaxWidth()
+							.padding(vertical = 4.dp),
+						horizontalArrangement = Arrangement.SpaceBetween
 					) {
-						Row(verticalAlignment = Alignment.Bottom) {
+						Row(verticalAlignment = Alignment.CenterVertically) {
 							Text(
 								text = profile.postCount?.toString() ?: "0",
 								style = MaterialTheme.typography.titleMedium,
 							)
 							Text(text = " posts", style = MaterialTheme.typography.bodyLarge)
 						}
-						Row(verticalAlignment = Alignment.Bottom) {
+						Row(verticalAlignment = Alignment.CenterVertically) {
 							Text(
 								text = profile.following?.toString() ?: "0",
 								style = MaterialTheme.typography.titleMedium,
 							)
 							Text(text = " following", style = MaterialTheme.typography.bodyLarge)
 						}
-						Row(verticalAlignment = Alignment.Bottom) {
+						Row(verticalAlignment = Alignment.CenterVertically) {
 							Text(
 								text = profile.followers?.toString() ?: "0",
 								style = MaterialTheme.typography.titleMedium,
