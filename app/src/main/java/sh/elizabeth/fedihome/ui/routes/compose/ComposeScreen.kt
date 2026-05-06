@@ -114,7 +114,9 @@ fun ComposeScreen(
 				modifier = Modifier.padding(horizontal = 16.dp),
 				icon = Icons.AutoMirrored.Outlined.Reply,
 				iconDescription = "Reply",
-				text = "Replying to ${uiState.replyTo.author.name}"
+				text = "Replying to ${uiState.replyTo.author.name}",
+				emojis = uiState.replyTo.author.emojis,
+				instance = uiState.replyTo.author.instance
 			)
 
 			if (activeProfile != null) SlimProfileSummary(

@@ -27,6 +27,7 @@ fun TopDisclaimer(
 	iconDescription: String,
 	text: String,
 	emojis: Map<String, Emoji> = emptyMap(),
+	instance: String,
 ) {
 	Surface(
 		modifier = Modifier.fillMaxWidth(),
@@ -49,7 +50,7 @@ fun TopDisclaimer(
 				style = MaterialTheme.typography.bodyMedium,
 				color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
 				allowClickable = false,
-				instance = "", // TODO: instance
+				instance = instance,
 			)
 		}
 	}
@@ -63,7 +64,8 @@ fun TopDisclaimerPreview() {
 		TopDisclaimer(
 			icon = Icons.Rounded.Repeat,
 			iconDescription = "Repost",
-			text = "Reposted by Elizabeth"
+			text = "Reposted by Elizabeth",
+			instance = "foo.cat"
 		)
 	}
 }

@@ -15,7 +15,6 @@ import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,16 +55,6 @@ fun SlimPostCard(
 	val onUnboost = localOnRemoveBoost.current
 
 	if (post.boostedPost != null) {
-//		Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-//			TopDisclaimer(
-//				icon = Icons.Rounded.Repeat,
-//				iconDescription = "Repost",
-//				text = "Reposted by ${post.author.name}",
-//				emojis = post.author.emojis
-//			)
-//			SlimPostCard(post.boostedPost, showDivider, disablePostClick, post.author)
-//		}
-
 		SlimPostCard(post.boostedPost, showDivider, disablePostClick, post.author)
 	}
 	else {
@@ -85,15 +74,19 @@ fun SlimPostCard(
 						icon = Icons.Rounded.Repeat,
 						iconDescription = "Repost",
 						text = "Reposted by ${boostedBy.name}",
-						emojis = boostedBy.emojis
+						emojis = boostedBy.emojis,
+						instance = boostedBy.instance
 					)
 
 					SlimProfileSummary(
 						profile = post.author, onClick = { navToProfile(post.author.username) })
 
 					if (!post.cw.isNullOrBlank()) {
-						Text(
-							text = post.cw, style = MaterialTheme.typography.titleMedium
+						EnrichedText(
+							text = post.cw,
+							style = MaterialTheme.typography.titleMedium,
+							emojis = post.emojis,
+							instance = post.author.instance
 						)
 						HorizontalDivider()
 					}
@@ -103,7 +96,6 @@ fun SlimPostCard(
 						emojis = post.emojis,
 						mentionLinksMap = post.mentionLinksMap,
 						style = MaterialTheme.typography.bodyLarge, // TODO: Maybe use a smaller font size like bodyMedium
-						modifier = Modifier,
 						instance = post.author.instance
 					)
 
