@@ -17,7 +17,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,10 +87,6 @@ fun NotificationsScreen(
 ) {
 	val pullRefreshState =
 		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
-
-	LaunchedEffect(key1 = uiState.activeAccount) {
-		if (uiState.activeAccount.isNotBlank()) onRefresh(uiState.activeAccount)
-	}
 
 	Box(
 		modifier = Modifier

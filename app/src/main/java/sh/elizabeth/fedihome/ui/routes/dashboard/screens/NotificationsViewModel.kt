@@ -19,6 +19,7 @@ import sh.elizabeth.fedihome.data.repository.PostRepository
 import sh.elizabeth.fedihome.domain.VotePollUseCase
 import sh.elizabeth.fedihome.model.Notification
 import sh.elizabeth.fedihome.util.viewmodel.PostHandlingViewModel
+import sh.elizabeth.fedihome.util.viewmodel.RefreshingViewModel
 import javax.inject.Inject
 
 sealed interface NotificationsUiState {
@@ -56,11 +57,11 @@ private data class NotificationsViewModelState(
 
 @HiltViewModel
 class NotificationsViewModel @Inject constructor(
-	authRepository: AuthRepository,
+	override val authRepository: AuthRepository,
 	private val notificationRepository: NotificationRepository,
 	override val votePollUseCase: VotePollUseCase,
 	override val postRepository: PostRepository,
-) : PostHandlingViewModel, ViewModel() {
+) : PostHandlingViewModel, RefreshingViewModel, ViewModel() {
 	override val coroutineHandlingScope: CoroutineScope
 		get() = viewModelScope
 
@@ -84,6 +85,14 @@ class NotificationsViewModel @Inject constructor(
 			notifications = null,
 		)
 	)
+
+	init {
+		startRefreshOnAccountChange()
+	}
+
+	override fun refreshOnAccountChange(activeAccount: String) {
+		refreshNotifications(activeAccount)
+	}
 
 	fun refreshNotifications(profileIdentifier: String) {
 		viewModelState.update { it.copy(isLoading = true) }

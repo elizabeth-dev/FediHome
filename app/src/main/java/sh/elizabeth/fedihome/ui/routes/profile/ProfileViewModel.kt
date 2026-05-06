@@ -9,6 +9,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -56,7 +58,8 @@ private data class ProfileViewModelState(
 		ProfileUiState.NoProfile(
 			isLoading = isLoading, activeAccount = activeAccount, profileTag = profileTag
 		)
-	} else {
+	}
+	else {
 		ProfileUiState.HasProfile(
 			profile = profile,
 			posts = posts,
@@ -93,8 +96,8 @@ class ProfileViewModel @Inject constructor(
 		profileRepository.getProfileByTagFlow(profileTag),
 	) { state, activeAccount, profile ->
 		val posts = profile.let {
-			if (it == null) return@let null else postRepository.getPostsByProfileFlow(it.id)
-				.firstOrNull()
+			if (it == null) return@let null
+			else postRepository.getPostsByProfileFlow(it.id).firstOrNull()
 		}
 
 		state.toUiState(activeAccount, profile, posts)
@@ -103,6 +106,24 @@ class ProfileViewModel @Inject constructor(
 		SharingStarted.Eagerly,
 		viewModelState.value.toUiState(profile = null, posts = null)
 	)
+
+	init {
+		viewModelScope.launch {
+			uiState.filter { it.activeAccount.isNotBlank() }.distinctUntilChangedBy {
+				Triple(
+					it.activeAccount,
+					it.profileTag,
+					(it as? ProfileUiState.HasProfile)?.profile?.id
+				)
+			}.collect {
+				refreshProfile(
+					it.activeAccount,
+					it.profileTag,
+					if (it is ProfileUiState.HasProfile) it.profile.id else null
+				)
+			}
+		}
+	}
 
 	fun refreshProfile(activeAccount: String, profileTag: String, profileId: String?) {
 		viewModelState.update {

@@ -126,7 +126,7 @@ fun SlimPostCard(
 				),
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy(4.dp)
-			) { // TODO: No padding in the bottom makes the buttons ripple touch the divider
+			) {
 				InteractionButton(
 					icons = InteractionButtonIcons(
 						unSelectedIcon = Icons.AutoMirrored.Outlined.Message,

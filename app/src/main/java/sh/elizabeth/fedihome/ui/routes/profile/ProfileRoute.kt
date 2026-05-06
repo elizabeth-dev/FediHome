@@ -12,7 +12,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -84,19 +83,6 @@ fun ProfileRoute(
 	navBack: () -> Unit,
 	onRefresh: (activeAccount: String, profileTag: String, profileId: String?) -> Unit,
 ) {
-	LaunchedEffect(
-		key1 = uiState.profileTag,
-		key2 = uiState.activeAccount,
-		key3 = if (uiState is ProfileUiState.HasProfile) uiState.profile.id else Unit
-	) {
-		if (uiState.activeAccount.isNotBlank()) onRefresh(
-			uiState.activeAccount,
-			uiState.profileTag,
-			if (uiState is ProfileUiState.HasProfile) uiState.profile.id else null
-		)
-
-	}
-
 	Scaffold(topBar = {
 		TopAppBar(
 			title = {

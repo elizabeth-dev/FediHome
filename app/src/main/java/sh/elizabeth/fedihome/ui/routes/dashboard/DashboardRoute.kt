@@ -16,7 +16,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -73,8 +73,8 @@ fun DashboardRoute(
 	switchActiveProfile: (profileId: String) -> Unit,
 ) {
 	val navToCompose = localNavToCompose.current
-	var selectedTab by remember { mutableStateOf(HOME.route) }
-	var showAccountPicker by remember { mutableStateOf(false) }
+	var selectedTab by rememberSaveable { mutableStateOf(HOME.route) }
+	var showAccountPicker by rememberSaveable { mutableStateOf(false) }
 
 	val homeScrollState = rememberLazyListState()
 	val notificationsScrollState = rememberLazyListState()

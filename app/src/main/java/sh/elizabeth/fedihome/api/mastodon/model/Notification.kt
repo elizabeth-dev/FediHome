@@ -50,7 +50,15 @@ data class Notification(
 	// From Iceshrimp.NET
 	val emoji: String? = null,
 	@SerialName("emoji_url") val emojiUrl: String? = null,
+	val bite: NotificationBite?,
 )
+
+@Serializable
+data class NotificationBite(
+	val id: String,
+	@SerialName("bite_back") val biteBack: Boolean,
+)
+
 
 fun Notification.toDomain(fetchedFromInstance: String, forAccount: String): DomainNotification {
 	val trimmedEmoji = emoji?.trim(':')
@@ -60,25 +68,26 @@ fun Notification.toDomain(fetchedFromInstance: String, forAccount: String): Doma
 		id = "$id@$fetchedFromInstance",
 		createdAt = createdAt,
 		forAccount = forAccount,
-		type = type.toDomain(),
+		type = type.toDomain(this),
 		post = status?.toDomain(fetchedFromInstance),
 		profile = account.toDomain(fetchedFromInstance),
 		reaction = if (trimmedEmoji == null) null else if (emojiContainsInstance || trimmedEmoji.containsEmoji()) trimmedEmoji else "${trimmedEmoji}@$fetchedFromInstance",
 		reactionEmoji = if (trimmedEmoji != null && emojiUrl != null) {
 			sh.elizabeth.fedihome.model.Emoji(
 				fullEmojiId = if (emojiContainsInstance) trimmedEmoji else "$trimmedEmoji@$fetchedFromInstance",
-				instance = if (emojiContainsInstance) trimmedEmoji.split('@')
-					.last() else fetchedFromInstance,
+				instance = if (emojiContainsInstance) trimmedEmoji.split('@').last()
+				else fetchedFromInstance,
 				shortcode = trimmedEmoji.split('@').first(),
 				url = emojiUrl
 			)
-		} else {
+		}
+		else {
 			null
 		}
 	)
 }
 
-fun NotificationType.toDomain() = when (this) {
+fun NotificationType.toDomain(notification: Notification) = when (this) {
 	NotificationType.STATUS -> DomainNotificationType.POST
 	NotificationType.FOLLOW -> DomainNotificationType.FOLLOW
 	NotificationType.FOLLOW_REQ -> DomainNotificationType.FOLLOW_REQ
@@ -88,5 +97,5 @@ fun NotificationType.toDomain() = when (this) {
 	NotificationType.REACTION -> DomainNotificationType.REACTION
 	NotificationType.REBLOG -> DomainNotificationType.REPOST
 	NotificationType.UPDATE -> DomainNotificationType.EDIT
-	NotificationType.BITE -> DomainNotificationType.BITE
+	NotificationType.BITE -> if (notification.bite?.biteBack == true) DomainNotificationType.BITE_BACK else DomainNotificationType.BITE
 }

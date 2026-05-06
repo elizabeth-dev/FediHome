@@ -2,8 +2,10 @@ package sh.elizabeth.fedihome.ui.composable
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,7 +34,10 @@ import sh.elizabeth.fedihome.model.NotificationType
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
 
 @Composable
-fun EmbeddedNotificationContext(notification: Notification) {
+fun EmbeddedNotificationContext(
+	notification: Notification,
+	content: @Composable (ColumnScope.() -> Unit)? = null,
+) {
 	val text = when (notification.type) {
 		NotificationType.REACTION -> "${notification.profile?.name} reacted to your post"
 		NotificationType.FAVORITE -> "${notification.profile?.name} favorited your post"
@@ -44,6 +49,7 @@ fun EmbeddedNotificationContext(notification: Notification) {
 		NotificationType.EDIT -> "${notification.profile?.name} edited"
 		NotificationType.FOLLOW_ACCEPTED -> "${notification.profile?.name} accepted your follow request"
 		NotificationType.QUOTE -> "${notification.profile?.name} quoted your post"
+		NotificationType.BITE_BACK -> if (notification.post != null) "${notification.profile?.name} bit your post back" else "${notification.profile?.name} bit you back"
 		NotificationType.BITE -> if (notification.post != null) "${notification.profile?.name} bit your post" else "${notification.profile?.name} bit you"
 		else -> ""
 	}
@@ -51,73 +57,85 @@ fun EmbeddedNotificationContext(notification: Notification) {
 	val icon = when (notification.type) {
 		NotificationType.REACTION, NotificationType.FAVORITE -> painterResource(R.drawable.icon_star)
 		NotificationType.REPOST -> painterResource(R.drawable.icon_repeat)
-		NotificationType.FOLLOW -> painterResource(R.drawable.icon_person_add)
+		NotificationType.FOLLOW, NotificationType.FOLLOW_ACCEPTED -> painterResource(R.drawable.icon_person_add)
 		NotificationType.FOLLOW_REQ -> painterResource(R.drawable.icon_outline_person)
-		NotificationType.POLL_VOTE -> painterResource(R.drawable.icon_outline_insert_chart)
-		NotificationType.POLL_ENDED -> painterResource(R.drawable.icon_outline_insert_chart)
+		NotificationType.POLL_VOTE, NotificationType.POLL_ENDED -> painterResource(R.drawable.icon_outline_insert_chart)
 		NotificationType.EDIT -> painterResource(R.drawable.icon_edit)
-		NotificationType.FOLLOW_ACCEPTED -> painterResource(R.drawable.icon_person_add)
 		NotificationType.QUOTE -> painterResource(R.drawable.icon_format_quote)
-		NotificationType.BITE -> painterResource(R.drawable.icon_outline_dentistry)
+		NotificationType.BITE, NotificationType.BITE_BACK -> painterResource(R.drawable.icon_outline_dentistry)
 
 		else -> painterResource(R.drawable.icon_notifications)
 	}
 
-	Row(
-		verticalAlignment = Alignment.CenterVertically,
-		modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+	Column(
+		modifier = Modifier.padding(
+			vertical = 16.dp, horizontal = 12.dp
+		), verticalArrangement = Arrangement.spacedBy(8.dp)
 	) {
-		if (notification.type != NotificationType.POLL_ENDED && notification.type != NotificationType.POLL_VOTE) Box(
-			modifier = Modifier.padding(end = 8.dp), contentAlignment = Alignment.BottomEnd
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier.padding(start = 8.dp)
 		) {
-			BlurHashAvatar(
-				modifier = Modifier.padding(end = 4.dp, bottom = 4.dp),
-				imageUrl = notification.profile?.avatarUrl,
-				imageBlur = notification.profile?.avatarBlur,
-				imageSize = 32.dp,
-				roundingRadius = 8f
-			)
+			if (notification.type != NotificationType.POLL_ENDED && notification.type != NotificationType.POLL_VOTE) Box(
+				modifier = Modifier.padding(end = 8.dp), contentAlignment = Alignment.BottomEnd
+			) {
+				BlurHashAvatar(
+					modifier = Modifier.padding(end = 4.dp, bottom = 4.dp),
+					imageUrl = notification.profile?.avatarUrl,
+					imageBlur = notification.profile?.avatarBlur,
+					imageSize = 32.dp,
+					roundingRadius = 8f
+				)
 
-			if (notification.reactionEmoji != null) {
-				AsyncImage(
-					model = notification.reactionEmoji.url,
-					contentDescription = notification.reactionEmoji.shortcode,
-					modifier = Modifier.size(18.dp)
-				)
-			} else if (!notification.reaction.isNullOrBlank()) {
-				Text(
-					text = notification.reaction,
-					color = MaterialTheme.colorScheme.onPrimaryContainer,
-					fontSize = 14.sp, // TODO: harmonize icon sizes
-					lineHeight = 14.sp
-				)
-			} else {
-				Box(
-					modifier = Modifier
-						.clip(
-							CircleShape
-						)
-						.background(MaterialTheme.colorScheme.primaryContainer)
-						.padding(1.dp)
-				) {
-					Icon(
-						painter = icon,
-						contentDescription = "foo",
-						tint = MaterialTheme.colorScheme.onPrimaryContainer,
-						modifier = Modifier.size(16.dp)
+				if (notification.reactionEmoji != null) {
+					AsyncImage(
+						model = notification.reactionEmoji.url,
+						contentDescription = notification.reactionEmoji.shortcode,
+						modifier = Modifier.size(18.dp)
 					)
 				}
+				else if (!notification.reaction.isNullOrBlank()) {
+					Text(
+						text = notification.reaction,
+						color = MaterialTheme.colorScheme.onPrimaryContainer,
+						fontSize = 14.sp, // TODO: harmonize icon sizes
+						lineHeight = 14.sp
+					)
+				}
+				else {
+					Box(
+						modifier = Modifier
+							.clip(
+								CircleShape
+							)
+							.background(MaterialTheme.colorScheme.primaryContainer)
+							.padding(1.dp)
+					) {
+						Icon(
+							painter = icon,
+							contentDescription = "foo",
+							tint = MaterialTheme.colorScheme.onPrimaryContainer,
+							modifier = Modifier.size(16.dp)
+						)
+					}
+				}
 			}
+			EnrichedText(
+				text = text,
+				style = MaterialTheme.typography.bodyLarge,
+				emojis = notification.profile?.emojis ?: emptyMap(),
+				instance = notification.profile?.instance ?: "",
+				modifier = Modifier.padding(bottom = 4.dp)
+			)
 		}
-		EnrichedText(
-			text = text,
-			style = MaterialTheme.typography.bodyLarge,
-			emojis = notification.profile?.emojis ?: emptyMap(),
-			instance = notification.profile?.instance ?: "",
-			modifier = Modifier.padding(bottom = 4.dp)
-		)
+		content?.invoke(this)
 	}
 }
+//
+//@Composable
+//fun GenericNotificationContent() {
+//
+//}
 
 @Composable
 fun NotificationCard(
@@ -130,36 +148,37 @@ fun NotificationCard(
 		NotificationType.EDIT,
 		NotificationType.POLL_ENDED,
 		NotificationType.POLL_VOTE,
-		NotificationType.BITE
-	).contains(notification.type)
+	).contains(notification.type) || (notification.type == NotificationType.BITE && notification.post != null)
 
 	Surface(
 		modifier = Modifier.fillMaxWidth(),
 		color = MaterialTheme.colorScheme.surface,
 		contentColor = MaterialTheme.colorScheme.onSurface
 	) {
-		if (isEmbeddedPost) Column(
-			modifier = Modifier.padding(
-				vertical = 16.dp, horizontal = 12.dp
-			)
-		) {
-			EmbeddedNotificationContext(notification)
+		if (isEmbeddedPost) EmbeddedNotificationContext(notification) {
 			PostPreview(
 				modifier = Modifier.fillMaxWidth(),
 				post = notification.post!!,
 			)
-		} else if (notification.post != null) {
+		}
+		else if (notification.type == NotificationType.BITE) {
+			EmbeddedNotificationContext(notification)
+		}
+		else if (notification.post != null) {
 			SlimPostCard(
 				post = notification.post,
 				showDivider = false,
 			)
-		} else if (notification.profile != null) {
-			EmbeddedNotificationContext(notification = notification)
-			ProfilePreview(
-				modifier = Modifier.padding(
-					vertical = 16.dp, horizontal = 12.dp
-				), profile = notification.profile
-			)
+		}
+		else if (notification.profile != null) {
+
+			EmbeddedNotificationContext(notification = notification) {
+				ProfilePreview(
+					modifier = Modifier.padding(
+						vertical = 16.dp, horizontal = 12.dp
+					), profile = notification.profile
+				)
+			}
 		}
 
 	}
