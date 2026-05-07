@@ -161,7 +161,7 @@ fun NotificationCard(
 				post = notification.post!!,
 			)
 		}
-		else if (notification.type == NotificationType.BITE) {
+		else if (notification.type == NotificationType.BITE || notification.type == NotificationType.BITE_BACK) {
 			EmbeddedNotificationContext(notification)
 		}
 		else if (notification.post != null) {
