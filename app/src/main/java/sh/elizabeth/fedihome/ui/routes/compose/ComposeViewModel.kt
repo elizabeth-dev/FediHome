@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -44,7 +45,10 @@ class ComposeViewModel @Inject constructor(
 
 	@OptIn(ExperimentalCoroutinesApi::class)
 	val uiState = combine(
-		authRepository.internalData.flatMapLatest { authData ->
+		authRepository.internalData
+			.distinctUntilChanged { old, new -> old.accounts.keys == new.accounts.keys && old.activeAccount == new.activeAccount }
+			.flatMapLatest { authData ->
+				// TODO: right now we're calling this every time the user's (or any?) profile is fetched, including on timeline fetch
 			profileRepository.getMultipleByIdsFlow(authData.accounts.keys.toList()).map {
 				Pair(authData.activeAccount, it)
 			}

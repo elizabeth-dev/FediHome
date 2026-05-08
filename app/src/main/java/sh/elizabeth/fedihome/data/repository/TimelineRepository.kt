@@ -74,6 +74,7 @@ class TimelineRepository @Inject constructor(
 		}
 
 
+		// TODO: make foreign keys deferrable and make this async
 		appDatabase.transaction {
 			emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray())
 

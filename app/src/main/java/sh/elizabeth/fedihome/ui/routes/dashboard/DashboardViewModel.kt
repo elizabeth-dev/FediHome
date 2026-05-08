@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -30,9 +31,11 @@ fun toUiState(
 	isAuthLoading: Boolean = true,
 ): DashboardUiState = if (isAuthLoading) {
 	DashboardUiState.Loading
-} else if (!loggedInProfiles.isNullOrEmpty() && !activeAccount.isNullOrBlank()) {
+}
+else if (!loggedInProfiles.isNullOrEmpty() && !activeAccount.isNullOrBlank()) {
 	DashboardUiState.LoggedIn(loggedInProfiles, activeAccount)
-} else {
+}
+else {
 	DashboardUiState.NotLoggedIn
 }
 
@@ -43,14 +46,20 @@ class DashboardViewModel @Inject constructor(
 ) : ViewModel() {
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	val uiState = authRepository.internalData.flatMapLatest { authData ->
-		profileRepository.getMultipleByIdsFlow(authData.accounts.keys.toList())
-			.map {
-			toUiState(
-				activeAccount = authData.activeAccount, loggedInProfiles = it, isAuthLoading = false
-			)
-		}
-	}.stateIn(viewModelScope, SharingStarted.Eagerly, DashboardUiState.Loading)
+	val uiState =
+		authRepository.internalData
+			.distinctUntilChanged { old, new -> old.accounts.keys == new.accounts.keys && old.activeAccount == new.activeAccount }
+			.flatMapLatest { authData ->
+				// TODO: right now we're calling this every time the user's (or any?) profile is fetched, including on timeline fetch
+				profileRepository.getMultipleByIdsFlow(authData.accounts.keys.toList()).map {
+					toUiState(
+						activeAccount = authData.activeAccount,
+						loggedInProfiles = it,
+						isAuthLoading = false
+					)
+				}
+			}
+			.stateIn(viewModelScope, SharingStarted.Eagerly, DashboardUiState.Loading)
 
 	fun switchActiveProfile(profileId: String, activeAccount: String?) {
 		if (profileId == activeAccount) return
