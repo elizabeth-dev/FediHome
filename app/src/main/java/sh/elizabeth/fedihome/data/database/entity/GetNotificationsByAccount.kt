@@ -111,6 +111,7 @@ fun GetNotificationByAccount.toDomain(
 				favorites = favoriteCount_!!,
 				favorited = favorited_!!,
 				attachments = attachments_?.map(AttachmentEntity::toDomain) ?: emptyList(),
+				inReplyToId = inReplyToId_
 			) else null,
 			poll = poll?.toDomain(),
 			reactions = reactions ?: emptyMap(),
@@ -118,6 +119,7 @@ fun GetNotificationByAccount.toDomain(
 			favorites = favoriteCount!!,
 			favorited = favorited!!,
 			attachments = attachments?.map(AttachmentEntity::toDomain) ?: emptyList(),
+			inReplyToId = inReplyToId
 		) else null
 	)
 }

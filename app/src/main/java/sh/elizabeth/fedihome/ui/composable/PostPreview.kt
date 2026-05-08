@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Article
 import androidx.compose.material.icons.rounded.Poll
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -60,27 +61,55 @@ fun PostPreview(
 				style = MaterialTheme.typography.bodyMedium,
 				instance = post.author.instance
 			)
-			if (post.poll != null) AssistChip(
-				onClick = {},
-				enabled = false,
-				label = { Text("Poll") },
-				leadingIcon = { Icon(Icons.Rounded.Poll, contentDescription = "Poll icon") },
-				colors = AssistChipDefaults.assistChipColors(
-					disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-					disabledLeadingIconContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-				),
-				border = AssistChipDefaults.assistChipBorder(
+			Column(
+				verticalArrangement = Arrangement.SpaceAround
+			) {
+				if (post.poll != null) AssistChip(
+					onClick = {},
 					enabled = false,
-					disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(
-						alpha = 0.4f
+					label = { Text("Poll") },
+					leadingIcon = { Icon(Icons.Rounded.Poll, contentDescription = "Poll icon") },
+					colors = AssistChipDefaults.assistChipColors(
+						disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+						disabledLeadingIconContentColor = MaterialTheme.colorScheme.onSurface.copy(
+							alpha = 0.6f
+						),
 					),
-				),
-			)
+					border = AssistChipDefaults.assistChipBorder(
+						enabled = false,
+						disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(
+							alpha = 0.4f
+						),
+					),
+				)
+				if (post.quote != null) AssistChip(
+					onClick = {},
+					enabled = false,
+					label = { Text("Quoted post") },
+					leadingIcon = {
+						Icon(
+							Icons.AutoMirrored.Rounded.Article, contentDescription = "Post icon"
+						)
+					},
+					colors = AssistChipDefaults.assistChipColors(
+						disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+						disabledLeadingIconContentColor = MaterialTheme.colorScheme.onSurface.copy(
+							alpha = 0.6f
+						),
+					),
+					border = AssistChipDefaults.assistChipBorder(
+						enabled = false,
+						disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(
+							alpha = 0.4f
+						),
+					),
+				)
+			}
 		}
 	}
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = false)
 @Preview(showBackground = true)
 @Composable
 fun PostPreviewPreview() {

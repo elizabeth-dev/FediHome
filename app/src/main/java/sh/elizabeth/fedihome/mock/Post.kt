@@ -26,7 +26,8 @@ val defaultPost = Post(
 		myReactions = emptyList(),
 		favorites = 3L,
 		favorited = false,
-		attachments = emptyList()
+		attachments = emptyList(),
+		inReplyToId = null
 	),
 	boosted = true,
 	boosts = 5,
@@ -41,5 +42,6 @@ val defaultPost = Post(
 	myReactions = listOf("👍"),
 	favorites = 3L,
 	favorited = false,
-	attachments = emptyList()
+	attachments = emptyList(),
+	inReplyToId = null
 )

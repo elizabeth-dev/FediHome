@@ -62,34 +62,6 @@ fun Post.isQuote(): Boolean =
 	renote != null && (!text.isNullOrBlank() || poll != null || files.isNotEmpty() || reply != null)
 
 fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post {
-	if (renote != null && !isQuote()) {
-		return sh.elizabeth.fedihome.model.Post(
-			id = "${renote.id}@$fetchedFromInstance",
-			createdAt = renote.createdAt,
-			updatedAt = renote.updatedAt,
-			text = renote.text,
-			cw = renote.cw,
-			author = renote.user.toDomain(fetchedFromInstance),
-			boosted = false,
-			boosts = renote.renoteCount.toLong(),
-			quote = renote.renote?.toDomain(fetchedFromInstance),
-			poll = renote.poll?.toDomain(),
-			emojis = renote.emojis.plus(renote.reactionEmojis).toDomainMap(fetchedFromInstance),
-			reactions = renote.reactions.mapKeys {
-				if (it.key.startsWith(':') && it.key.endsWith(':')) it.key.trim(
-					':'
-				) else it.key
-			},
-			myReactions = listOfNotNull(renote.myReaction.let {
-				if (it != null && it.startsWith(':') && it.endsWith(':')) it.trim(':') else it
-			}),
-
-			// TODO: handle favorites in Sharkey
-			favorites = renote.reactions.size.toLong(),
-			favorited = renote.myReaction != null,
-			attachments = files.map(File::toDomain)
-		)
-	}
 	return sh.elizabeth.fedihome.model.Post(
 		id = "$id@$fetchedFromInstance",
 		createdAt = createdAt,
@@ -99,6 +71,7 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 		author = user.toDomain(fetchedFromInstance),
 		boosted = false,
 		boosts = renoteCount.toLong(),
+		boostedPost = if (isQuote()) null else renote?.toDomain(fetchedFromInstance),
 		quote = renote?.toDomain(fetchedFromInstance),
 		poll = poll?.toDomain(),
 		emojis = emojis.plus(reactionEmojis).toDomainMap(fetchedFromInstance),
@@ -114,7 +87,8 @@ fun Post.toDomain(fetchedFromInstance: String): sh.elizabeth.fedihome.model.Post
 		// TODO: handle favorites in Sharkey
 		favorites = reactions.size.toLong(),
 		favorited = myReaction != null,
-		attachments = files.map(File::toDomain)
+		attachments = files.map(File::toDomain),
+		inReplyToId = replyId
 	)
 }
 

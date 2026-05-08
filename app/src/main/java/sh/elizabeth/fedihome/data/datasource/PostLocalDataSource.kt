@@ -132,4 +132,5 @@ fun Post.toEntity() = PostEntity(
 			description = it.description,
 		)
 	},
+	inReplyToId = inReplyToId
 )

@@ -21,6 +21,8 @@ data class Post(
 	val emojis: Map<String, Emoji>,
 	val mentionLinksMap: Map<String, String>? = null,
 	val attachments: List<Attachment>,
+	val inReplyToId: String?,
+	val inReplyTo: Post? = null,
 )
 
 fun Post.unwrapPosts(): List<Post> {
@@ -32,6 +34,7 @@ private fun Post._unwrapPosts(): List<Post> {
 
 	if (quote != null) posts.addAll(quote._unwrapPosts())
 	if (boostedPost != null) posts.addAll(boostedPost._unwrapPosts())
+	if (inReplyTo != null) posts.addAll(inReplyTo._unwrapPosts())
 
 	return posts
 }

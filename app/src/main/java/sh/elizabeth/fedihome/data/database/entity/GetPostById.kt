@@ -9,7 +9,7 @@ import sh.elizabeth.fedihome.model.ProfileField
 
 fun GetPostById.toPostDomain(
 	postEmojiList: List<GetEmojisForPosts>,
-	profileEmojiList: List<GetEmojisForProfiles>
+	profileEmojiList: List<GetEmojisForProfiles>,
 ): Post {
 	val postEmojis = postEmojiList.associate { it.emojiId to it.toDomain() }
 	val profileEmojis = profileEmojiList.associate { it.emojiId to it.toDomain() }
@@ -76,6 +76,7 @@ fun GetPostById.toPostDomain(
 			favorites = favoriteCount__!!,
 			favorited = favorited__!!,
 			attachments = attachments__?.map(AttachmentEntity::toDomain) ?: emptyList(),
+			inReplyToId = inReplyToId__
 		)
 		else null,
 		quote = if (postId_ != null && profileId_ != null) Post(
@@ -114,7 +115,9 @@ fun GetPostById.toPostDomain(
 			favorited = favorited_!!,
 			mentionLinksMap = mentionLinks_,
 			attachments = attachments_?.map(AttachmentEntity::toDomain) ?: emptyList(),
-		) else null,
+			inReplyToId = inReplyToId_
+		)
+		else null,
 		poll = poll?.toDomain(),
 		emojis = postEmojis,
 		reactions = reactions ?: emptyMap(),
@@ -123,5 +126,6 @@ fun GetPostById.toPostDomain(
 		favorited = favorited,
 		mentionLinksMap = mentionLinks,
 		attachments = attachments?.map(AttachmentEntity::toDomain) ?: emptyList(),
+		inReplyToId = inReplyToId
 	)
 }

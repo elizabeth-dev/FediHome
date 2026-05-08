@@ -91,6 +91,7 @@ fun Post.toDomain(fetchedFromInstance: String): DomainPost {
 		},
 		attachments = mediaAttachments.map(Media::toDomain),
 		boostedPost = reblog?.toDomain(fetchedFromInstance),
+		inReplyToId = inReplyToId
 	)
 }
 

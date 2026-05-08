@@ -35,6 +35,7 @@ import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveFavorite
 import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveReaction
 import sh.elizabeth.fedihome.ui.compositionlocals.localOnVotePoll
 import sh.elizabeth.fedihome.ui.theme.FediHomeTheme
+import sh.elizabeth.fedihome.util.PreviewImages
 
 @Composable
 fun SlimPostCard(
@@ -203,8 +204,38 @@ private fun AttachmentGrid(attachments: List<Attachment>) {
 @Composable
 fun SlimPostCardPreview() {
 	FediHomeTheme {
-		SlimPostCard(
-			post = defaultPost,
-		)
+		PreviewImages {
+			SlimPostCard(
+				post = defaultPost,
+			)
+		}
+	}
+}
+
+@Preview(
+	uiMode = Configuration.UI_MODE_NIGHT_YES,
+	showBackground = true,
+	backgroundColor = 0xFF000000,
+	name = "Dark",
+	group = "SlimPostCard",
+)
+@Preview(
+	showBackground = true,
+	backgroundColor = 0xFFFFFFFF,
+	name = "Light",
+	group = "SlimPostCard"
+)
+@Composable
+fun SlimPostCardListPreview() {
+	FediHomeTheme {
+		PreviewImages {
+			Column {
+				for (i in 1..5) {
+					SlimPostCard(
+						post = defaultPost,
+					)
+				}
+			}
+		}
 	}
 }

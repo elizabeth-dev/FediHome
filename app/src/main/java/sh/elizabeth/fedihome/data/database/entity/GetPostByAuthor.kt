@@ -76,6 +76,7 @@ fun GetPostByAuthor.toPostDomain(
 			favorites = favoriteCount__!!,
 			favorited = favorited__!!,
 			attachments = attachments__?.map(AttachmentEntity::toDomain) ?: emptyList(),
+			inReplyToId = inReplyToId__
 		)
 		else null,
 		quote = if (postId_ != null && profileId_ != null) Post(
@@ -113,6 +114,7 @@ fun GetPostByAuthor.toPostDomain(
 			favorites = favoriteCount_!!,
 			favorited = favorited_!!,
 			attachments = attachments_?.map(AttachmentEntity::toDomain) ?: emptyList(),
+			inReplyToId = inReplyToId_
 		)
 		else null,
 		poll = poll?.toDomain(),
@@ -122,5 +124,6 @@ fun GetPostByAuthor.toPostDomain(
 		favorites = favoriteCount,
 		favorited = favorited,
 		attachments = attachments?.map(AttachmentEntity::toDomain) ?: emptyList(),
+		inReplyToId = inReplyToId
 	)
 }

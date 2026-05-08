@@ -75,6 +75,7 @@ fun GetTimelinePosts.toPostDomain(
 			favorited = favorited__!!,
 			mentionLinksMap = mentionLinks__,
 			attachments = attachments__?.map(AttachmentEntity::toDomain) ?: emptyList(),
+			inReplyToId = inReplyToId__
 		)
 		else null,
 		quote = if (postId__ != null && profileId_ != null) Post(
@@ -113,6 +114,7 @@ fun GetTimelinePosts.toPostDomain(
 			favorited = favorited_!!,
 			mentionLinksMap = mentionLinks_,
 			attachments = attachments_?.map(AttachmentEntity::toDomain) ?: emptyList(),
+			inReplyToId = inReplyToId_
 		)
 		else null,
 		poll = poll?.toDomain(),
@@ -123,5 +125,6 @@ fun GetTimelinePosts.toPostDomain(
 		favorited = favorited,
 		mentionLinksMap = mentionLinks,
 		attachments = attachments?.map(AttachmentEntity::toDomain) ?: emptyList(),
+		inReplyToId = inReplyToId
 	)
 }

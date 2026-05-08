@@ -25,6 +25,7 @@ CREATE TABLE PostEntity (
     boostedPostId TEXT,
     mentionLinks TEXT AS Map<String, String>,
     attachments TEXT AS List<AttachmentEntity>,
+    inReplyToId TEXT,
     FOREIGN KEY (authorId) REFERENCES ProfileEntity(profileId),
     FOREIGN KEY (quoteId) REFERENCES PostEntity(postId),
     FOREIGN KEY (boostedPostId) REFERENCES PostEntity(postId)
