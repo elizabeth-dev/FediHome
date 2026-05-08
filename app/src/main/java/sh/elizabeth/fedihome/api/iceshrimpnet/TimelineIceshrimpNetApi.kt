@@ -15,9 +15,11 @@ class TimelineIceshrimpNetApi @Inject constructor(private val httpClient: HttpCl
 	suspend fun getHome(
 		endpoint: String,
 		token: String,
+		untilId: String? = null,
+		limit: Int = 20,
 	): List<Post> = httpClient.post("https://$endpoint/api/iceshrimp/timelines/home") {
 		contentType(ContentType.Application.Json)
 		bearerAuth(token)
-		setBody(GetHomeRequest(limit = 11))
+		setBody(GetHomeRequest(limit = limit, untilId = untilId))
 	}.body()
 }

@@ -12,10 +12,15 @@ import sh.elizabeth.fedihome.api.iceshrimp.model.Post
 import javax.inject.Inject
 
 class TimelineIceshrimpApi @Inject constructor(private val httpClient: HttpClient) {
-	suspend fun getHome(endpoint: String, token: String): List<Post> =
+	suspend fun getHome(
+		endpoint: String,
+		token: String,
+		untilId: String? = null,
+		limit: Int = 20,
+	): List<Post> =
 		httpClient.post("https://$endpoint/api/notes/timeline") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
-			setBody(GetHomeRequest(limit = 11))
+			setBody(GetHomeRequest(limit = limit, untilId = untilId))
 		}.body()
 }

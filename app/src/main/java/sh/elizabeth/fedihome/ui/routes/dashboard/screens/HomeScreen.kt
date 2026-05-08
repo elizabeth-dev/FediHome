@@ -17,7 +17,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -74,6 +76,7 @@ fun HomeScreen(
 			uiState = uiState,
 			scrollState = scrollState,
 			onRefresh = homeViewModel::refreshTimeline,
+			onLoadMore = homeViewModel::loadMore,
 		)
 	}
 
@@ -85,9 +88,22 @@ fun HomeScreen(
 	uiState: HomeUiState,
 	scrollState: LazyListState,
 	onRefresh: (String) -> Unit,
+	onLoadMore: () -> Unit,
 ) {
 	val pullRefreshState =
 		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
+
+	val shouldLoadMore = remember {
+		derivedStateOf {
+			val lastVisibleItem = scrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+			val totalItems = scrollState.layoutInfo.totalItemsCount
+			lastVisibleItem >= totalItems - 3
+		}
+	}
+
+	LaunchedEffect(shouldLoadMore.value) {
+		if (shouldLoadMore.value) onLoadMore()
+	}
 
 	LaunchedEffect(key1 = uiState.activeAccount) {
 		if (uiState.activeAccount.isNotBlank()) onRefresh(uiState.activeAccount)

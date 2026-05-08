@@ -40,7 +40,13 @@ sealed interface HomeUiState {
 
 private data class HomeViewModelState(
 	val isLoading: Boolean = false,
+	val pageSize: Long = 20,
+	val loadedPages: Int = 1,
+	val canLoadMore: Boolean = true,
+	val isLoadingMore: Boolean = false,
 ) {
+	val limit: Long get() = pageSize * loadedPages
+
 	fun toUiState(posts: List<Post>?, activeAccount: String = ""): HomeUiState =
 		if (posts.isNullOrEmpty()) {
 			HomeUiState.NoPosts(
@@ -67,10 +73,13 @@ class HomeViewModel @Inject constructor(
 	private val viewModelState = MutableStateFlow(HomeViewModelState(isLoading = true))
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private val timeline = authRepository.activeAccount.flatMapLatest {
-		timelineRepository.getTimeline(
-			it
-		)
+	private val timeline = combine(
+		authRepository.activeAccount,
+		viewModelState
+	) { account, state ->
+		Pair(account, state.limit)
+	}.distinctUntilChanged().flatMapLatest { (account, limit) ->
+		timelineRepository.getTimeline(account, limit = limit, offset = 0)
 	}.distinctUntilChanged()
 
 	val uiState = combine(
@@ -84,10 +93,35 @@ class HomeViewModel @Inject constructor(
 	)
 
 	fun refreshTimeline(profileIdentifier: String) {
-		viewModelState.update { it.copy(isLoading = true) }
+		viewModelState.update { it.copy(isLoading = true, loadedPages = 1) }
 		viewModelScope.launch {
 			refreshTimelineUseCase(profileIdentifier)
 			viewModelState.update { it.copy(isLoading = false) }
+		}
+	}
+
+	fun loadMore() {
+		if (viewModelState.value.isLoadingMore || !viewModelState.value.canLoadMore) return
+		viewModelState.update { it.copy(isLoadingMore = true, loadedPages = it.loadedPages + 1) }
+
+		// Also fetch more from remote API using the oldest post as cursor
+		val currentState = uiState.value
+		if (currentState is HomeUiState.HasPosts && currentState.posts.isNotEmpty()) {
+			val oldestPostId = currentState.posts.last().id
+			viewModelScope.launch {
+				try {
+					timelineRepository.fetchTimeline(
+						activeAccount = currentState.activeAccount,
+						profileIdentifier = currentState.activeAccount,
+						untilId = oldestPostId
+					)
+				} finally {
+					viewModelState.update { it.copy(isLoadingMore = false) }
+				}
+			}
+		}
+		else {
+			viewModelState.update { it.copy(isLoadingMore = false) }
 		}
 	}
 }

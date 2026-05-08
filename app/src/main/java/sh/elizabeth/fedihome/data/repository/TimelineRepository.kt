@@ -37,20 +37,27 @@ class TimelineRepository @Inject constructor(
 			)
 		}
 
-	fun getTimeline(profileIdentifier: String): Flow<List<Post>> =
-		timelineLocalDataSource.getTimelinePosts(profileIdentifier)
+	fun getTimeline(
+		profileIdentifier: String,
+		limit: Long = 20,
+		offset: Long = 0,
+	): Flow<List<Post>> = timelineLocalDataSource.getTimelinePosts(profileIdentifier, limit, offset)
 
 	suspend fun fetchTimeline(
 		activeAccount: String,
 		profileIdentifier: String,
-	) {
+		untilId: String? = null,
+		limit: Int = 20,
+	): List<String> {
 		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
 		val posts = timelineRemoteDataSource.getHome(
 			instance = instanceData.instance,
 			endpoint = instanceData.endpoint,
 			instanceType = instanceData.instanceType,
-			token = instanceData.token
+			token = instanceData.token,
+			untilId = untilId,
+			limit = limit
 		)
 		val unwrappedPosts = posts.flatMap { it.unwrapPosts() }
 		val profiles = unwrappedPosts.flatMap { it.unwrapProfiles() }
@@ -89,6 +96,34 @@ class TimelineRepository @Inject constructor(
 
 			postRepository.insertOrReplaceEmojiCrossRef(*postEmojiCrossRefs.toTypedArray())
 			profileRepository.insertOrReplaceEmojiCrossRef(*profileEmojiCrossRefs.toTypedArray())
+		}
+
+		return posts.map { it.id }
+	}
+
+	suspend fun fetchTimelineWithBackfill(
+		activeAccount: String,
+		profileIdentifier: String,
+		limit: Int = 20,
+		maxBackfillPages: Int = 5,
+	) {
+		var fetchedIds = fetchTimeline(
+			activeAccount = activeAccount, profileIdentifier = profileIdentifier, limit = limit
+		)
+
+		var pagesLoaded = 1
+		while (fetchedIds.isNotEmpty() && pagesLoaded < maxBackfillPages) {
+			val oldestFetchedId = fetchedIds.last()
+
+			if (timelineLocalDataSource.existsInTimeline(profileIdentifier, oldestFetchedId)) break
+
+			fetchedIds = fetchTimeline(
+				activeAccount = activeAccount,
+				profileIdentifier = profileIdentifier,
+				untilId = oldestFetchedId,
+				limit = limit
+			)
+			pagesLoaded++
 		}
 	}
 }

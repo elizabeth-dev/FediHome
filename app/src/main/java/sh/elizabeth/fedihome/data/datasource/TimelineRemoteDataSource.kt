@@ -20,17 +20,22 @@ class TimelineRemoteDataSource @Inject constructor(
 		endpoint: String,
 		instanceType: SupportedInstances,
 		token: String,
+		untilId: String? = null,
+		limit: Int = 20,
 	): List<Post> = when (instanceType) {
 		SupportedInstances.ICESHRIMP -> timelineIceshrimpApi.getHome(
-			endpoint = endpoint, token = token
+			endpoint = endpoint, token = token, untilId = untilId, limit = limit
 		).map { it.toDomain(instance) }
 
-		SupportedInstances.SHARKEY -> timelineSharkeyApi.getHome(endpoint = endpoint, token = token)
-			.map { it.toDomain(instance) }
+		SupportedInstances.SHARKEY -> timelineSharkeyApi.getHome(
+			endpoint = endpoint, token = token, untilId = untilId, limit = limit
+		).map { it.toDomain(instance) }
 
 		SupportedInstances.GLITCH, SupportedInstances.MASTODON, SupportedInstances.ICESHRIMPNET -> timelineMastodonApi.getHome(
 			endpoint = endpoint,
-			token = token
+			token = token,
+			maxId = untilId,
+			limit = limit
 		).map { it.toDomain(instance) }
 	}
 }

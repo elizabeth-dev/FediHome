@@ -19,9 +19,13 @@ class TimelineLocalDataSource @Inject constructor(private val appDatabase: AppDa
 		}
 	}
 
-	fun getTimelinePosts(profileIdentifier: String): Flow<List<Post>> =
+	fun existsInTimeline(profileIdentifier: String, postId: String): Boolean =
+		appDatabase.timelinePostQueries.existsInTimeline(profileIdentifier, postId)
+			.executeAsOne() > 0
+
+	fun getTimelinePosts(profileIdentifier: String, limit: Long, offset: Long): Flow<List<Post>> =
 		appDatabase.timelinePostQueries
-			.getTimelinePosts(profileIdentifier)
+			.getTimelinePosts(profileIdentifier, limit, offset)
 			.asFlow()
 			.mapToList(Dispatchers.IO)
 			.map { posts ->

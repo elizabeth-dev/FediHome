@@ -21,4 +21,9 @@ LEFT JOIN PostEntity AS BoostedPost ON PostEntity.boostedPostId = BoostedPost.po
 LEFT JOIN ProfileEntity AS BoostedPostProfile ON BoostedPost.authorId = BoostedPostProfile.profileId
 
 WHERE TimelinePostEntity.timelineProfileId = ?
-ORDER BY PostEntity.createdAt DESC;
+ORDER BY PostEntity.createdAt DESC
+LIMIT ? OFFSET ?;
+
+existsInTimeline:
+SELECT COUNT(*) FROM TimelinePostEntity
+WHERE timelineProfileId = ? AND postId = ?;
