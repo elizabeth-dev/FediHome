@@ -1,0 +1,15 @@
+CREATE TABLE TimelineRemoteKeyEntity (
+    profileId TEXT PRIMARY KEY NOT NULL,
+    nextKey TEXT
+);
+
+insertOrReplace:
+INSERT OR REPLACE INTO TimelineRemoteKeyEntity (profileId, nextKey) VALUES (?, ?);
+
+getByProfileId:
+SELECT * FROM TimelineRemoteKeyEntity WHERE profileId = ?;
+
+deleteByProfileId:
+DELETE FROM TimelineRemoteKeyEntity WHERE profileId = ?;
+
+

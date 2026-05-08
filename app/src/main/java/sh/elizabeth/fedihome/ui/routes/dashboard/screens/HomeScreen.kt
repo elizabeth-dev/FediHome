@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
@@ -16,14 +15,13 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import sh.elizabeth.fedihome.ui.composable.SlimPostCard
 import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddBoost
 import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddFavorite
@@ -33,112 +31,83 @@ import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveFavorite
 import sh.elizabeth.fedihome.ui.compositionlocals.localOnRemoveReaction
 import sh.elizabeth.fedihome.ui.compositionlocals.localOnVotePoll
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
 	homeViewModel: HomeViewModel = hiltViewModel(),
 	scrollState: LazyListState,
 ) {
-	val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+	val activeAccount by homeViewModel.activeAccount.collectAsStateWithLifecycle()
+	val lazyPagingItems = homeViewModel.pagingFlow.collectAsLazyPagingItems()
+
+	val isRefreshing = lazyPagingItems.loadState.refresh is LoadState.Loading
 
 	CompositionLocalProvider(localOnVotePoll provides { postId, pollId, choices ->
 		homeViewModel.votePoll(
-			activeAccount = uiState.activeAccount,
+			activeAccount = activeAccount,
 			postId = postId,
 			pollId = pollId,
 			choices = choices
 		)
 	}, localOnAddFavorite provides {
 		homeViewModel.addFavorite(
-			activeAccount = uiState.activeAccount, postId = it
+			activeAccount = activeAccount, postId = it
 		)
 	}, localOnRemoveFavorite provides {
 		homeViewModel.removeFavorite(
-			activeAccount = uiState.activeAccount, postId = it
+			activeAccount = activeAccount, postId = it
 		)
 	}, localOnAddReaction provides { postId, reaction ->
 		homeViewModel.addReaction(
-			activeAccount = uiState.activeAccount, postId = postId, reaction = reaction
+			activeAccount = activeAccount, postId = postId, reaction = reaction
 		)
 	}, localOnRemoveReaction provides { postId, reaction ->
 		homeViewModel.removeReaction(
-			activeAccount = uiState.activeAccount, postId = postId, reaction = reaction
+			activeAccount = activeAccount, postId = postId, reaction = reaction
 		)
 	}, localOnAddBoost provides { postId ->
 		homeViewModel.addBoost(
-			activeAccount = uiState.activeAccount, postId = postId
+			activeAccount = activeAccount, postId = postId
 		)
 	}, localOnRemoveBoost provides { postId ->
 		homeViewModel.removeBoost(
-			activeAccount = uiState.activeAccount, postId = postId
+			activeAccount = activeAccount, postId = postId
 		)
 	}) {
-		HomeScreen(
-			uiState = uiState,
-			scrollState = scrollState,
-			onRefresh = homeViewModel::refreshTimeline,
-			onLoadMore = homeViewModel::loadMore,
-		)
-	}
+		val pullRefreshState =
+			rememberPullRefreshState(isRefreshing, { lazyPagingItems.refresh() })
 
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun HomeScreen(
-	uiState: HomeUiState,
-	scrollState: LazyListState,
-	onRefresh: (String) -> Unit,
-	onLoadMore: () -> Unit,
-) {
-	val pullRefreshState =
-		rememberPullRefreshState(uiState.isLoading, { onRefresh(uiState.activeAccount) })
-
-	val shouldLoadMore = remember {
-		derivedStateOf {
-			val lastVisibleItem = scrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-			val totalItems = scrollState.layoutInfo.totalItemsCount
-			lastVisibleItem >= totalItems - 3
-		}
-	}
-
-	LaunchedEffect(shouldLoadMore.value) {
-		if (shouldLoadMore.value) onLoadMore()
-	}
-
-	LaunchedEffect(key1 = uiState.activeAccount) {
-		if (uiState.activeAccount.isNotBlank()) onRefresh(uiState.activeAccount)
-	}
-
-	Box(
-		Modifier
-			.fillMaxSize()
-			.pullRefresh(pullRefreshState, true)
-
-	) {
-		when (uiState) {
-			is HomeUiState.NoPosts -> if (!uiState.isLoading) Column(
-				Modifier
-					.fillMaxSize()
-					.verticalScroll(rememberScrollState()),
-				verticalArrangement = Arrangement.Center,
-				horizontalAlignment = Alignment.CenterHorizontally
-			) {
-				Text(text = "No posts yet!")
-			}
-
-			is HomeUiState.HasPosts -> LazyColumn(
-				modifier = Modifier.fillMaxSize(), state = scrollState
-			) {
-				items(uiState.posts) { post ->
-					SlimPostCard(
-						post = post,
-					)
+		Box(
+			Modifier
+				.fillMaxSize()
+				.pullRefresh(pullRefreshState, true)
+		) {
+			if (lazyPagingItems.itemCount == 0 && !isRefreshing) {
+				Column(
+					Modifier
+						.fillMaxSize()
+						.verticalScroll(rememberScrollState()),
+					verticalArrangement = Arrangement.Center,
+					horizontalAlignment = Alignment.CenterHorizontally
+				) {
+					Text(text = "No posts yet!")
 				}
 			}
-		}
+			else {
+				LazyColumn(
+					modifier = Modifier.fillMaxSize(), state = scrollState
+				) {
+					items(lazyPagingItems.itemCount) { index ->
+						lazyPagingItems[index]?.let { post ->
+							SlimPostCard(post = post)
+						}
+					}
+				}
+			}
 
-		PullRefreshIndicator(
-			uiState.isLoading, pullRefreshState, Modifier.align(Alignment.TopCenter)
-		)
+			PullRefreshIndicator(
+				isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter)
+			)
+		}
 	}
 }

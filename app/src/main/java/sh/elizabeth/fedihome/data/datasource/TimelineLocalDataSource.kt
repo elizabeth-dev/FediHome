@@ -23,31 +23,16 @@ class TimelineLocalDataSource @Inject constructor(private val appDatabase: AppDa
 		appDatabase.timelinePostQueries.existsInTimeline(profileIdentifier, postId)
 			.executeAsOne() > 0
 
+	fun deleteByProfileId(profileIdentifier: String) {
+		appDatabase.timelinePostQueries.deleteByProfileId(profileIdentifier)
+	}
+
 	fun getTimelinePosts(profileIdentifier: String, limit: Long, offset: Long): Flow<List<Post>> =
 		appDatabase.timelinePostQueries
 			.getTimelinePosts(profileIdentifier, limit, offset)
 			.asFlow()
 			.mapToList(Dispatchers.IO)
 			.map { posts ->
-				val postIds =
-					posts.flatMap { setOfNotNull(it.postId, it.postId_, it.postId__, it.postId___) }
-				val profileIds = posts.flatMap {
-					setOfNotNull(
-						it.profileId,
-						it.profileId_,
-						it.profileId__,
-					)
-				}
-
-				// TODO: see if we can incorporate emojis in main query
-				val postEmojis = appDatabase.postQueries.getEmojisForPosts(postIds).executeAsList()
-				val profileEmojis =
-					appDatabase.profileQueries.getEmojisForProfiles(profileIds).executeAsList()
-
-				posts.map {
-					it.toPostDomain(
-						postEmojis.filter { postEmoji -> postIds.contains(postEmoji.postId) },
-						profileEmojis.filter { profileEmoji -> profileIds.contains(profileEmoji.profileId) })
-				}
+				posts.map { it.toPostDomain() }
 			}
 }

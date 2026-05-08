@@ -1,17 +1,44 @@
 package sh.elizabeth.fedihome.data.database.entity
 
-import sh.elizabeth.fedihome.GetEmojisForPosts
-import sh.elizabeth.fedihome.GetEmojisForProfiles
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import sh.elizabeth.fedihome.GetTimelinePosts
+import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
 
-fun GetTimelinePosts.toPostDomain(
-	postEmojiList: List<GetEmojisForPosts>, profileEmojiList: List<GetEmojisForProfiles>,
-): Post {
-	val postEmojis = postEmojiList.associate { it.emojiId to it.toDomain() }
-	val profileEmojis = profileEmojiList.associate { it.emojiId to it.toDomain() }
+private val gson = Gson()
+private val emojiListType = object : TypeToken<List<EmojiJson>>() {}.type
+
+private data class EmojiJson(
+	val emojiId: String,
+	val instance: String,
+	val shortcode: String,
+	val url: String,
+)
+
+private fun parseEmojisJson(json: String?): Map<String, Emoji> {
+	if (json.isNullOrBlank() || json == "[null]") return emptyMap()
+	val list: List<EmojiJson> = gson.fromJson(json, emojiListType)
+	return list.associate {
+		it.emojiId to Emoji(
+			fullEmojiId = it.emojiId,
+			instance = it.instance,
+			shortcode = it.shortcode,
+			url = it.url
+		)
+	}
+}
+
+fun GetTimelinePosts.toPostDomain(): Post {
+	val postEmojis = parseEmojisJson(postEmojisJson)
+	val authorProfileEmojis = parseEmojisJson(authorEmojisJson)
+	val quotedPostEmojis = parseEmojisJson(quotedPostEmojisJson)
+	val quotedProfileEmojis = parseEmojisJson(quotedProfileEmojisJson)
+	val boostedPostEmojisParsed = parseEmojisJson(boostedPostEmojisJson)
+	val boostedProfileEmojisParsed = parseEmojisJson(boostedProfileEmojisJson)
+
 	return Post(
 		id = postId_,
 		createdAt = createdAt,
@@ -35,7 +62,7 @@ fun GetTimelinePosts.toPostDomain(
 			avatarBlur = avatarBlur,
 			headerUrl = headerUrl,
 			headerBlur = headerBlur,
-			emojis = profileEmojis,
+			emojis = authorProfileEmojis,
 		),
 		boosted = boosted,
 		boosts = boostsCount,
@@ -62,13 +89,13 @@ fun GetTimelinePosts.toPostDomain(
 				avatarBlur = avatarBlur__,
 				headerUrl = headerUrl__,
 				headerBlur = headerBlur__,
-				emojis = profileEmojis,
+				emojis = boostedProfileEmojisParsed,
 			),
 			boosted = boosted__!!,
 			boosts = boostsCount__!!,
 			quote = null,
 			poll = poll__?.toDomain(),
-			emojis = postEmojis,
+			emojis = boostedPostEmojisParsed,
 			reactions = reactions__ ?: emptyMap(),
 			myReactions = myReactions__ ?: emptyList(),
 			favorites = favoriteCount__!!,
@@ -101,13 +128,13 @@ fun GetTimelinePosts.toPostDomain(
 				avatarBlur = avatarBlur_,
 				headerUrl = headerUrl_,
 				headerBlur = headerBlur_,
-				emojis = profileEmojis,
+				emojis = quotedProfileEmojis,
 			),
 			boosted = boosted_!!,
 			boosts = boostsCount_!!,
 			quote = null,
 			poll = poll_?.toDomain(),
-			emojis = postEmojis,
+			emojis = quotedPostEmojis,
 			reactions = reactions_ ?: emptyMap(),
 			myReactions = myReactions_ ?: emptyList(),
 			favorites = favoriteCount_!!,

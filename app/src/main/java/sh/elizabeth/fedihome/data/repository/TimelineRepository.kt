@@ -1,5 +1,8 @@
 package sh.elizabeth.fedihome.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import sh.elizabeth.fedihome.PostEmojiCrossRef
@@ -9,6 +12,7 @@ import sh.elizabeth.fedihome.data.datasource.EmojiLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.TimelineLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.TimelineRemoteDataSource
+import sh.elizabeth.fedihome.data.paging.TimelinePagingSource
 import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.unwrapPosts
@@ -42,6 +46,27 @@ class TimelineRepository @Inject constructor(
 		limit: Long = 20,
 		offset: Long = 0,
 	): Flow<List<Post>> = timelineLocalDataSource.getTimelinePosts(profileIdentifier, limit, offset)
+
+	fun getPagedTimeline(
+		activeAccount: String,
+		profileIdentifier: String,
+		pageSize: Int = 20,
+	): Flow<PagingData<Post>> = Pager(
+		config = PagingConfig(
+			pageSize = pageSize,
+			prefetchDistance = 5,
+			enablePlaceholders = false,
+			initialLoadSize = pageSize,
+		),
+		pagingSourceFactory = {
+			TimelinePagingSource(
+				activeAccount = activeAccount,
+				profileIdentifier = profileIdentifier,
+				timelineRepository = this,
+				appDatabase = appDatabase,
+			)
+		}
+	).flow
 
 	suspend fun fetchTimeline(
 		activeAccount: String,

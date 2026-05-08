@@ -11,7 +11,38 @@ insert:
 INSERT INTO TimelinePostEntity (timelineProfileId, postId) VALUES (?, ?);
 
 getTimelinePosts:
-SELECT * FROM TimelinePostEntity
+SELECT *,
+    (SELECT json_group_array(json_object('emojiId', EmojiEntity.emojiId, 'instance', EmojiEntity.instance, 'shortcode', EmojiEntity.shortcode, 'url', EmojiEntity.url))
+     FROM PostEmojiCrossRef
+     JOIN EmojiEntity ON PostEmojiCrossRef.emojiId = EmojiEntity.emojiId
+     WHERE PostEmojiCrossRef.postId = PostEntity.postId
+    ) AS postEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', EmojiEntity.emojiId, 'instance', EmojiEntity.instance, 'shortcode', EmojiEntity.shortcode, 'url', EmojiEntity.url))
+     FROM ProfileEmojiCrossRef
+     JOIN EmojiEntity ON ProfileEmojiCrossRef.emojiId = EmojiEntity.emojiId
+     WHERE ProfileEmojiCrossRef.profileId = ProfileEntity.profileId
+    ) AS authorEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', EmojiEntity.emojiId, 'instance', EmojiEntity.instance, 'shortcode', EmojiEntity.shortcode, 'url', EmojiEntity.url))
+     FROM PostEmojiCrossRef
+     JOIN EmojiEntity ON PostEmojiCrossRef.emojiId = EmojiEntity.emojiId
+     WHERE PostEmojiCrossRef.postId = QuotedPost.postId
+    ) AS quotedPostEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', EmojiEntity.emojiId, 'instance', EmojiEntity.instance, 'shortcode', EmojiEntity.shortcode, 'url', EmojiEntity.url))
+     FROM ProfileEmojiCrossRef
+     JOIN EmojiEntity ON ProfileEmojiCrossRef.emojiId = EmojiEntity.emojiId
+     WHERE ProfileEmojiCrossRef.profileId = QuotedProfile.profileId
+    ) AS quotedProfileEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', EmojiEntity.emojiId, 'instance', EmojiEntity.instance, 'shortcode', EmojiEntity.shortcode, 'url', EmojiEntity.url))
+     FROM PostEmojiCrossRef
+     JOIN EmojiEntity ON PostEmojiCrossRef.emojiId = EmojiEntity.emojiId
+     WHERE PostEmojiCrossRef.postId = BoostedPost.postId
+    ) AS boostedPostEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', EmojiEntity.emojiId, 'instance', EmojiEntity.instance, 'shortcode', EmojiEntity.shortcode, 'url', EmojiEntity.url))
+     FROM ProfileEmojiCrossRef
+     JOIN EmojiEntity ON ProfileEmojiCrossRef.emojiId = EmojiEntity.emojiId
+     WHERE ProfileEmojiCrossRef.profileId = BoostedPostProfile.profileId
+    ) AS boostedProfileEmojisJson
+FROM TimelinePostEntity
 JOIN PostEntity ON TimelinePostEntity.postId = PostEntity.postId
 JOIN ProfileEntity ON PostEntity.authorId = ProfileEntity.profileId
 
@@ -27,3 +58,12 @@ LIMIT ? OFFSET ?;
 existsInTimeline:
 SELECT COUNT(*) FROM TimelinePostEntity
 WHERE timelineProfileId = ? AND postId = ?;
+
+countTimelinePosts:
+SELECT COUNT(*) FROM TimelinePostEntity
+WHERE timelineProfileId = ?;
+
+deleteByProfileId:
+DELETE FROM TimelinePostEntity
+WHERE timelineProfileId = ?;
+

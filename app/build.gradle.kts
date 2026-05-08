@@ -106,7 +106,8 @@ sqldelight {
 	databases {
 		register("AppDatabase") {
 			packageName.set("sh.elizabeth.fedihome.data.database")
-
+			dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+			module("app.cash.sqldelight:sqlite-json-module:2.3.2")
 		}
 	}
 }
@@ -115,7 +116,7 @@ dependencies {
 	implementation("androidx.core:core-ktx:1.18.0")
 	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
 	implementation("androidx.activity:activity-compose:1.13.0")
-	implementation(platform("androidx.compose:compose-bom:2026.04.01"))
+	implementation(platform("androidx.compose:compose-bom:2026.05.00"))
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
@@ -135,7 +136,7 @@ dependencies {
 	testImplementation("org.mockito:mockito-core:5.23.0")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
 
-	androidTestImplementation(platform("androidx.compose:compose-bom:2026.04.01"))
+	androidTestImplementation(platform("androidx.compose:compose-bom:2026.05.00"))
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 	debugImplementation("androidx.compose.ui:ui-tooling")
 	debugImplementation("androidx.compose.ui:ui-test-manifest")
@@ -183,10 +184,15 @@ dependencies {
 	// SQLDelight
 	implementation("app.cash.sqldelight:android-driver:2.3.2")
 	implementation("app.cash.sqldelight:coroutines-extensions:2.3.2")
+	implementation("app.cash.sqldelight:androidx-paging3-extensions:2.3.2")
 	implementation("com.google.code.gson:gson:2.14.0")
 
+	// Paging
+	implementation("androidx.paging:paging-runtime:3.5.0")
+	implementation("androidx.paging:paging-compose:3.5.0")
+
 	// Firebase
-	implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+	implementation(platform("com.google.firebase:firebase-bom:34.13.0"))
 	implementation("com.google.firebase:firebase-analytics")
 	implementation("com.google.firebase:firebase-messaging")
 
