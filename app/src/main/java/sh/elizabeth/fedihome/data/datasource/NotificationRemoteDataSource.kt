@@ -21,17 +21,19 @@ class NotificationRemoteDataSource @Inject constructor(
 		endpoint: String,
 		instanceType: SupportedInstances,
 		token: String,
+		untilId: String? = null,
+		limit: Int = 20,
 	): List<Notification> = when (instanceType) {
 		SupportedInstances.SHARKEY -> notificationSharkeyApi.getNotifications(
-			endpoint = endpoint, token = token
+			endpoint = endpoint, token = token, untilId = untilId, limit = limit
 		).map { it.toDomain(instance, forAccount) }
 
 		SupportedInstances.ICESHRIMP -> notificationIceshrimpApi.getNotifications(
-			endpoint = endpoint, token = token
+			endpoint = endpoint, token = token, untilId = untilId, limit = limit
 		).map { it.toDomain(instance, forAccount) }
 
 		SupportedInstances.MASTODON, SupportedInstances.GLITCH, SupportedInstances.ICESHRIMPNET -> notificationMastodonApi.getNotifications(
-			endpoint = endpoint, token = token
+			endpoint = endpoint, token = token, maxId = untilId, limit = limit
 		).map { it.toDomain(instance, forAccount) }
 
 	}

@@ -1,15 +1,22 @@
 package sh.elizabeth.fedihome.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import sh.elizabeth.fedihome.PostEmojiCrossRef
 import sh.elizabeth.fedihome.ProfileEmojiCrossRef
+import sh.elizabeth.fedihome.data.database.AppDatabase
 import sh.elizabeth.fedihome.data.datasource.EmojiLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.NotificationLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.NotificationRemoteDataSource
+import sh.elizabeth.fedihome.data.paging.NotificationPagingSource
+import sh.elizabeth.fedihome.model.Notification
 import sh.elizabeth.fedihome.model.unwrapPosts
 import sh.elizabeth.fedihome.model.unwrapProfiles
 import sh.elizabeth.fedihome.util.InstanceEndpointTypeToken
@@ -22,6 +29,7 @@ class NotificationRepository @Inject constructor(
 	private val postRepository: PostRepository,
 	private val profileRepository: ProfileRepository,
 	private val emojiLocalDataSource: EmojiLocalDataSource,
+	private val appDatabase: AppDatabase,
 ) {
 
 	private suspend fun getInstanceAndEndpointAndTypeAndToken(activeAccount: String): InstanceEndpointTypeToken =
@@ -36,17 +44,21 @@ class NotificationRepository @Inject constructor(
 			)
 		}
 
-	suspend fun fetchNotifications(activeAccount: String) {
-		val instanceData = getInstanceAndEndpointAndTypeAndToken(
-			activeAccount
-		)
+	suspend fun fetchNotifications(
+		activeAccount: String,
+		untilId: String? = null,
+		limit: Int = 20,
+	): List<String> {
+		val instanceData = getInstanceAndEndpointAndTypeAndToken(activeAccount)
 
 		val notificationRes = notificationRemoteDataSource.getNotifications(
 			forAccount = activeAccount,
 			instance = instanceData.instance,
 			endpoint = instanceData.endpoint,
 			instanceType = instanceData.instanceType,
-			token = instanceData.token
+			token = instanceData.token,
+			untilId = untilId,
+			limit = limit
 		)
 
 		val posts = notificationRes.mapNotNull { it.post }.flatMap {
@@ -92,9 +104,26 @@ class NotificationRepository @Inject constructor(
 
 			awaitAll(notificationRef, postEmojiRef, profileEmojiRef)
 		}
+
+		return notificationRes.map { it.id }
 	}
 
-	fun getNotificationsFlow(activeAccount: String) =
-		notificationLocalDataSource.getNotificationsFlow(activeAccount)
-
+	fun getPagedNotifications(
+		activeAccount: String,
+		pageSize: Int = 20,
+	): Flow<PagingData<Notification>> = Pager(
+		config = PagingConfig(
+			pageSize = pageSize,
+			prefetchDistance = 5,
+			enablePlaceholders = false,
+			initialLoadSize = pageSize,
+		),
+		pagingSourceFactory = {
+			NotificationPagingSource(
+				activeAccount = activeAccount,
+				notificationRepository = this,
+				appDatabase = appDatabase,
+			)
+		}
+	).flow
 }

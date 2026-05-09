@@ -12,10 +12,15 @@ import sh.elizabeth.fedihome.api.sharkey.model.GetNotificationsRequest
 import javax.inject.Inject
 
 class NotificationIceshrimpApi @Inject constructor(private val httpClient: HttpClient) {
-	suspend fun getNotifications(endpoint: String, token: String): List<Notification> =
+	suspend fun getNotifications(
+		endpoint: String,
+		token: String,
+		untilId: String? = null,
+		limit: Int? = null,
+	): List<Notification> =
 		httpClient.post("https://$endpoint/api/i/notifications") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
-			setBody(GetNotificationsRequest())
+			setBody(GetNotificationsRequest(untilId = untilId, limit = limit))
 		}.body()
 }

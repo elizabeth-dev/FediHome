@@ -18,11 +18,13 @@ class NotificationSharkeyApi @Inject constructor(private val httpClient: HttpCli
 	suspend fun getNotifications(
 		endpoint: String,
 		token: String,
+		untilId: String? = null,
+		limit: Int? = null,
 	): List<Notification> =
 		httpClient.post("https://$endpoint/api/i/notifiications") {
 			contentType(ContentType.Application.Json)
 			bearerAuth(token)
-			setBody(GetNotificationsRequest())
+			setBody(GetNotificationsRequest(untilId = untilId, limit = limit))
 		}.body()
 
 	suspend fun createPushSubscription(

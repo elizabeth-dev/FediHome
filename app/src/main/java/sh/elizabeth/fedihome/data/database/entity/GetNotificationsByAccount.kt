@@ -1,7 +1,7 @@
 package sh.elizabeth.fedihome.data.database.entity
 
-import sh.elizabeth.fedihome.GetEmojisForPosts
-import sh.elizabeth.fedihome.GetEmojisForProfiles
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import sh.elizabeth.fedihome.GetNotificationByAccount
 import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.model.Notification
@@ -9,11 +9,35 @@ import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
 
-fun GetNotificationByAccount.toDomain(
-	postEmojiList: List<GetEmojisForPosts>, profileEmojiList: List<GetEmojisForProfiles>
-): Notification {
-	val postEmojis = postEmojiList.associate { it.emojiId to it.toDomain() }
-	val profileEmojis = profileEmojiList.associate { it.emojiId to it.toDomain() }
+private val gson = Gson()
+private val emojiListType = object : TypeToken<List<NotifEmojiJson>>() {}.type
+
+private data class NotifEmojiJson(
+	val emojiId: String,
+	val instance: String,
+	val shortcode: String,
+	val url: String,
+)
+
+private fun parseNotifEmojisJson(json: String?): Map<String, Emoji> {
+	if (json.isNullOrBlank() || json == "[null]") return emptyMap()
+	val list: List<NotifEmojiJson> = gson.fromJson(json, emojiListType)
+	return list.associate {
+		it.emojiId to Emoji(
+			fullEmojiId = it.emojiId,
+			instance = it.instance,
+			shortcode = it.shortcode,
+			url = it.url
+		)
+	}
+}
+
+fun GetNotificationByAccount.toNotificationDomain(): Notification {
+	val postEmojis = parseNotifEmojisJson(postEmojisJson)
+	val notifProfileEmojis = parseNotifEmojisJson(notifProfileEmojisJson)
+	val postProfileEmojis = parseNotifEmojisJson(postProfileEmojisJson)
+	val quotePostEmojis = parseNotifEmojisJson(quotePostEmojisJson)
+	val quoteProfileEmojis = parseNotifEmojisJson(quoteProfileEmojisJson)
 
 	return Notification(
 		id = notificationId,
@@ -44,7 +68,7 @@ fun GetNotificationByAccount.toDomain(
 			fields = fields!!.map {
 				ProfileField(name = it.name, value = it.value)
 			},
-			emojis = profileEmojis
+			emojis = notifProfileEmojis
 		) else null,
 		post = if (postId_ != null && profileId__ !== null) Post(
 			id = postId_,
@@ -52,7 +76,6 @@ fun GetNotificationByAccount.toDomain(
 			updatedAt = updatedAt,
 			cw = cw,
 			text = text,
-			// author = author.toDomain(authorEmojis),
 			author = Profile(
 				id = profileId__,
 				username = username_!!,
@@ -70,7 +93,7 @@ fun GetNotificationByAccount.toDomain(
 				avatarBlur = avatarBlur_,
 				headerUrl = headerUrl_,
 				headerBlur = headerBlur_,
-				emojis = profileEmojis,
+				emojis = postProfileEmojis,
 			),
 			emojis = postEmojis,
 			boosted = boosted!!,
@@ -81,7 +104,6 @@ fun GetNotificationByAccount.toDomain(
 				updatedAt = updatedAt_,
 				cw = cw_,
 				text = text_,
-				// author = author.toDomain(authorEmojis),
 				author = Profile(
 					id = profileId___,
 					username = username__!!,
@@ -99,9 +121,9 @@ fun GetNotificationByAccount.toDomain(
 					avatarBlur = avatarBlur__,
 					headerUrl = headerUrl__,
 					headerBlur = headerBlur__,
-					emojis = profileEmojis,
+					emojis = quoteProfileEmojis,
 				),
-				emojis = postEmojis,
+				emojis = quotePostEmojis,
 				boosted = boosted_!!,
 				boosts = boostsCount_!!,
 				quote = null,

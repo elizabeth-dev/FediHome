@@ -12,4 +12,20 @@ SELECT * FROM TimelineRemoteKeyEntity WHERE profileId = ?;
 deleteByProfileId:
 DELETE FROM TimelineRemoteKeyEntity WHERE profileId = ?;
 
+-- Notification remote keys
+
+CREATE TABLE NotificationRemoteKeyEntity (
+    accountId TEXT PRIMARY KEY NOT NULL,
+    nextKey TEXT
+);
+
+insertOrReplaceNotification:
+INSERT OR REPLACE INTO NotificationRemoteKeyEntity (accountId, nextKey) VALUES (?, ?);
+
+getNotificationByAccountId:
+SELECT * FROM NotificationRemoteKeyEntity WHERE accountId = ?;
+
+deleteNotificationByAccountId:
+DELETE FROM NotificationRemoteKeyEntity WHERE accountId = ?;
+
 

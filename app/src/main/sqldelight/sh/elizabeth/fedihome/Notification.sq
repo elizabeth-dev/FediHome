@@ -1,6 +1,59 @@
 import java.time.Instant;
 import sh.elizabeth.fedihome.model.NotificationType;
 
+CREATE TABLE NotificationPagingItemEntity(
+    rowId INTEGER PRIMARY KEY AUTOINCREMENT,
+    forAccount TEXT NOT NULL,
+    type TEXT NOT NULL,
+    notificationId TEXT,
+    UNIQUE (forAccount, notificationId) ON CONFLICT IGNORE,
+    FOREIGN KEY (notificationId) REFERENCES NotificationEntity(notificationId)
+);
+
+CREATE INDEX notificationPaging_forAccount ON NotificationPagingItemEntity(forAccount);
+
+insertOrReplacePagingItem:
+INSERT INTO NotificationPagingItemEntity VALUES ?;
+
+getNotificationPagingItemsByAccount:
+SELECT *,
+    (SELECT json_group_array(json_object('emojiId', PE.emojiId, 'instance', PE.instance, 'shortcode', PE.shortcode, 'url', PE.url))
+     FROM PostEmojiCrossRef
+     JOIN EmojiEntity AS PE ON PostEmojiCrossRef.emojiId = PE.emojiId
+     WHERE PostEmojiCrossRef.postId = PostEntity.postId
+    ) AS postEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', NPE.emojiId, 'instance', NPE.instance, 'shortcode', NPE.shortcode, 'url', NPE.url))
+     FROM ProfileEmojiCrossRef
+     JOIN EmojiEntity AS NPE ON ProfileEmojiCrossRef.emojiId = NPE.emojiId
+     WHERE ProfileEmojiCrossRef.profileId = ProfileEntity.profileId
+    ) AS notifProfileEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', PPE.emojiId, 'instance', PPE.instance, 'shortcode', PPE.shortcode, 'url', PPE.url))
+     FROM ProfileEmojiCrossRef
+     JOIN EmojiEntity AS PPE ON ProfileEmojiCrossRef.emojiId = PPE.emojiId
+     WHERE ProfileEmojiCrossRef.profileId = PostProfile.profileId
+    ) AS postProfileEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', QE.emojiId, 'instance', QE.instance, 'shortcode', QE.shortcode, 'url', QE.url))
+     FROM PostEmojiCrossRef
+     JOIN EmojiEntity AS QE ON PostEmojiCrossRef.emojiId = QE.emojiId
+     WHERE PostEmojiCrossRef.postId = Quote.postId
+    ) AS quotePostEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', QPE.emojiId, 'instance', QPE.instance, 'shortcode', QPE.shortcode, 'url', QPE.url))
+     FROM ProfileEmojiCrossRef
+     JOIN EmojiEntity AS QPE ON ProfileEmojiCrossRef.emojiId = QPE.emojiId
+     WHERE ProfileEmojiCrossRef.profileId = QuoteProfile.profileId
+    ) AS quoteProfileEmojisJson
+FROM NotificationPagingItemEntity
+JOIN NotificationEntity ON NotificationEntity.notificationId = NotificationPagingItemEntity.notificationId
+LEFT JOIN ProfileEntity ON NotificationEntity.profileId = ProfileEntity.profileId
+LEFT JOIN PostEntity ON NotificationEntity.postId = PostEntity.postId
+LEFT JOIN ProfileEntity AS PostProfile ON PostEntity.authorId = PostProfile.profileId
+LEFT JOIN EmojiEntity ON NotificationEntity.reactionEmoji = EmojiEntity.emojiId
+LEFT JOIN PostEntity AS Quote ON PostEntity.quoteId = Quote.postId
+LEFT JOIN ProfileEntity AS QuoteProfile ON Quote.authorId = QuoteProfile.profileId
+
+WHERE NotificationPagingItemEntity.forAccount = ? ORDER BY NotificationPagingItemEntity.rowId DESC
+LIMIT ? OFFSET ?;
+
 CREATE TABLE NotificationEntity (
     notificationId TEXT PRIMARY KEY NOT NULL,
     forAccount TEXT NOT NULL,
@@ -14,13 +67,39 @@ CREATE TABLE NotificationEntity (
     FOREIGN KEY (reactionEmoji) REFERENCES EmojiEntity(emojiId)
 );
 
-CREATE INDEX notiication_forAccount ON NotificationEntity(forAccount);
+CREATE INDEX notification_forAccount ON NotificationEntity(forAccount);
 
 insertOrReplace:
 INSERT OR REPLACE INTO NotificationEntity VALUES ?;
 
 getNotificationByAccount:
-SELECT * FROM NotificationEntity
+SELECT *,
+    (SELECT json_group_array(json_object('emojiId', PE.emojiId, 'instance', PE.instance, 'shortcode', PE.shortcode, 'url', PE.url))
+     FROM PostEmojiCrossRef
+     JOIN EmojiEntity AS PE ON PostEmojiCrossRef.emojiId = PE.emojiId
+     WHERE PostEmojiCrossRef.postId = PostEntity.postId
+    ) AS postEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', NPE.emojiId, 'instance', NPE.instance, 'shortcode', NPE.shortcode, 'url', NPE.url))
+     FROM ProfileEmojiCrossRef
+     JOIN EmojiEntity AS NPE ON ProfileEmojiCrossRef.emojiId = NPE.emojiId
+     WHERE ProfileEmojiCrossRef.profileId = ProfileEntity.profileId
+    ) AS notifProfileEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', PPE.emojiId, 'instance', PPE.instance, 'shortcode', PPE.shortcode, 'url', PPE.url))
+     FROM ProfileEmojiCrossRef
+     JOIN EmojiEntity AS PPE ON ProfileEmojiCrossRef.emojiId = PPE.emojiId
+     WHERE ProfileEmojiCrossRef.profileId = PostProfile.profileId
+    ) AS postProfileEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', QE.emojiId, 'instance', QE.instance, 'shortcode', QE.shortcode, 'url', QE.url))
+     FROM PostEmojiCrossRef
+     JOIN EmojiEntity AS QE ON PostEmojiCrossRef.emojiId = QE.emojiId
+     WHERE PostEmojiCrossRef.postId = Quote.postId
+    ) AS quotePostEmojisJson,
+    (SELECT json_group_array(json_object('emojiId', QPE.emojiId, 'instance', QPE.instance, 'shortcode', QPE.shortcode, 'url', QPE.url))
+     FROM ProfileEmojiCrossRef
+     JOIN EmojiEntity AS QPE ON ProfileEmojiCrossRef.emojiId = QPE.emojiId
+     WHERE ProfileEmojiCrossRef.profileId = QuoteProfile.profileId
+    ) AS quoteProfileEmojisJson
+FROM NotificationEntity
 LEFT JOIN ProfileEntity ON NotificationEntity.profileId = ProfileEntity.profileId
 LEFT JOIN PostEntity ON NotificationEntity.postId = PostEntity.postId
 LEFT JOIN ProfileEntity AS PostProfile ON PostEntity.authorId = PostProfile.profileId
@@ -28,4 +107,8 @@ LEFT JOIN EmojiEntity ON NotificationEntity.reactionEmoji = EmojiEntity.emojiId
 LEFT JOIN PostEntity AS Quote ON PostEntity.quoteId = Quote.postId
 LEFT JOIN ProfileEntity AS QuoteProfile ON Quote.authorId = QuoteProfile.profileId
 
-WHERE forAccount = ? ORDER BY NotificationEntity.createdAt DESC;
+WHERE forAccount = ? ORDER BY NotificationEntity.createdAt DESC
+LIMIT ? OFFSET ?;
+
+countNotificationsByAccount:
+SELECT COUNT(*) FROM NotificationEntity WHERE forAccount = ?;

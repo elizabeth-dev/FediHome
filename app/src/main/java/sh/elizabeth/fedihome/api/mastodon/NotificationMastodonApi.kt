@@ -23,8 +23,14 @@ class NotificationMastodonApi @Inject constructor(private val httpClient: HttpCl
 	suspend fun getNotifications(
 		endpoint: String,
 		token: String,
+		maxId: String? = null,
+		limit: Int? = null,
 	): List<Notification> =
 		httpClient.get("https://$endpoint/api/v1/notifications") {
+			url {
+				if (maxId != null) parameters.append("max_id", maxId)
+				if (limit != null) parameters.append("limit", limit.toString())
+			}
 			bearerAuth(token)
 		}.body()
 
