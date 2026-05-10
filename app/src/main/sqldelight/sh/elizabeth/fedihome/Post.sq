@@ -26,17 +26,17 @@ CREATE TABLE PostEntity (
     mentionLinks TEXT AS Map<String, String>,
     attachments TEXT AS List<AttachmentEntity>,
     inReplyToId TEXT,
-    FOREIGN KEY (authorId) REFERENCES ProfileEntity(profileId),
-    FOREIGN KEY (quoteId) REFERENCES PostEntity(postId),
-    FOREIGN KEY (boostedPostId) REFERENCES PostEntity(postId)
+    FOREIGN KEY (authorId) REFERENCES ProfileEntity(profileId) DEFERRABLE INITIALLY DEFERRED,
+    FOREIGN KEY (quoteId) REFERENCES PostEntity(postId) DEFERRABLE INITIALLY DEFERRED,
+    FOREIGN KEY (boostedPostId) REFERENCES PostEntity(postId) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE PostEmojiCrossRef (
 	postId TEXT,
 	emojiId TEXT,
 	PRIMARY KEY (postId, emojiId),
-	FOREIGN KEY (postId) REFERENCES PostEntity(postId),
-	FOREIGN KEY (emojiId) REFERENCES EmojiEntity(emojiId)
+	FOREIGN KEY (postId) REFERENCES PostEntity(postId) DEFERRABLE INITIALLY DEFERRED,
+	FOREIGN KEY (emojiId) REFERENCES EmojiEntity(emojiId) DEFERRABLE INITIALLY DEFERRED
 );
 
 -- TODO: Add indexes

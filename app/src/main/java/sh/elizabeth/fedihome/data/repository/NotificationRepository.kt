@@ -1,12 +1,5 @@
 package sh.elizabeth.fedihome.data.repository
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import sh.elizabeth.fedihome.PostEmojiCrossRef
 import sh.elizabeth.fedihome.ProfileEmojiCrossRef
@@ -15,8 +8,6 @@ import sh.elizabeth.fedihome.data.datasource.EmojiLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.InternalDataLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.NotificationLocalDataSource
 import sh.elizabeth.fedihome.data.datasource.NotificationRemoteDataSource
-import sh.elizabeth.fedihome.data.paging.NotificationPagingSource
-import sh.elizabeth.fedihome.model.Notification
 import sh.elizabeth.fedihome.model.unwrapPosts
 import sh.elizabeth.fedihome.model.unwrapProfiles
 import sh.elizabeth.fedihome.util.InstanceEndpointTypeToken
@@ -64,13 +55,17 @@ class NotificationRepository @Inject constructor(
 		val posts = notificationRes.mapNotNull { it.post }.flatMap {
 			it.unwrapPosts()
 		}.toSet()
-		val profiles = posts.flatMap { it.unwrapProfiles() }
-			.plus(notificationRes.mapNotNull { it.profile })
-			.toSet()
-		val emojis = posts.flatMap { it.emojis.values }
-			.plus(profiles.flatMap { it.emojis.values })
-			.plus(notificationRes.mapNotNull { it.reactionEmoji })
-			.toSet()
+		val profiles =
+			posts
+				.flatMap { it.unwrapProfiles() }
+				.plus(notificationRes.mapNotNull { it.profile })
+				.toSet()
+		val emojis =
+			posts
+				.flatMap { it.emojis.values }
+				.plus(profiles.flatMap { it.emojis.values })
+				.plus(notificationRes.mapNotNull { it.reactionEmoji })
+				.toSet()
 
 		val postEmojiCrossRefs = posts.flatMap { post ->
 			post.emojis.values.map { emoji ->
@@ -85,45 +80,19 @@ class NotificationRepository @Inject constructor(
 			}
 		}
 
-		coroutineScope {
-			val emojiRef = async { emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray()) }
-
+		appDatabase.notificationQueries.transaction {
+			emojiLocalDataSource.insertOrReplace(*emojis.toTypedArray())
 			profileRepository.insertOrReplace(*profiles.toTypedArray())
 			postRepository.insertOrReplace(*posts.toTypedArray())
-
-			emojiRef.await()
-
-			val notificationRef = async {
-				notificationLocalDataSource.insertOrReplace(*notificationRes.toTypedArray())
-			}
-
-			val postEmojiRef =
-				async { postRepository.insertOrReplaceEmojiCrossRef(*postEmojiCrossRefs.toTypedArray()) }
-			val profileEmojiRef =
-				async { profileRepository.insertOrReplaceEmojiCrossRef(*profileEmojiCrossRefs.toTypedArray()) }
-
-			awaitAll(notificationRef, postEmojiRef, profileEmojiRef)
+			notificationLocalDataSource.insertOrReplace(*notificationRes.toTypedArray())
+			postRepository.insertOrReplaceEmojiCrossRef(*postEmojiCrossRefs.toTypedArray())
+			profileRepository.insertOrReplaceEmojiCrossRef(*profileEmojiCrossRefs.toTypedArray())
+			notificationLocalDataSource.insertNotificationPagingItems(*notificationRes.toTypedArray())
 		}
 
 		return notificationRes.map { it.id }
 	}
 
-	fun getPagedNotifications(
-		activeAccount: String,
-		pageSize: Int = 20,
-	): Flow<PagingData<Notification>> = Pager(
-		config = PagingConfig(
-			pageSize = pageSize,
-			prefetchDistance = 5,
-			enablePlaceholders = false,
-			initialLoadSize = pageSize,
-		),
-		pagingSourceFactory = {
-			NotificationPagingSource(
-				activeAccount = activeAccount,
-				notificationRepository = this,
-				appDatabase = appDatabase,
-			)
-		}
-	).flow
+	fun getNotificationPagingSource(forAccount: String) =
+		notificationLocalDataSource.getNotificationPagingSource(forAccount)
 }

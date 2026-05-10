@@ -65,7 +65,7 @@ fun Notification.toDomain(fetchedFromInstance: String, forAccount: String): Doma
 	val emojiContainsInstance = trimmedEmoji?.contains('@') ?: false
 
 	return DomainNotification(
-		id = "$id@$fetchedFromInstance",
+		id = id,
 		createdAt = createdAt,
 		forAccount = forAccount,
 		type = type.toDomain(this),

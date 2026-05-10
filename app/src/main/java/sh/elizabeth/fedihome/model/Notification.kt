@@ -2,6 +2,17 @@ package sh.elizabeth.fedihome.model
 
 import java.time.Instant
 
+data class NotificationPagingItem(
+	val notification: Notification,
+	val forAccount: String,
+	val type: NotificationPagingItemType,
+)
+
+enum class NotificationPagingItemType {
+	NOTIFICATION,
+	PLACEHOLDER
+}
+
 data class Notification(
 	val id: String, // id@instance
 	val forAccount: String,
@@ -10,7 +21,7 @@ data class Notification(
 	val profile: Profile?, // TODO: the notifications we support should always have a profile
 	val post: Post?,
 	val reaction: String?,
-	val reactionEmoji: Emoji?
+	val reactionEmoji: Emoji?,
 )
 
 enum class NotificationType {

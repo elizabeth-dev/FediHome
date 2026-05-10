@@ -34,7 +34,9 @@ class NotificationRemoteDataSource @Inject constructor(
 
 		SupportedInstances.MASTODON, SupportedInstances.GLITCH, SupportedInstances.ICESHRIMPNET -> notificationMastodonApi.getNotifications(
 			endpoint = endpoint, token = token, maxId = untilId, limit = limit
-		).map { it.toDomain(instance, forAccount) }
+		)
+			.map { it.toDomain(instance, forAccount) }
+			.reversed()
 
 	}
 }

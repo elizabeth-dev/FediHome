@@ -23,8 +23,8 @@ CREATE TABLE ProfileEmojiCrossRef (
 	profileId TEXT,
 	emojiId TEXT,
 	PRIMARY KEY(profileId, emojiId),
-	FOREIGN KEY(profileId) REFERENCES ProfileEntity(profileId),
-	FOREIGN KEY(emojiId) REFERENCES EmojiEntity(emojiId)
+	FOREIGN KEY(profileId) REFERENCES ProfileEntity(profileId) DEFERRABLE INITIALLY DEFERRED,
+	FOREIGN KEY(emojiId) REFERENCES EmojiEntity(emojiId) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE INDEX profile_username ON ProfileEntity (username);

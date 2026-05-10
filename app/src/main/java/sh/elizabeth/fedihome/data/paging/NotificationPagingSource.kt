@@ -2,128 +2,73 @@ package sh.elizabeth.fedihome.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import app.cash.sqldelight.TransactionCallbacks
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import sh.elizabeth.fedihome.GetNotificationsByAccount
 import sh.elizabeth.fedihome.data.database.AppDatabase
-import sh.elizabeth.fedihome.data.database.entity.toNotificationDomain
-import sh.elizabeth.fedihome.data.repository.NotificationRepository
-import sh.elizabeth.fedihome.model.Notification
 
 class NotificationPagingSource(
-	private val activeAccount: String,
-	private val notificationRepository: NotificationRepository,
 	private val appDatabase: AppDatabase,
-) : PagingSource<Int, Notification>() {
+	private val forAccount: String,
+) : PagingSource<String, GetNotificationsByAccount>() {
+	private var pageBoundaries: List<String>? = null
+	override val jumpingSupported: Boolean get() = false
 
-	override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Notification> {
-		return try {
-			val offset = params.key ?: 0
-			val limit = params.loadSize.toLong()
-
-			// On first load, fetch latest from network
-			if (offset == 0) {
-				try {
-					val fetchedIds = notificationRepository.fetchNotifications(
-						activeAccount = activeAccount,
-						untilId = null,
-						limit = params.loadSize
-					)
-
-					if (fetchedIds.isNotEmpty()) {
-						appDatabase.timelineRemoteKeyQueries.insertOrReplaceNotification(
-							accountId = activeAccount,
-							nextKey = fetchedIds.last(),
-						)
-					}
-				} catch (_: Exception) {
-					// Network failed — fall through to cached data
-				}
-			}
-
-			// Load from local DB
-			val dbResults = appDatabase.notificationQueries
-				.getNotificationByAccount(activeAccount, limit, offset.toLong())
-				.executeAsList()
-				.map { it.toNotificationDomain() }
-
-			if (dbResults.size < params.loadSize) {
-				// DB doesn't have enough — fetch from network
-				val remoteKey = appDatabase.timelineRemoteKeyQueries
-					.getNotificationByAccountId(activeAccount)
-					.executeAsOneOrNull()
-
-				val nextKey = remoteKey?.nextKey
-				if (nextKey != null) {
-					try {
-						val fetchedIds = notificationRepository.fetchNotifications(
-							activeAccount = activeAccount,
-							untilId = nextKey,
-							limit = params.loadSize
-						)
-
-						if (fetchedIds.isNotEmpty()) {
-							appDatabase.timelineRemoteKeyQueries.insertOrReplaceNotification(
-								accountId = activeAccount,
-								nextKey = fetchedIds.last(),
-							)
-
-							val updatedResults = appDatabase.notificationQueries
-								.getNotificationByAccount(activeAccount, limit, offset.toLong())
-								.executeAsList()
-								.map { it.toNotificationDomain() }
-
-							return LoadResult.Page(
-								data = updatedResults,
-								prevKey = if (offset == 0) null else offset - params.loadSize,
-								nextKey = if (updatedResults.isEmpty()) null
-								else offset + updatedResults.size
-							)
-						}
-					} catch (_: Exception) {
-						// Network failed — return what we have
-					}
-				}
-			}
-			else {
-				// Check boundary
-				val remoteKey = appDatabase.timelineRemoteKeyQueries
-					.getNotificationByAccountId(activeAccount)
-					.executeAsOneOrNull()
-
-				val nextKey = remoteKey?.nextKey
-				if (nextKey != null && dbResults.last().id == nextKey) {
-					try {
-						val fetchedIds = notificationRepository.fetchNotifications(
-							activeAccount = activeAccount,
-							untilId = nextKey,
-							limit = params.loadSize
-						)
-
-						if (fetchedIds.isNotEmpty()) {
-							appDatabase.timelineRemoteKeyQueries.insertOrReplaceNotification(
-								accountId = activeAccount,
-								nextKey = fetchedIds.last(),
-							)
-						}
-					} catch (_: Exception) {
-						// Network failed
-					}
-				}
-			}
-
-			LoadResult.Page(
-				data = dbResults,
-				prevKey = if (offset == 0) null else offset - params.loadSize,
-				nextKey = if (dbResults.isEmpty()) null else offset + dbResults.size
-			)
-		} catch (e: Exception) {
-			LoadResult.Error(e)
+	init {
+		appDatabase.notificationQueries.count(forAccount).addListener {
+			invalidate()
 		}
 	}
 
-	override fun getRefreshKey(state: PagingState<Int, Notification>): Int? {
-		return state.anchorPosition?.let { anchor ->
-			state.closestPageToPosition(anchor)?.prevKey?.plus(state.config.pageSize)
-				?: state.closestPageToPosition(anchor)?.nextKey?.minus(state.config.pageSize)
+	override fun getRefreshKey(state: PagingState<String, GetNotificationsByAccount>): String? {
+		val boundaries = pageBoundaries ?: return null
+		val last = state.pages.lastOrNull() ?: return null
+		val keyIndexFromNext = last.nextKey?.let { boundaries.indexOf(it) - 1 }
+		val keyIndexFromPrev = last.prevKey?.let { boundaries.indexOf(it) + 1 }
+		val keyIndex = keyIndexFromNext ?: keyIndexFromPrev ?: return null
+
+		return boundaries.getOrNull(keyIndex)
+	}
+
+	override suspend fun load(params: LoadParams<String>): LoadResult<String, GetNotificationsByAccount> {
+		return withContext(Dispatchers.IO) {
+			try {
+				val getPagingSourceLoadResult: TransactionCallbacks.() -> LoadResult<String, GetNotificationsByAccount> =
+					{
+						val boundaries =
+							pageBoundaries ?: appDatabase.notificationQueries.pageBoundaries(
+								limit = params.loadSize.toLong(),
+								anchor = params.key,
+								forAccount = forAccount
+							).executeAsList().also { pageBoundaries = it }
+
+						// FIXME: the key is null when we reach the end of the available items, and it causes the list to "jump"
+						val key = params.key ?: boundaries.first()
+
+						require(key in boundaries)
+
+						val keyIndex = boundaries.indexOf(key)
+						val previousKey = boundaries.getOrNull(keyIndex - 1)
+						val nextKey = boundaries.getOrNull(keyIndex + 1)
+						val results = appDatabase.notificationQueries.getNotificationsByAccount(
+							forAccount = forAccount, beginInclusive = key, endExclusive = nextKey
+						).executeAsList()
+
+						LoadResult.Page(
+							data = results,
+							prevKey = previousKey,
+							nextKey = nextKey,
+						)
+					}
+
+				appDatabase.transactionWithResult {
+					getPagingSourceLoadResult()
+				}
+			} catch (e: Exception) {
+				if (e is IllegalArgumentException) throw e
+				LoadResult.Error(e)
+			}
 		}
 	}
 }
-

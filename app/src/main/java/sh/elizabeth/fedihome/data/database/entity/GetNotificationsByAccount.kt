@@ -2,55 +2,54 @@ package sh.elizabeth.fedihome.data.database.entity
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import sh.elizabeth.fedihome.GetNotificationByAccount
+import sh.elizabeth.fedihome.GetNotificationsByAccount
 import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.model.Notification
+import sh.elizabeth.fedihome.model.NotificationPagingItem
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
 
 private val gson = Gson()
-private val emojiListType = object : TypeToken<List<NotifEmojiJson>>() {}.type
+private val emojiListType = object : TypeToken<List<PagingNotifEmojiJson>>() {}.type
 
-private data class NotifEmojiJson(
+private data class PagingNotifEmojiJson(
 	val emojiId: String,
 	val instance: String,
 	val shortcode: String,
 	val url: String,
 )
 
-private fun parseNotifEmojisJson(json: String?): Map<String, Emoji> {
+private fun parsePagingNotifEmojisJson(json: String?): Map<String, Emoji> {
 	if (json.isNullOrBlank() || json == "[null]") return emptyMap()
-	val list: List<NotifEmojiJson> = gson.fromJson(json, emojiListType)
+	val list: List<PagingNotifEmojiJson> = gson.fromJson(json, emojiListType)
 	return list.associate {
 		it.emojiId to Emoji(
-			fullEmojiId = it.emojiId,
-			instance = it.instance,
-			shortcode = it.shortcode,
-			url = it.url
+			fullEmojiId = it.emojiId, instance = it.instance, shortcode = it.shortcode, url = it.url
 		)
 	}
 }
 
-fun GetNotificationByAccount.toNotificationDomain(): Notification {
-	val postEmojis = parseNotifEmojisJson(postEmojisJson)
-	val notifProfileEmojis = parseNotifEmojisJson(notifProfileEmojisJson)
-	val postProfileEmojis = parseNotifEmojisJson(postProfileEmojisJson)
-	val quotePostEmojis = parseNotifEmojisJson(quotePostEmojisJson)
-	val quoteProfileEmojis = parseNotifEmojisJson(quoteProfileEmojisJson)
+fun GetNotificationsByAccount.toNotificationPagingItemDomain(): NotificationPagingItem {
+	val postEmojis = parsePagingNotifEmojisJson(postEmojisJson)
+	val notifProfileEmojis = parsePagingNotifEmojisJson(notifProfileEmojisJson)
+	val postProfileEmojis = parsePagingNotifEmojisJson(postProfileEmojisJson)
+	val quotePostEmojis = parsePagingNotifEmojisJson(quotePostEmojisJson)
+	val quoteProfileEmojis = parsePagingNotifEmojisJson(quoteProfileEmojisJson)
 
-	return Notification(
-		id = notificationId,
-		forAccount = forAccount,
+	val notification = Notification(
+		id = notificationId_,
+		forAccount = forAccount_,
 		createdAt = createdAt,
-		type = type,
+		type = type_,
 		reaction = reaction,
 		reactionEmoji = if (emojiId != null && instance__ != null && shortcode != null && url != null) Emoji(
 			fullEmojiId = emojiId,
 			instance = instance__,
 			shortcode = shortcode,
 			url = url,
-		) else null,
+		)
+		else null,
 		profile = if (profileId_ != null) Profile(
 			id = profileId_,
 			name = name!!,
@@ -69,7 +68,8 @@ fun GetNotificationByAccount.toNotificationDomain(): Notification {
 				ProfileField(name = it.name, value = it.value)
 			},
 			emojis = notifProfileEmojis
-		) else null,
+		)
+		else null,
 		post = if (postId_ != null && profileId__ !== null) Post(
 			id = postId_,
 			createdAt = createdAt__,
@@ -134,7 +134,8 @@ fun GetNotificationByAccount.toNotificationDomain(): Notification {
 				favorited = favorited_!!,
 				attachments = attachments_?.map(AttachmentEntity::toDomain) ?: emptyList(),
 				inReplyToId = inReplyToId_
-			) else null,
+			)
+			else null,
 			poll = poll?.toDomain(),
 			reactions = reactions ?: emptyMap(),
 			myReactions = myReactions ?: emptyList(),
@@ -142,6 +143,9 @@ fun GetNotificationByAccount.toNotificationDomain(): Notification {
 			favorited = favorited!!,
 			attachments = attachments?.map(AttachmentEntity::toDomain) ?: emptyList(),
 			inReplyToId = inReplyToId
-		) else null
+		)
+		else null
 	)
+
+	return NotificationPagingItem(notification = notification, forAccount = forAccount, type = type)
 }

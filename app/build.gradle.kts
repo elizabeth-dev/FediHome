@@ -22,7 +22,7 @@ android {
 
 	defaultConfig {
 		applicationId = "sh.elizabeth.fedihome"
-		minSdk = 24
+		minSdk = 30
 		targetSdk = 37
 		versionCode = 2
 		versionName = "0.0.2"
@@ -106,7 +106,7 @@ sqldelight {
 	databases {
 		register("AppDatabase") {
 			packageName.set("sh.elizabeth.fedihome.data.database")
-			dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+//			dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
 			module("app.cash.sqldelight:sqlite-json-module:2.3.2")
 		}
 	}
@@ -129,8 +129,8 @@ dependencies {
 	androidTestImplementation("androidx.test:core-ktx:1.7.0")
 	androidTestImplementation("androidx.test:runner:1.7.0")
 	androidTestImplementation("androidx.test:rules:1.7.0")
-	androidTestImplementation("androidx.test.ext:junit:1.7.0")
-	androidTestImplementation("androidx.test.ext:junit-ktx:1.7.0")
+	androidTestImplementation("androidx.test.ext:junit:4.13.2")
+	androidTestImplementation("androidx.test.ext:junit-ktx:4.13.2")
 	androidTestImplementation("androidx.test.ext:truth:1.7.0")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
 	testImplementation("org.mockito:mockito-core:5.23.0")

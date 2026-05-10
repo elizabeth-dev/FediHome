@@ -13,6 +13,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import sh.elizabeth.fedihome.NotificationEntity
+import sh.elizabeth.fedihome.NotificationPagingItemEntity
 import sh.elizabeth.fedihome.PostEntity
 import sh.elizabeth.fedihome.ProfileEntity
 import sh.elizabeth.fedihome.data.database.AppDatabase
@@ -123,7 +124,6 @@ object DatabaseModule {
 					)
 				}
 			}),
-
 		NotificationEntityAdapter = NotificationEntity.Adapter(
 			typeAdapter = EnumColumnAdapter(), createdAtAdapter = instantAdapter
 		),
@@ -139,5 +139,6 @@ object DatabaseModule {
 		ProfileEntityAdapter = ProfileEntity.Adapter(
 			fieldsAdapter = profileFieldEntityListAdapter, createdAtAdapter = instantAdapter
 		),
+		NotificationPagingItemEntityAdapter = NotificationPagingItemEntity.Adapter(typeAdapter = EnumColumnAdapter()),
 	)
 }

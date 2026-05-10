@@ -66,7 +66,7 @@ data class Notification(
 )
 
 fun Notification.toDomain(fetchedFromInstance: String, forAccount: String) = sh.elizabeth.fedihome.model.Notification(
-	id = "$id@$fetchedFromInstance",
+	id = id,
 	forAccount = forAccount,
 	createdAt = createdAt,
 	type = type.toDomain(),

@@ -22,6 +22,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import sh.elizabeth.fedihome.model.NotificationPagingItemType
 import sh.elizabeth.fedihome.ui.composable.NotificationCard
 import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddBoost
 import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddFavorite
@@ -44,10 +46,7 @@ fun NotificationsScreen(
 
 	CompositionLocalProvider(localOnVotePoll provides { postId, pollId, choices ->
 		notificationsViewModel.votePoll(
-			activeAccount = activeAccount,
-			postId = postId,
-			pollId = pollId,
-			choices = choices
+			activeAccount = activeAccount, postId = postId, pollId = pollId, choices = choices
 		)
 	}, localOnAddFavorite provides {
 		notificationsViewModel.addFavorite(
@@ -74,8 +73,7 @@ fun NotificationsScreen(
 			activeAccount = activeAccount, postId = postId
 		)
 	}) {
-		val pullRefreshState =
-			rememberPullRefreshState(isRefreshing, { lazyPagingItems.refresh() })
+		val pullRefreshState = rememberPullRefreshState(isRefreshing, { lazyPagingItems.refresh() })
 
 		Box(
 			modifier = Modifier
@@ -95,9 +93,20 @@ fun NotificationsScreen(
 			}
 			else {
 				LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
-					items(lazyPagingItems.itemCount) { index ->
-						lazyPagingItems[index]?.let { notification ->
-							NotificationCard(notification = notification)
+					items(
+						count = lazyPagingItems.itemCount,
+						key = lazyPagingItems.itemKey { it.notification.id }) { index ->
+						lazyPagingItems[index]?.let { item ->
+							if (item.type == NotificationPagingItemType.NOTIFICATION) NotificationCard(
+								notification = item.notification
+							)
+							else Text("Placeholder")
+						}
+					}
+					item {
+						val appendState = lazyPagingItems.loadState.append
+						if (appendState is LoadState.Loading) {
+							Text("Loading")
 						}
 					}
 				}
