@@ -16,6 +16,7 @@ import sh.elizabeth.fedihome.NotificationEntity
 import sh.elizabeth.fedihome.NotificationPagingItemEntity
 import sh.elizabeth.fedihome.PostEntity
 import sh.elizabeth.fedihome.ProfileEntity
+import sh.elizabeth.fedihome.TimelinePostEntity
 import sh.elizabeth.fedihome.data.database.AppDatabase
 import sh.elizabeth.fedihome.data.database.entity.AttachmentEntity
 import sh.elizabeth.fedihome.data.database.entity.PollEntity
@@ -140,5 +141,6 @@ object DatabaseModule {
 			fieldsAdapter = profileFieldEntityListAdapter, createdAtAdapter = instantAdapter
 		),
 		NotificationPagingItemEntityAdapter = NotificationPagingItemEntity.Adapter(typeAdapter = EnumColumnAdapter()),
+		TimelinePostEntityAdapter = TimelinePostEntity.Adapter(typeAdapter = EnumColumnAdapter()),
 	)
 }

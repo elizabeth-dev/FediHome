@@ -22,6 +22,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import sh.elizabeth.fedihome.model.TimelinePostItemType
 import sh.elizabeth.fedihome.ui.composable.SlimPostCard
 import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddBoost
 import sh.elizabeth.fedihome.ui.compositionlocals.localOnAddFavorite
@@ -44,10 +46,7 @@ fun HomeScreen(
 
 	CompositionLocalProvider(localOnVotePoll provides { postId, pollId, choices ->
 		homeViewModel.votePoll(
-			activeAccount = activeAccount,
-			postId = postId,
-			pollId = pollId,
-			choices = choices
+			activeAccount = activeAccount, postId = postId, pollId = pollId, choices = choices
 		)
 	}, localOnAddFavorite provides {
 		homeViewModel.addFavorite(
@@ -74,8 +73,7 @@ fun HomeScreen(
 			activeAccount = activeAccount, postId = postId
 		)
 	}) {
-		val pullRefreshState =
-			rememberPullRefreshState(isRefreshing, { lazyPagingItems.refresh() })
+		val pullRefreshState = rememberPullRefreshState(isRefreshing, { lazyPagingItems.refresh() })
 
 		Box(
 			Modifier
@@ -97,9 +95,18 @@ fun HomeScreen(
 				LazyColumn(
 					modifier = Modifier.fillMaxSize(), state = scrollState
 				) {
-					items(lazyPagingItems.itemCount) { index ->
-						lazyPagingItems[index]?.let { post ->
-							SlimPostCard(post = post)
+					items(
+						count = lazyPagingItems.itemCount,
+						key = lazyPagingItems.itemKey { it.post.id }) { index ->
+						lazyPagingItems[index]?.let { item ->
+							if (item.type == TimelinePostItemType.POST) SlimPostCard(post = item.post)
+							else Text("Placeholder")
+						}
+					}
+					item {
+						val appendState = lazyPagingItems.loadState.append
+						if (appendState is LoadState.Loading) {
+							Text("Loading")
 						}
 					}
 				}

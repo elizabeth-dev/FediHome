@@ -1,14 +1,19 @@
+import sh.elizabeth.fedihome.model.TimelinePostItemType;
+
 CREATE TABLE TimelinePostEntity (
-    rowId INTEGER PRIMARY KEY AUTOINCREMENT,
     timelineProfileId TEXT NOT NULL,
     postId TEXT NOT NULL,
-    UNIQUE (timelineProfileId, postId) ON CONFLICT REPLACE,
+    type TEXT AS TimelinePostItemType NOT NULL,
+    PRIMARY KEY (timelineProfileId, postId, type) ON CONFLICT IGNORE,
     FOREIGN KEY (timelineProfileId) REFERENCES ProfileEntity(profileId),
     FOREIGN KEY (postId) REFERENCES PostEntity(postId)
 );
 
+CREATE INDEX timelinePost_timelineProfileIdPostId ON TimelinePostEntity(timelineProfileId, postId);
+CREATE INDEX timelinePost_timelineProfileId ON TimelinePostEntity(timelineProfileId);
+
 insert:
-INSERT INTO TimelinePostEntity (timelineProfileId, postId) VALUES (?, ?);
+INSERT INTO TimelinePostEntity (timelineProfileId, postId, type) VALUES (?, ?, ?);
 
 getTimelinePosts:
 SELECT *,
@@ -51,19 +56,29 @@ LEFT JOIN ProfileEntity AS QuotedProfile ON QuotedPost.authorId = QuotedProfile.
 LEFT JOIN PostEntity AS BoostedPost ON PostEntity.boostedPostId = BoostedPost.postId
 LEFT JOIN ProfileEntity AS BoostedPostProfile ON BoostedPost.authorId = BoostedPostProfile.profileId
 
-WHERE TimelinePostEntity.timelineProfileId = ?
-ORDER BY PostEntity.createdAt DESC
-LIMIT ? OFFSET ?;
+WHERE TimelinePostEntity.timelineProfileId = :timelineProfileId
+AND TimelinePostEntity.postId <= :beginInclusive
+AND (TimelinePostEntity.postId > :endExclusive OR :endExclusive IS NULL)
 
-existsInTimeline:
+ORDER BY TimelinePostEntity.postId DESC;
+
+pageBoundaries:
+SELECT postId
+FROM (
+  SELECT
+    postId,
+    CASE
+      WHEN ((row_number() OVER(ORDER BY postId DESC) - 1) % :limit) = 0 THEN 1
+      WHEN (:anchor IS NOT NULL) AND postId = :anchor THEN 1
+      ELSE 0
+    END page_boundary
+  FROM TimelinePostEntity
+  WHERE TimelinePostEntity.timelineProfileId = :timelineProfileId
+  ORDER BY TimelinePostEntity.postId DESC
+)
+WHERE page_boundary = 1;
+
+count:
 SELECT COUNT(*) FROM TimelinePostEntity
-WHERE timelineProfileId = ? AND postId = ?;
-
-countTimelinePosts:
-SELECT COUNT(*) FROM TimelinePostEntity
-WHERE timelineProfileId = ?;
-
-deleteByProfileId:
-DELETE FROM TimelinePostEntity
-WHERE timelineProfileId = ?;
+WHERE timelineProfileId = :timelineProfileId;
 

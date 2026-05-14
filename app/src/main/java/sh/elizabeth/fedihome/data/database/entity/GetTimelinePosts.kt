@@ -7,6 +7,7 @@ import sh.elizabeth.fedihome.model.Emoji
 import sh.elizabeth.fedihome.model.Post
 import sh.elizabeth.fedihome.model.Profile
 import sh.elizabeth.fedihome.model.ProfileField
+import sh.elizabeth.fedihome.model.TimelinePostItem
 
 private val gson = Gson()
 private val emojiListType = object : TypeToken<List<EmojiJson>>() {}.type
@@ -23,13 +24,13 @@ private fun parseEmojisJson(json: String?): Map<String, Emoji> {
 	val list: List<EmojiJson> = gson.fromJson(json, emojiListType)
 	return list.associate {
 		it.emojiId to Emoji(
-			fullEmojiId = it.emojiId,
-			instance = it.instance,
-			shortcode = it.shortcode,
-			url = it.url
+			fullEmojiId = it.emojiId, instance = it.instance, shortcode = it.shortcode, url = it.url
 		)
 	}
 }
+
+fun GetTimelinePosts.toTimelinePostItem(): TimelinePostItem =
+	TimelinePostItem(post = this.toPostDomain(), forAccount = timelineProfileId, type = type)
 
 fun GetTimelinePosts.toPostDomain(): Post {
 	val postEmojis = parseEmojisJson(postEmojisJson)
