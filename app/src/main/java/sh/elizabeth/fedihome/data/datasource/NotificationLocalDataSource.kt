@@ -1,7 +1,5 @@
 package sh.elizabeth.fedihome.data.datasource
 
-import app.cash.sqldelight.paging3.QueryPagingSource
-import kotlinx.coroutines.Dispatchers
 import sh.elizabeth.fedihome.NotificationEntity
 import sh.elizabeth.fedihome.data.database.AppDatabase
 import sh.elizabeth.fedihome.model.Notification
@@ -35,20 +33,20 @@ class NotificationLocalDataSource @Inject constructor(private val appDatabase: A
 			)
 		}
 
-	fun getNotificationPagingSource(forAccount: String) = QueryPagingSource(
-		transacter = appDatabase,
-		context = Dispatchers.IO,
-		pageBoundariesProvider = { anchor, limit ->
-			appDatabase.notificationQueries.pageBoundaries(
-				limit = limit, anchor = anchor, forAccount = forAccount
-			)
-		},
-		queryProvider = { beginInclusive: String, endExclusive: String? ->
-			appDatabase.notificationQueries.getNotificationsByAccount(
-				forAccount = forAccount,
-				beginInclusive = beginInclusive,
-				endExclusive = endExclusive
-			)
-		})
+//	fun getNotificationPagingSource(forAccount: String) = QueryPagingSource(
+//		transacter = appDatabase,
+//		context = Dispatchers.IO,
+//		pageBoundariesProvider = { anchor, limit ->
+//			appDatabase.notificationQueries.pageBoundaries(
+//				limit = limit, anchor = anchor, forAccount = forAccount
+//			)
+//		},
+//		queryProvider = { beginInclusive: String, endExclusive: String? ->
+//			appDatabase.notificationQueries.getNotificationsByAccount(
+//				forAccount = forAccount,
+//				beginInclusive = beginInclusive,
+//				endExclusive = endExclusive
+//			)
+//		})
 
 }

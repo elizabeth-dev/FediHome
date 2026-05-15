@@ -79,26 +79,9 @@ LEFT JOIN PostEntity AS Quote ON PostEntity.quoteId = Quote.postId
 LEFT JOIN ProfileEntity AS QuoteProfile ON Quote.authorId = QuoteProfile.profileId
 
 WHERE NotificationPagingItemEntity.forAccount = :forAccount
-AND NotificationPagingItemEntity.notificationId <= :beginInclusive
-AND (NotificationPagingItemEntity.notificationId > :endExclusive OR :endExclusive IS NULL)
 
-ORDER BY NotificationPagingItemEntity.notificationId DESC;
-
-pageBoundaries:
-SELECT notificationId
-FROM (
-  SELECT
-    notificationId,
-    CASE
-      WHEN ((row_number() OVER(ORDER BY notificationId DESC) - 1) % :limit) = 0 THEN 1
-      WHEN (:anchor IS NOT NULL) AND notificationId = :anchor THEN 1
-      ELSE 0
-    END page_boundary
-  FROM NotificationPagingItemEntity
-  WHERE NotificationPagingItemEntity.forAccount = :forAccount
-  ORDER BY NotificationPagingItemEntity.notificationId DESC
-)
-WHERE page_boundary = 1;
+ORDER BY NotificationPagingItemEntity.notificationId DESC
+LIMIT :limit OFFSET :offset;
 
 count:
 SELECT COUNT(*) FROM NotificationPagingItemEntity

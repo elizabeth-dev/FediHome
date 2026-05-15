@@ -92,7 +92,7 @@ class NotificationRepository @Inject constructor(
 
 		return notificationRes.map { it.id }
 	}
-
-	fun getNotificationPagingSource(forAccount: String) =
-		notificationLocalDataSource.getNotificationPagingSource(forAccount)
+//
+//	fun getNotificationPagingSource(forAccount: String) =
+//		notificationLocalDataSource.getNotificationPagingSource(forAccount)
 }

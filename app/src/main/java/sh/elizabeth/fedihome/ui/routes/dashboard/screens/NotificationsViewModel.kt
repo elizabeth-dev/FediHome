@@ -53,15 +53,22 @@ class NotificationsViewModel @Inject constructor(
 				flowOf(PagingData.empty())
 			}
 			else {
+				var currentPagingSource: NotificationPagingSource? = null
 				Pager(
 					config = PagingConfig(
 						pageSize = 20,
 						enablePlaceholders = false,
 						initialLoadSize = 20,
-						prefetchDistance = 60
+						prefetchDistance = 20
 					), pagingSourceFactory = {
-						NotificationPagingSource(appDatabase, account)
-					}, remoteMediator = NotificationRemoteMediator(account, notificationRepository)
+						NotificationPagingSource(appDatabase, account).also {
+							currentPagingSource = it
+						}
+					}, remoteMediator = NotificationRemoteMediator(
+						account,
+						notificationRepository,
+						getPagingSource = { currentPagingSource }
+					)
 				).flow.map { pagingData ->
 					pagingData.map {
 						it.toNotificationPagingItemDomain()
